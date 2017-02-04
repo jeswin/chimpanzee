@@ -10,9 +10,9 @@ describe("chimpanzee", () => {
   function run([description, dir, isMatch]) {
     it(`${description}`, () => {
       const fixture = require(`./fixtures/${dir}/fixture`);
-      const expected = require(`./fixtures/${dir}/expected`);
       const result = match(fixture.schema(fixture.input));
       if (isMatch) {
+        const expected = require(`./fixtures/${dir}/expected`);
         result.value.should.deepEqual(expected.result);
       } else {
         should(result.value).not.be.ok;
@@ -31,24 +31,13 @@ describe("chimpanzee", () => {
     ['nested-array-capture', 'nested-array-capture', true],
     ['modifier', 'modifier', true],
     ['object-modifier', 'object-modifier', true],
-    // ['import-select', 'import-select', { import: true }],
-    // ['import-update', 'import-update', { import: true }],
-    // ['insert', 'insert'],
-    // ['map', 'map'],
-    // ['select', 'select'],
-    // ['select-all', 'select-all'],
-    // ['select-count', 'select-count'],
-    // ['select-map', 'select-map'],
-    // ['select-slice', 'select-slice'],
-    // ['select-sort', 'select-sort'],
-    // ['slice', 'slice'],
-    // ['sort', 'sort'],
-    // ['update', 'update'],
+    ['any', 'any', true],
+    ['empty', 'empty', true],
+    ['empty-negative', 'empty-negative', false],
   ];
 
   for (const test of tests) {
     run(test);
   }
-
 
 });

@@ -20,7 +20,7 @@ export function traverse(schema, options = {}) {
     obj = options.objectModifier ? options.objectModifier(obj) : obj;
 
     if (options.predicate && !options.predicate(obj)) {
-      return mismatch();
+      return mismatch(`Predicate returned false.`);
     }
 
     let generators = [];
