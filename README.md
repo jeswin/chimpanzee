@@ -1,2 +1,2 @@
 # chimpanzee
-Tree climbing and pattern matching..
+Tree climbing and pattern matching.
