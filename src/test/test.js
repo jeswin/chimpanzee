@@ -29,6 +29,8 @@ describe("chimpanzee", () => {
     ['array-match', 'array-match', true],
     ['nested-array-match', 'nested-array-match', true],
     ['nested-array-capture', 'nested-array-capture', true],
+    ['modifier', 'modifier', true],
+    ['object-modifier', 'object-modifier', true],
     // ['import-select', 'import-select', { import: true }],
     // ['import-update', 'import-update', { import: true }],
     // ['insert', 'insert'],

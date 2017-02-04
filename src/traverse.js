@@ -17,7 +17,7 @@ export function traverse(schema, options = {}) {
   }
 
   return function*(obj, state = {}, key) {
-    obj = options.modifier ? options.modifier(obj) : obj;
+    obj = options.objectModifier ? options.objectModifier(obj) : obj;
 
     if (options.predicate && !options.predicate(obj)) {
       return mismatch();
@@ -27,7 +27,7 @@ export function traverse(schema, options = {}) {
 
     if (typeof schema === "object") {
       for (const key in schema) {
-        const lhs = obj[key];
+        const lhs = options.modifier ? options.modifier(obj, key) : obj[key];
         const rhs = schema[key];
 
         if (["string", "number", "boolean"].includes(typeof rhs)) {
