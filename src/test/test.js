@@ -26,6 +26,7 @@ describe("chimpanzee", () => {
     ['capture-if-negative', 'capture-if-negative', false],
     ['nested-capture', 'nested-capture', true],
     ['named-capture', 'named-capture', true],
+    ['capture-parent-child', 'capture-parent-child', true],
     ['array-match', 'array-match', true],
     ['nested-array-match', 'nested-array-match', true],
     ['nested-array-capture', 'nested-array-capture', true],

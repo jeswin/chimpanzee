@@ -16,7 +16,7 @@ export function traverse(schema, options = {}) {
     return skip(message);
   }
 
-  return function*(obj, state = {}, key) {
+  return function*(obj, state = {}, key, parent) {
     obj = options.objectModifier ? options.objectModifier(obj) : obj;
 
     if (options.predicate && !options.predicate(obj)) {
@@ -37,11 +37,11 @@ export function traverse(schema, options = {}) {
         }
 
         else if (typeof rhs === "object") {
-          generators.push(traverse(rhs, options)(lhs, state, key));
+          generators.push(traverse(rhs, options)(lhs, state, key, parent));
         }
 
         else if (typeof rhs === "function") {
-          generators.push(rhs(lhs, { parent: state }, key));
+          generators.push(rhs(lhs, state, key, { parent }));
         }
       }
     }
@@ -58,7 +58,7 @@ export function traverse(schema, options = {}) {
       for (let i = 0; i < schema.length; i++) {
         const lhs = obj[i];
         const rhs = schema[i];
-        generators.push(traverse(rhs, options)(lhs, state, i));
+        generators.push(traverse(rhs, options)(lhs, state, i, parent));
       }
     }
 
