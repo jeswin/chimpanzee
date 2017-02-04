@@ -5,42 +5,60 @@ export function traverse(schema, options = {}) {
     options.result = v => v;
   }
 
+  function mismatch(message) {
+    if (options.mustMatch) {
+      throw new Error(message);
+    }
+
+    if (options.logMismatch) {
+      options.logMismatch(message);
+    }
+    return skip(message);
+  }
+
   return function*(obj, state = {}, key) {
     obj = options.modifier ? options.modifier(obj) : obj;
 
     if (options.predicate && !options.predicate(obj)) {
-      return skip();
+      return mismatch();
     }
 
     let generators = [];
 
-    for (const key in schema) {
-      const lhs = obj[key];
-      const rhs = schema[key];
+    if (typeof schema === "object") {
+      for (const key in schema) {
+        const lhs = obj[key];
+        const rhs = schema[key];
 
-      if (["string", "number", "boolean"].includes(typeof rhs)) {
-        if (lhs !== rhs) {
-          return error(`Expected ${rhs} but got ${lhs}.`);
-        }
-      }
-
-      else if (Array.isArray(rhs)) {
-        if (!Array.isArray(lhs)) {
-          return error(`Expected array but got ${typeof lhs}.`)
-        }
-        if (rhs.length !== lhs.length) {
-          return error(`Expected array of length ${rhs.length} but got ${lhs.length}.`)
+        if (["string", "number", "boolean"].includes(typeof rhs)) {
+          if (lhs !== rhs) {
+            return mismatch(`Expected ${rhs} but got ${lhs}.`);
+          }
         }
 
-        generators = generators.concat(rhs.map(item => traverse(item, options)(lhs, state, key)))
+        else if (typeof rhs === "object") {
+          generators.push(traverse(rhs, options)(lhs, state, key));
+        }
+
+        else if (typeof rhs === "function") {
+          generators.push(rhs(lhs, { parent: state }, key));
+        }
+      }
+    }
+
+    else if (Array.isArray(schema)) {
+      if (!Array.isArray(obj)) {
+        return mismatch(`Expected array but got ${typeof obj}.`)
       }
 
-      else if (typeof rhs === "object") {
-        generators = generators.concat(traverse(rhs, options)(lhs, state, key));
+      if (schema.length !== obj.length) {
+        return mismatch(`Expected array of length ${schema.length} but got ${obj.length}.`)
       }
 
-      else if (typeof rhs === "function") {
-        generators = generators.concat(rhs(lhs, { parent: state }, key));
+      for (let i = 0; i < schema.length; i++) {
+        const lhs = obj[i];
+        const rhs = schema[i];
+        generators.push(traverse(rhs, options)(lhs, state, i));
       }
     }
 
@@ -50,14 +68,14 @@ export function traverse(schema, options = {}) {
       const unfinished = iterated.filter(r => !r[1].done);
 
       for (const [gen, { value: genValue }] of finished) {
-        if (genValue.type === "error") {
-          return error(result.message)
+        if (genValue.type === "return") {
+          state = { ...state, ...genValue.value };
         }
         else if (genValue.type === "skip") {
-          return skip();
+          return mismatch(genValue.message)
         }
-        else if (genValue.type === "return") {
-          state = { ...state, ...genValue.value };
+        else if (genValue.type === "error") {
+          return error(genValue.message)
         }
       }
 

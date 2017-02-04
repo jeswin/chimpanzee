@@ -3,11 +3,11 @@ export function wait() {
 }
 
 export function error(message) {
-  return { type: "error", message };
+  return { type: "skip", message };
 }
 
-export function skip() {
-  return { type: "skip" }
+export function skip(message) {
+  return { type: "skip", message };
 }
 
 export function ret(value) {
