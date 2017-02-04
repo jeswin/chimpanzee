@@ -7,22 +7,28 @@ import { match } from "../chimpanzee";
 sourceMapSupport.install();
 
 describe("chimpanzee", () => {
-  function run([description, dir]) {
+  function run([description, dir, isMatch]) {
     it(`${description}`, () => {
       const fixture = require(`./fixtures/${dir}/fixture`);
       const expected = require(`./fixtures/${dir}/expected`);
       const result = match(fixture.schema(fixture.input));
-      result.value.should.deepEqual(expected.result);
+      if (isMatch) {
+        result.value.should.deepEqual(expected.result);
+      } else {
+        should(result.value).not.be.ok;
+      }
     });
   }
 
   const tests = [
-    ['simple-capture', 'simple-capture'],
-    ['nested-capture', 'nested-capture'],
-    ['named-capture', 'named-capture'],
-    ['array-match', 'array-match'],
-    ['nested-array-match', 'nested-array-match'],
-    ['nested-array-capture', 'nested-array-capture'],
+    ['simple-capture', 'simple-capture', true],
+    ['capture-if', 'capture-if', true],
+    ['capture-if-negative', 'capture-if-negative', false],
+    ['nested-capture', 'nested-capture', true],
+    ['named-capture', 'named-capture', true],
+    ['array-match', 'array-match', true],
+    ['nested-array-match', 'nested-array-match', true],
+    ['nested-array-capture', 'nested-array-capture', true],
     // ['import-select', 'import-select', { import: true }],
     // ['import-update', 'import-update', { import: true }],
     // ['insert', 'insert'],

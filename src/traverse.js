@@ -81,14 +81,11 @@ export function traverse(schema, options = {}) {
 
       generators = unfinished.map(r => r[0]);
 
-      if (
-        generators.length
-        || (options.preconditions && options.preconditions.length && !options.preconditions.every(expr => expr()))
-      ) {
-        yield wait();
-      }
+      const mustWait = generators.length || (options.preconditions && options.preconditions.length && !options.preconditions.every(expr => expr()));
 
-      else {
+      if (mustWait) {
+        yield wait();
+      } else {
         if (options.asserts) {
           for (const assert of options.asserts) {
             if (assert[0]()) {

@@ -1,24 +1,13 @@
 import { traverse } from "./traverse";
 
-export function capture(name, schema) {
+export function capture(name, schema, options) {
   return function*(obj, state, key) {
-    const genFn = traverse(
-      schema || {},
-      {
-        result: (state, obj) => ({ [name || key]: obj })
-      }
-    );
+    const _options = { ...options, result: (state, obj) => ({ [name || key]: obj }) }
+    const genFn = traverse(schema || {}, _options);
     return yield* genFn(obj, state, key);
   }
 }
 
-//
-// export function captureIf(predicate, name, schema) {
-//   return traverse(
-//     schema || {},
-//     {
-//       predicate,
-//       result: (state, obj) => ({ [name]: obj })
-//     }
-//   )
-// }
+export function captureIf(predicate, name, schema) {
+  return capture(name, schema, { predicate });
+}
