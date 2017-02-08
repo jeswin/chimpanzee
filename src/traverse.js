@@ -2,7 +2,7 @@ import { skip, error, wait, ret } from "./wrap";
 
 export function traverse(schema, options = {}) {
   if (!options.result) {
-    options.result = v => v;
+    options.result = (obj, state) => state;
   }
 
   function mismatch(message) {
@@ -41,7 +41,7 @@ export function traverse(schema, options = {}) {
         }
 
         else if (typeof rhs === "function") {
-          generators.push(rhs(lhs, state, key, { parent }));
+          generators.push(rhs(lhs, state, key, { object: obj, state: state }));
         }
       }
     }
@@ -81,7 +81,11 @@ export function traverse(schema, options = {}) {
 
       generators = unfinished.map(r => r[0]);
 
-      const mustWait = generators.length || (options.preconditions && options.preconditions.length && !options.preconditions.every(expr => expr()));
+      const mustWait = generators.length || (
+        options.preconditions
+        && options.preconditions.length
+        && !options.preconditions.every(expr => expr(obj, state, parent))
+      );
 
       if (mustWait) {
         yield wait();
@@ -93,7 +97,7 @@ export function traverse(schema, options = {}) {
             }
           }
         }
-        return ret(options.result(state, obj));
+        return ret(options.result(obj, state, parent));
       }
     }
   }
