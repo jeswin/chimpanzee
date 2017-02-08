@@ -5,7 +5,7 @@ export function capture(name, schema, options) {
     const _options = {
       ...options,
       predicate: obj => typeof obj !== "undefined",
-      result: (obj, state) => ({ ...state, [name || key]: obj }) 
+      result: (obj, state) => ({ ...state, [name || key]: obj })
     }
     const genFn = traverse(schema || {}, _options);
     return yield* genFn(obj, state, key, parent);
