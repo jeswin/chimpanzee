@@ -1,7 +1,3 @@
-export function wait() {
-  return { type: "wait" };
-}
-
 export function error(message) {
   return { type: "skip", message };
 }

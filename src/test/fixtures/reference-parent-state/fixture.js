@@ -11,16 +11,23 @@ export const input = {
   }
 }
 
-export const schema = traverse({
-  level1: {
-    level1a: {
-      prop1: capture(),
-    },
-    level2: traverse({
-      prop2: capture(),
-    }, {
-      preconditions: [(obj, state, parent) => parent.state.prop1],
-      result: (obj, state, parent) => console.log(parent) && ({ prop3: `${parent.state.prop1} ${state.prop2}` })
-    })
+export const schema = traverse(
+  {
+    level1: {
+      level1a: {
+        prop1: capture(),
+      },
+      level2: traverse(
+        {
+          prop2: capture(),
+        },
+        {
+          builders: [{
+            precondition: (obj, state, parent) => parent.state.prop1,
+            get: (obj, state, parent) => ({ prop3: `${parent.state.prop1} ${state.prop2}` })
+          }]
+        }
+      )
+    }
   }
-})
+)

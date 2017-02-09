@@ -1,38 +1,27 @@
-import { skip, error, wait, ret } from "./wrap";
+import { skip, error, ret } from "./wrap";
 
 export function traverse(schema, options = {}) {
-  if (!options.result) {
-    options.result = (obj, state) => state;
+  if (!options.builders) {
+    options.builders = [{ get: (obj, state) => state }];
   }
 
-  function mismatch(message) {
-    if (options.mustMatch) {
-      throw new Error(message);
-    }
+  return async function(obj, state = {}, key, parent) {
+    obj = options.objectModifier ? (await options.objectModifier(obj)) : obj;
 
-    if (options.logMismatch) {
-      options.logMismatch(message);
-    }
-    return skip(message);
-  }
-
-  return function*(obj, state = {}, key, parent) {
-    obj = options.objectModifier ? options.objectModifier(obj) : obj;
-
-    if (options.predicate && !options.predicate(obj)) {
-      return mismatch(`Predicate returned false.`);
+    if (options.predicate && !(await options.predicate(obj))) {
+      return skip(`Predicate returned false.`);
     }
 
     let generators = [];
 
     if (typeof schema === "object") {
       for (const key in schema) {
-        const lhs = options.modifier ? options.modifier(obj, key) : obj[key];
+        const lhs = options.modifier ? (await options.modifier(obj, key)) : obj[key];
         const rhs = schema[key];
 
         if (["string", "number", "boolean"].includes(typeof rhs)) {
           if (lhs !== rhs) {
-            return mismatch(`Expected ${rhs} but got ${lhs}.`);
+            return skip(`Expected ${rhs} but got ${lhs}.`);
           }
         }
 
@@ -48,11 +37,11 @@ export function traverse(schema, options = {}) {
 
     else if (Array.isArray(schema)) {
       if (!Array.isArray(obj)) {
-        return mismatch(`Expected array but got ${typeof obj}.`)
+        return skip(`Expected array but got ${typeof obj}.`)
       }
 
       if (schema.length !== obj.length) {
-        return mismatch(`Expected array of length ${schema.length} but got ${obj.length}.`)
+        return skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
       }
 
       for (let i = 0; i < schema.length; i++) {
@@ -62,43 +51,55 @@ export function traverse(schema, options = {}) {
       }
     }
 
-    while (true) {
-      const iterated = generators.map(gen => [gen, gen.next()]);
-      const finished = iterated.filter(r => r[1].done)
-      const unfinished = iterated.filter(r => !r[1].done);
-
-      for (const [gen, { value: genValue }] of finished) {
-        if (genValue.type === "return") {
-          state = { ...state, ...genValue.value };
-        }
-        else if (genValue.type === "skip") {
-          return mismatch(genValue.message)
-        }
-        else if (genValue.type === "error") {
-          return error(genValue.message)
-        }
-      }
-
-      generators = unfinished.map(r => r[0]);
-
-      const mustWait = generators.length || (
-        options.preconditions
-        && options.preconditions.length
-        && !options.preconditions.every(expr => expr(obj, state, parent))
-      );
-
-      if (mustWait) {
-        yield wait();
-      } else {
-        if (options.asserts) {
-          for (const assert of options.asserts) {
-            if (assert[0]()) {
-              return error(assert[1]);
+    function thisGenerator(builder) {
+      return async function fn() {
+        if (!builder.precondition || (await builder.precondition(obj, state, parent))) {
+          if (builder.asserts) {
+            for (const assert of builder.asserts) {
+              if (await assert.predicate(obj, state, parent)) {
+                return error(assert.error);
+              }
             }
           }
+          return ret(await builder.get(obj, state, parent));
+        } else {
+          return fn;
         }
-        return ret(options.result(obj, state, parent));
       }
     }
+
+    generators = generators.concat(options.builders.map(builder => thisGenerator(builder)));
+
+    async function run(generators) {
+      let unfinished = [], finished = [];
+      for (const gen of generators) {
+        const val = await gen;
+        if (typeof val === "function") {
+          unfinished.push(val());
+        } else {
+          finished.push(val);
+        }
+      }
+
+      for (const item of finished) {
+        if (item.type === "skip" || item.type === "error") {
+          return item;
+        }
+        else if (item.type === "return") {
+          state = { ...state, ...item.value };
+        }
+        else {
+          throw new Error(`Unknown result ${item}.`);
+        }
+      }
+
+      if (unfinished.length) {
+        return async () => { return run(unfinished); }
+      } else {
+        return ret(state);
+      }
+    }
+
+    return async () => { return run(generators); }
   }
 }

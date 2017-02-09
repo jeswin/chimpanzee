@@ -3,11 +3,11 @@ export { capture as capture, captureIf as captureIf } from "./capture";
 export { any as any } from "./any";
 export { empty as empty } from "./empty";
 
-export function match(generator) {
-  while (true) {
-    const result = generator.next();
-    if (result.done) {
-      return result.value;
-    }
+export async function match(traverseResult) {
+  const result = await traverseResult;
+  if (typeof result === "function") {
+    return await match(result())
+  } else {
+    return result;
   }
 }

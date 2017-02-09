@@ -10,11 +10,20 @@ export const input = {
   }
 }
 
+// export const schema = traverse({
+//   level1: {
+//     prop1: capture(),
+//     level2: {
+//       prop2: capture()
+//     }
+//   }
+// })
+
 export const schema = traverse({
   level1: {
-    prop1: capture(),
+    prop1: capture("prop1", {}, { name: "P1"}),
     level2: {
-      prop2: capture()
+      prop2: capture("prop2", {}, {name: "P2"})
     }
   }
-})
+}, { "name": "ROOT" })

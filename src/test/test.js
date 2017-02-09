@@ -8,9 +8,9 @@ sourceMapSupport.install();
 
 describe("chimpanzee", () => {
   function run([description, dir, isMatch]) {
-    it(`${description}`, () => {
+    it(`${description}`, async () => {
       const fixture = require(`./fixtures/${dir}/fixture`);
-      const result = match(fixture.schema(fixture.input));
+      const result = await match(fixture.schema(fixture.input));
       if (isMatch) {
         const expected = require(`./fixtures/${dir}/expected`);
         result.value.should.deepEqual(expected.result);

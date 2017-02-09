@@ -1,14 +1,15 @@
 import { traverse } from "./traverse";
 
-export function capture(name, schema, options) {
-  return function*(obj, state, key, parent) {
+export function capture(name, schema, options = {}) {
+  return async function(obj, state, key, parent) {
     const _options = {
       ...options,
       predicate: obj => typeof obj !== "undefined",
-      result: (obj, state) => ({ ...state, [name || key]: obj })
-    }
-    const genFn = traverse(schema || {}, _options);
-    return yield* genFn(obj, state, key, parent);
+      builders: (options.builders || []).concat({
+        get: (obj, state) => ({ ...state, [name || key]: obj })
+      })
+    };
+    return traverse(schema || {}, _options)(obj, state, key, parent);
   }
 }
 
