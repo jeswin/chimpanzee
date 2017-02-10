@@ -2,10 +2,10 @@ import { skip, error, ret } from "./wrap";
 
 export function traverse(schema, options = {}) {
   if (!options.builders) {
-    options.builders = [{ get: (obj, state) => state }];
+    options.builders = [{ get: (obj, { state }) => state }];
   }
 
-  return async function(obj, state = {}, key, parent) {
+  return async function(obj, context = { state: {} }, key, parentObj, parentContext) {
     obj = options.objectModifier ? (await options.objectModifier(obj)) : obj;
 
     if (options.predicate && !(await options.predicate(obj))) {
@@ -26,11 +26,11 @@ export function traverse(schema, options = {}) {
         }
 
         else if (typeof rhs === "object") {
-          generators.push(traverse(rhs, options)(lhs, state, key, parent));
+          generators.push(traverse(rhs, options)(lhs, context, key, parentObj, parentContext));
         }
 
         else if (typeof rhs === "function") {
-          generators.push(rhs(lhs, state, key, { object: obj, state: state }));
+          generators.push(rhs(lhs, undefined, key, obj, context));
         }
       }
     }
@@ -47,21 +47,21 @@ export function traverse(schema, options = {}) {
       for (let i = 0; i < schema.length; i++) {
         const lhs = obj[i];
         const rhs = schema[i];
-        generators.push(traverse(rhs, options)(lhs, state, i, parent));
+        generators.push(traverse(rhs, options)(lhs, context, i, parentObj, parentContext));
       }
     }
 
     function thisGenerator(builder) {
       return async function fn() {
-        if (!builder.precondition || (await builder.precondition(obj, state, parent))) {
+        if (!builder.precondition || (await builder.precondition(obj, context, key, parentObj, parentContext))) {
           if (builder.asserts) {
             for (const assert of builder.asserts) {
-              if (await assert.predicate(obj, state, parent)) {
+              if (await assert.predicate(obj, context, key, parentObj, parentContext)) {
                 return error(assert.error);
               }
             }
           }
-          return ret(await builder.get(obj, state, parent));
+          return ret(await builder.get(obj, context, key, parentObj, parentContext));
         } else {
           return fn;
         }
@@ -86,7 +86,7 @@ export function traverse(schema, options = {}) {
           return item;
         }
         else if (item.type === "return") {
-          state = { ...state, ...item.value };
+          context.state = { ...context.state, ...item.value };
         }
         else {
           throw new Error(`Unknown result ${item}.`);
@@ -96,7 +96,7 @@ export function traverse(schema, options = {}) {
       if (unfinished.length) {
         return async () => { return run(unfinished); }
       } else {
-        return ret(state);
+        return ret(context.state);
       }
     }
 

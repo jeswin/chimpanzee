@@ -1,15 +1,15 @@
 import { traverse } from "./traverse";
 
 export function capture(name, schema, options = {}) {
-  return async function(obj, state, key, parent) {
+  return async function(obj, context, key, parentObj, parentContext) {
     const _options = {
       ...options,
       predicate: obj => typeof obj !== "undefined",
       builders: (options.builders || []).concat({
-        get: (obj, state) => ({ ...state, [name || key]: obj })
+        get: obj => ({ [name || key]: obj })
       })
     };
-    return traverse(schema || {}, _options)(obj, state, key, parent);
+    return traverse(schema || {}, _options)(obj, context, key, parentObj, parentContext);
   }
 }
 

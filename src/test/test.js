@@ -36,6 +36,7 @@ describe("chimpanzee", () => {
     ['empty', 'empty', true],
     ['empty-negative', 'empty-negative', false],
     ['reference-parent-state', 'reference-parent-state', true],
+    ['precondition', 'precondition', true],
   ];
 
   for (const test of tests) {
