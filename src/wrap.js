@@ -1,5 +1,5 @@
 export function error(message) {
-  return { type: "skip", message };
+  return { type: "error", message };
 }
 
 export function skip(message) {

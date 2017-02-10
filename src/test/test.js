@@ -7,36 +7,46 @@ import { match } from "../chimpanzee";
 sourceMapSupport.install();
 
 describe("chimpanzee", () => {
-  function run([description, dir, isMatch]) {
+  function run([description, dir, isError, isMatch]) {
     it(`${description}`, async () => {
       const fixture = require(`./fixtures/${dir}/fixture`);
       const result = await match(fixture.schema(fixture.input));
-      if (isMatch) {
-        const expected = require(`./fixtures/${dir}/expected`);
-        result.value.should.deepEqual(expected.result);
+      const expected = require(`./fixtures/${dir}/expected`);
+
+      if (isError) {
+        result.type.should.equal("error");
+        result.message.should.deepEqual(expected.result);
       } else {
-        should(result.value).not.be.ok;
+        if (isMatch) {
+          result.value.should.deepEqual(expected.result);
+        } else {
+          result.type.should.equal("skip");
+          result.message.should.deepEqual(expected.result);
+        }
       }
     });
   }
 
   const tests = [
-    ['simple-capture', 'simple-capture', true],
-    ['capture-if', 'capture-if', true],
-    ['capture-if-negative', 'capture-if-negative', false],
-    ['nested-capture', 'nested-capture', true],
-    ['named-capture', 'named-capture', true],
-    ['capture-parent-child', 'capture-parent-child', true],
-    ['array-match', 'array-match', true],
-    ['nested-array-match', 'nested-array-match', true],
-    ['nested-array-capture', 'nested-array-capture', true],
-    ['modifier', 'modifier', true],
-    ['object-modifier', 'object-modifier', true],
-    ['any', 'any', true],
-    ['empty', 'empty', true],
-    ['empty-negative', 'empty-negative', false],
-    ['reference-parent-state', 'reference-parent-state', true],
-    ['precondition', 'precondition', true],
+    ['simple-capture', 'simple-capture', false, true],
+    ['capture-if', 'capture-if', false, true],
+    ['capture-if-negative', 'capture-if-negative', false, false],
+    ['nested-capture', 'nested-capture', false, true],
+    ['named-capture', 'named-capture', false, true],
+    ['capture-parent-child', 'capture-parent-child', false, true],
+    ['array-match', 'array-match', false, true],
+    ['nested-array-match', 'nested-array-match', false, true],
+    ['nested-array-capture', 'nested-array-capture', false, true],
+    ['modifier', 'modifier', false, true],
+    ['object-modifier', 'object-modifier', false, true],
+    ['any', 'any', false, true],
+    ['empty', 'empty', false, true],
+    ['empty-negative', 'empty-negative', false, false],
+    ['reference-parent-state', 'reference-parent-state', false, true],
+    ['precondition', 'precondition', false, true],
+    ['async-precondition', 'async-precondition', false, true],
+    ['async-result', 'async-result', false, true],
+    ['assert', 'assert', true, true],
   ];
 
   for (const test of tests) {

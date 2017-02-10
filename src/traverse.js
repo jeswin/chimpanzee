@@ -12,7 +12,30 @@ export function traverse(schema, options = {}) {
       return skip(`Predicate returned false.`);
     }
 
-    let generators = [];
+    function getTask(builder) {
+      return async function fn() {
+        if (!builder.precondition || (await builder.precondition(obj, context, key, parentObj, parentContext))) {
+          const predicates =
+            (!builder.predicates ? [] : builder.predicates.map(p => ({ fn: p.predicate, invalid: () => skip(`Predicate returned false.`) })))
+            .concat(!builder.asserts ? [] : builder.asserts.map(a => ({ fn: a.predicate, invalid: () => error(a.error) })));
+
+          for (const predicate of predicates) {
+            if (!(await predicate.fn(obj, context, key, parentObj, parentContext))) {
+              return predicate.invalid()
+            }
+          }
+
+          return ret(await builder.get(obj, context, key, parentObj, parentContext));
+
+        } else {
+          return fn;
+        }
+      }
+    }
+
+    const tasks = options.builders.map(builder => getTask(builder));
+
+    let childTasks = [];
 
     if (typeof schema === "object") {
       for (const key in schema) {
@@ -26,11 +49,11 @@ export function traverse(schema, options = {}) {
         }
 
         else if (typeof rhs === "object") {
-          generators.push(traverse(rhs, options)(lhs, context, key, parentObj, parentContext));
+          childTasks.push(traverse(rhs, options)(lhs, context, key, parentObj, parentContext));
         }
 
         else if (typeof rhs === "function") {
-          generators.push(rhs(lhs, undefined, key, obj, context));
+          childTasks.push(rhs(lhs, undefined, key, obj, context));
         }
       }
     }
@@ -47,32 +70,19 @@ export function traverse(schema, options = {}) {
       for (let i = 0; i < schema.length; i++) {
         const lhs = obj[i];
         const rhs = schema[i];
-        generators.push(traverse(rhs, options)(lhs, context, i, parentObj, parentContext));
+        childTasks.push(traverse(rhs, options)(lhs, context, i, parentObj, parentContext));
       }
     }
 
-    function thisGenerator(builder) {
-      return async function fn() {
-        if (!builder.precondition || (await builder.precondition(obj, context, key, parentObj, parentContext))) {
-          if (builder.asserts) {
-            for (const assert of builder.asserts) {
-              if (await assert.predicate(obj, context, key, parentObj, parentContext)) {
-                return error(assert.error);
-              }
-            }
-          }
-          return ret(await builder.get(obj, context, key, parentObj, parentContext));
-        } else {
-          return fn;
-        }
-      }
-    }
 
-    generators = generators.concat(options.builders.map(builder => thisGenerator(builder)));
+    /*
+      Tasks must run only after childTasks are complete.
+    */
+    async function run(childTasks, tasks) {
+      const runnables = childTasks.length ? childTasks : tasks;
 
-    async function run(generators) {
       let unfinished = [], finished = [];
-      for (const gen of generators) {
+      for (const gen of runnables) {
         const val = await gen;
         if (typeof val === "function") {
           unfinished.push(val());
@@ -93,13 +103,13 @@ export function traverse(schema, options = {}) {
         }
       }
 
-      if (unfinished.length) {
-        return async () => { return run(unfinished); }
+      if (childTasks.length || unfinished.length) {
+        return async () => { return childTasks.length ? run(unfinished, tasks) : run([], unfinished); }
       } else {
         return ret(context.state);
       }
     }
 
-    return async () => { return run(generators); }
+    return async () => { return run(childTasks, tasks); }
   }
 }
