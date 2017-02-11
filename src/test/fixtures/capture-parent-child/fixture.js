@@ -7,7 +7,7 @@ export const input = {
 }
 
 export const schema = traverse({
-  level1: capture("prop1", {
+  level1: capture("prop1", traverse({
     level2: capture("prop2")
-  })
+  }))
 })

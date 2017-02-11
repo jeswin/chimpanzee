@@ -1,18 +1,21 @@
 import { traverse } from "./traverse";
+import { match } from "./chimpanzee";
+import { ret, skip } from "./wrap";
 
-export function capture(name, schema, options = {}) {
-  return async function(obj, context, key, parentObj, parentContext) {
-    const _options = {
-      predicate: obj => typeof obj !== "undefined",
-      ...options,
-      builders: (options.builders || []).concat({
-        get: obj => ({ [name || key]: obj })
-      })
-    };
-    return traverse(schema || {}, _options)(obj, context, key, parentObj, parentContext);
-  }
+export function capture(name, gen) {
+  return captureIf(obj => typeof obj !== "undefined", name, gen);
 }
 
-export function captureIf(predicate, name, schema) {
-  return capture(name, schema, { predicate });
+export function captureIf(predicate, name, gen) {
+  return async function(obj, context, key) {
+    const inner = gen ? (await match(gen(obj, context, key))) : {};
+    const captured = predicate(obj) ? { [name || key]: obj } : undefined;
+    return gen ?
+      (
+        inner.type === "return" ?
+          ret({ ...captured, ...inner.value }) :
+          inner
+      ) :
+      captured ? ret(captured) : skip("Predicate returned false.");
+  }
 }

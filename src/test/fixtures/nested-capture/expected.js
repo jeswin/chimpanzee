@@ -1,4 +1,10 @@
 export const result = {
-  prop1: "hello",
-  prop2: "world",
+  level1: {
+    level2: {
+      prop2: "world"
+    },
+    other1: "something1",
+    prop1: "hello"
+  },
+  other1: "something1"
 }

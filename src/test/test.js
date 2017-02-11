@@ -33,6 +33,7 @@ describe("chimpanzee", () => {
     ['capture-if-negative', 'capture-if-negative', false, false],
     ['nested-capture', 'nested-capture', false, true],
     ['named-capture', 'named-capture', false, true],
+    ['nested-named-capture', 'nested-named-capture', false, true],
     ['capture-parent-child', 'capture-parent-child', false, true],
     ['array-match', 'array-match', false, true],
     ['nested-array-match', 'nested-array-match', false, true],
@@ -40,13 +41,19 @@ describe("chimpanzee", () => {
     ['modifier', 'modifier', false, true],
     ['object-modifier', 'object-modifier', false, true],
     ['any', 'any', false, true],
+    ['map', 'map', false, true],
     ['empty', 'empty', false, true],
     ['empty-negative', 'empty-negative', false, false],
     ['reference-parent-state', 'reference-parent-state', false, true],
     ['precondition', 'precondition', false, true],
     ['async-precondition', 'async-precondition', false, true],
     ['async-result', 'async-result', false, true],
-    ['assert', 'assert', true, true],
+    ['builder-assert', 'builder-assert', true, true],
+    ['builder-predicate', 'builder-predicate', false, false],
+    ['async-builder-assert', 'async-builder-assert', true, true],
+    ['async-builder-predicate', 'async-builder-predicate', false, false],
+    ['nested-any', 'nested-any', false, true],
+    ['traverse-wrapper', 'traverse-wrapper', false, true],
   ];
 
   for (const test of tests) {

@@ -23,8 +23,8 @@ export const schema = traverse(
         },
         {
           builders: [{
-            precondition: (obj, context, key, parentObj, parentContext) => parentContext.state.prop1,
-            get: (obj, context, key, parentObj, parentContext) => ({ prop3: `${parentContext.state.prop1} ${context.state.prop2}` })
+            precondition: (obj, context, key) => context.parent.state.prop1,
+            get: (obj, context, key) => ({ prop3: `${context.parent.state.prop1} ${context.state.prop2}` })
           }]
         }
       )

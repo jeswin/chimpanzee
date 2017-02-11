@@ -1,11 +1,19 @@
 import { skip, error, ret } from "./wrap";
 
-export function traverse(schema, options = {}) {
+let ctr = 0;
+
+export function traverse(schema, options = {}, newContext = true) {
   if (!options.builders) {
     options.builders = [{ get: (obj, { state }) => state }];
   }
 
-  return async function(obj, context = { state: {} }, key, parentObj, parentContext) {
+  return async function(obj, context, key) {
+    if (newContext) {
+      context = { state: {}, parent: context, ctr: ctr++ }
+    } else {
+      context = context || { state: {} }
+    }
+
     obj = options.objectModifier ? (await options.objectModifier(obj)) : obj;
 
     if (options.predicate && !(await options.predicate(obj))) {
@@ -14,18 +22,18 @@ export function traverse(schema, options = {}) {
 
     function getTask(builder) {
       return async function fn() {
-        if (!builder.precondition || (await builder.precondition(obj, context, key, parentObj, parentContext))) {
+        if (!builder.precondition || (await builder.precondition(obj, context, key))) {
           const predicates =
-            (!builder.predicates ? [] : builder.predicates.map(p => ({ fn: p.predicate, invalid: () => skip(`Predicate returned false.`) })))
+            (!builder.predicates ? [] : builder.predicates.map(p => ({ fn: p.predicate, invalid: () => skip(p.message || `Predicate returned false.`) })))
             .concat(!builder.asserts ? [] : builder.asserts.map(a => ({ fn: a.predicate, invalid: () => error(a.error) })));
 
           for (const predicate of predicates) {
-            if (!(await predicate.fn(obj, context, key, parentObj, parentContext))) {
+            if (!(await predicate.fn(obj, context, key))) {
               return predicate.invalid()
             }
           }
 
-          return ret(await builder.get(obj, context, key, parentObj, parentContext));
+          return ret(await builder.get(obj, context, key));
 
         } else {
           return fn;
@@ -41,7 +49,6 @@ export function traverse(schema, options = {}) {
       for (const key in schema) {
         const lhs = options.modifier ? (await options.modifier(obj, key)) : obj[key];
         const rhs = schema[key];
-
         if (["string", "number", "boolean"].includes(typeof rhs)) {
           if (lhs !== rhs) {
             return skip(`Expected ${rhs} but got ${lhs}.`);
@@ -49,11 +56,11 @@ export function traverse(schema, options = {}) {
         }
 
         else if (typeof rhs === "object") {
-          childTasks.push(traverse(rhs, options)(lhs, context, key, parentObj, parentContext));
+          childTasks.push(traverse(rhs, options, false)(lhs, context, key));
         }
 
         else if (typeof rhs === "function") {
-          childTasks.push(rhs(lhs, undefined, key, obj, context));
+          childTasks.push(rhs(lhs, context, key));
         }
       }
     }
@@ -70,8 +77,12 @@ export function traverse(schema, options = {}) {
       for (let i = 0; i < schema.length; i++) {
         const lhs = obj[i];
         const rhs = schema[i];
-        childTasks.push(traverse(rhs, options)(lhs, context, i, parentObj, parentContext));
+        childTasks.push(traverse(rhs, options, false)(lhs, context, `${key}_${i}`));
       }
+    }
+
+    else if (typeof schema === "function") {
+      childTasks.push(schema(obj, context, key));
     }
 
 
@@ -79,7 +90,9 @@ export function traverse(schema, options = {}) {
       Tasks must run only after childTasks are complete.
     */
     async function run(childTasks, tasks) {
-      const runnables = childTasks.length ? childTasks : tasks;
+      const isRunningChildTasks = childTasks.length;
+
+      const runnables = isRunningChildTasks ? childTasks : tasks;
 
       let unfinished = [], finished = [];
       for (const gen of runnables) {
@@ -95,16 +108,16 @@ export function traverse(schema, options = {}) {
         if (item.type === "skip" || item.type === "error") {
           return item;
         }
-        else if (item.type === "return") {
-          context.state = { ...context.state, ...item.value };
-        }
-        else {
+
+        if (item.type === "return") {
+          context.state = isRunningChildTasks ? { ...context.state, ...item.value } : item.value;
+        } else {
           throw new Error(`Unknown result ${item}.`);
         }
       }
 
       if (childTasks.length || unfinished.length) {
-        return async () => { return childTasks.length ? run(unfinished, tasks) : run([], unfinished); }
+        return async () => { return isRunningChildTasks ? run(unfinished, tasks) : run([], unfinished); }
       } else {
         return ret(context.state);
       }
