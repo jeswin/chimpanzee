@@ -54,6 +54,8 @@ describe("chimpanzee", () => {
     ['async-builder-predicate', 'async-builder-predicate', false, false],
     ['nested-any', 'nested-any', false, true],
     ['traverse-wrapper', 'traverse-wrapper', false, true],
+    ['optional', 'optional', false, true],
+    ['deep', 'deep', false, true],
   ];
 
   for (const test of tests) {

@@ -3,12 +3,14 @@ import { skip } from "./wrap";
 
 export function any(list) {
   return async function(obj, context, key) {
-    for (const gen of list) {
-      const result = await match(gen(obj, context, key));
-      if (result && result.type === "return") {
-        return result;
-      }
-    }
-    return list.length ? skip("None of the items matched.") : ret({});
+    return list.length ?
+      (async function loop(gens) {
+        return gens.length ? await (async () => {
+          const result = await match(gens[0](obj, context, key))
+          return result.type === "return" ? result : (await loop(gens.slice(1)))
+        })() :
+        skip("None of the items matched.")
+      })(list) :
+      ret({});
   }
 }

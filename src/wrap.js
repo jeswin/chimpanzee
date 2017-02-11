@@ -4,11 +4,7 @@ export function wrap(item, meta) {
 
 export function unwrap(wrapped) {
   const { __isWrapped, __item } = wrapped;
-  if (__isWrapped) {
-    return __item;
-  } else {
-    throw new Error("This is not a wrapped object.");
-  }
+  return __isWrapped ? __item : error("This is not a wrapped object.");
 }
 
 export function isWrapped(wrapped) {

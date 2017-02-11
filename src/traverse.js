@@ -46,45 +46,48 @@ export function traverse(schema, options = {}, newContext = true) {
     let childTasks = [];
 
     if (typeof schema === "object") {
-      for (const key in schema) {
-        const lhs = options.modifier ? (await options.modifier(obj, key)) : obj[key];
-        const rhs = schema[key];
-        if (["string", "number", "boolean"].includes(typeof rhs)) {
-          if (lhs !== rhs) {
-            return skip(`Expected ${rhs} but got ${lhs}.`);
+      if (typeof obj !== "undefined") {
+        for (const key in schema) {
+          const lhs = options.modifier ? (await options.modifier(obj, key)) : obj[key];
+          const rhs = schema[key];
+          if (["string", "number", "boolean"].includes(typeof rhs)) {
+            if (lhs !== rhs) {
+              return skip(`Expected ${rhs} but got ${lhs}.`);
+            }
+          }
+
+          else if (typeof rhs === "object") {
+            childTasks.push(traverse(rhs, options, false)(lhs, context, key));
+          }
+
+          else if (typeof rhs === "function") {
+            childTasks.push(rhs(lhs, context, key));
           }
         }
-
-        else if (typeof rhs === "object") {
-          childTasks.push(traverse(rhs, options, false)(lhs, context, key));
-        }
-
-        else if (typeof rhs === "function") {
-          childTasks.push(rhs(lhs, context, key));
-        }
+      } else {
+        return skip(`Cannot traverse undefined`);
       }
     }
 
     else if (Array.isArray(schema)) {
       if (!Array.isArray(obj)) {
-        return skip(`Expected array but got ${typeof obj}.`)
-      }
+        if (schema.length !== obj.length) {
+          return skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
+        }
 
-      if (schema.length !== obj.length) {
-        return skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
-      }
-
-      for (let i = 0; i < schema.length; i++) {
-        const lhs = obj[i];
-        const rhs = schema[i];
-        childTasks.push(traverse(rhs, options, false)(lhs, context, `${key}_${i}`));
+        for (let i = 0; i < schema.length; i++) {
+          const lhs = obj[i];
+          const rhs = schema[i];
+          childTasks.push(traverse(rhs, options, false)(lhs, context, `${key}_${i}`));
+        }
+      } else {
+        return skip(`Cannot traverse undefined`);
       }
     }
 
     else if (typeof schema === "function") {
       childTasks.push(schema(obj, context, key));
     }
-
 
     /*
       Tasks must run only after childTasks are complete.
