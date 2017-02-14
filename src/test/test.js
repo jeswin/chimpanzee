@@ -1,3 +1,4 @@
+import "babel-polyfill";
 import should from "should";
 import fs from "fs";
 import path from "path";

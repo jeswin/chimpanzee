@@ -1,5 +1,6 @@
 import { match } from "./chimpanzee";
 import { ret, skip } from "./wrap";
+import { Seq } from "lazily-async";
 
 export function deep(gen, options = {}) {
   const repeating = options.repeating || false;
@@ -9,28 +10,28 @@ export function deep(gen, options = {}) {
   return async function(obj, context, key) {
     obj = objectModifier ? objectModifier(obj) : obj;
     const result = await match(gen(obj, context, key));
-    return result.type === "return" ? result : (
-      typeof obj === "object" ? (
-        await (async function loop(keys) {
-          return keys.length ? await (async () => {
-            const item = obj[keys[0]]
-            const result = await match(deep(gen, options)(item, context, key))
-            return result && result.type === "return" ? result : await loop(keys.slice(1))
-          })() : skip("Not found in deep.");
-        })(Object.keys(obj))
-      ) :
 
-      Array.isArray(obj) ? (
-        await (async function loop(items) {
-          return items.length ? await (async () => {
-            const item = items[0];
-            const result = await match(deep(gen, options)(item, context, key))
-            return result && result.type === "return" ? result : await loop(items.slice(1))
-          })() : skip("Not found in deep.");
-        })(obj)
-      ) :
-
-      skip("Not found in deep.")
-    );
+    return result.type === "return"
+      ? result
+      : typeof obj === "object"
+          ? await Seq.of(Object.keys(obj))
+              .map(async key => {
+                const item = obj[key]
+                const result = await match(deep(gen, options)(item, context, key))
+                return result && result.type === "return" ? result : undefined
+              })
+              .filter(x => x)
+              .first()
+            || skip("Not found in deep.")
+          : typeof obj === "object"
+            ? await Seq.of(obj)
+                .map(async item => {
+                  const result = await match(deep(gen, options)(item, context, key))
+                  return result && result.type === "return" ? result : undefined
+                })
+                .filter(k => k)
+                .first()
+              || skip("Not found in deep.")
+            : skip("Not found in deep.")
   }
 }
