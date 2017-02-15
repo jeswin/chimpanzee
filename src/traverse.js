@@ -1,92 +1,86 @@
 import { skip, error, ret } from "./wrap";
+import { Seq } from "lazily-async";
 
 let ctr = 0;
 
 export function traverse(schema, options = {}, newContext = true) {
-  if (!options.builders) {
-    options.builders = [{ get: (obj, { state }) => state }];
-  }
+  options.ctr = ctr++;
+  options.builders = options.builders || [{ get: (obj, { state }) => state }];
 
-  return async function(obj, context, key) {
-    if (newContext) {
-      context = { state: {}, parent: context, ctr: ctr++ }
-    } else {
-      context = context || { state: {} }
-    }
+  return async function(_obj, _context, key) {
+    const context = newContext
+      ? { state: {}, parent: _context }
+      : _context || { state: {} };
 
-    obj = options.objectModifier ? (await options.objectModifier(obj)) : obj;
+    const obj = options.objectModifier ? (await options.objectModifier(_obj)) : _obj;
 
-    if (options.predicate && !(await options.predicate(obj))) {
-      return skip(`Predicate returned false.`);
-    }
+    const mustRun = !options.predicate || await options.predicate(obj);
 
-    function getTask(builder) {
+    async function getTask(builder) {
       return async function fn() {
-        if (!builder.precondition || (await builder.precondition(obj, context, key))) {
-          const predicates =
-            (!builder.predicates ? [] : builder.predicates.map(p => ({ fn: p.predicate, invalid: () => skip(p.message || `Predicate returned false.`) })))
-            .concat(!builder.asserts ? [] : builder.asserts.map(a => ({ fn: a.predicate, invalid: () => error(a.error) })));
+        const readyToRun = !builder.precondition || (await builder.precondition(obj, context, key));
+        return readyToRun
+          ? await (async () => {
+            const predicates =
+              (!builder.predicates ? [] : builder.predicates.map(p =>
+                ({ fn: p.predicate, invalid: () => skip(p.message || `Predicate returned false.`) })))
+              .concat(!builder.asserts ? [] : builder.asserts.map(a => ({ fn: a.predicate, invalid: () => error(a.error) })));
 
-          for (const predicate of predicates) {
-            if (!(await predicate.fn(obj, context, key))) {
-              return predicate.invalid()
-            }
-          }
-
-          return ret(await builder.get(obj, context, key));
-
-        } else {
-          return fn;
-        }
+            return (
+              (await Seq.of(predicates)
+                .map(async predicate => !(await predicate.fn(obj, context, key))
+                  ? predicate.invalid()
+                  : undefined)
+                .first(x => x)
+              )
+              || ret(await builder.get(obj, context, key))
+            )
+          })()
+          : fn
       }
     }
 
-    const tasks = options.builders.map(builder => getTask(builder));
+    async function getObjectTasks() {
+      return typeof obj !== "undefined"
+        ? await Seq.of(Object.keys(schema))
+            .map(async key => {
+              const lhs = options.modifier ? (await options.modifier(obj, key)) : obj[key];
+              const rhs = schema[key];
 
-    let childTasks = [];
-
-    if (typeof schema === "object") {
-      if (typeof obj !== "undefined") {
-        for (const key in schema) {
-          const lhs = options.modifier ? (await options.modifier(obj, key)) : obj[key];
-          const rhs = schema[key];
-          if (["string", "number", "boolean"].includes(typeof rhs)) {
-            if (lhs !== rhs) {
-              return skip(`Expected ${rhs} but got ${lhs}.`);
-            }
-          }
-
-          else if (typeof rhs === "object") {
-            childTasks.push(traverse(rhs, options, false)(lhs, context, key));
-          }
-
-          else if (typeof rhs === "function") {
-            childTasks.push(rhs(lhs, context, key));
-          }
-        }
-      } else {
-        return skip(`Cannot traverse undefined`);
-      }
+              return (["string", "number", "boolean"].includes(typeof rhs))
+                ? lhs !== rhs
+                  ? skip(`Expected ${rhs} but got ${lhs}.`)
+                  : undefined
+                : typeof rhs === "object"
+                  ? traverse(rhs, options, false)(lhs, context, key)
+                  : typeof rhs === "function"
+                    ? rhs(lhs, context, key)
+                    : error(`Cannot traverse ${typeof rhs}.`)
+            })
+            .filter(x => x)
+            .reduce(
+              (acc, x) => !["skip", "error"].includes(x.type) ? acc.concat(x) : [x],
+              [],
+              (acc, x) => x && ["skip", "error"].includes(x.type)
+            )
+        : skip(`Cannot traverse undefined.`)
     }
 
-    else if (Array.isArray(schema)) {
-      if (!Array.isArray(obj)) {
-        if (schema.length !== obj.length) {
-          return skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
-        }
-
-        for (let i = 0; i < schema.length; i++) {
-          const lhs = obj[i];
-          const rhs = schema[i];
-          childTasks.push(traverse(rhs, options, false)(lhs, context, `${key}_${i}`));
-        }
-      } else {
-        return skip(`Cannot traverse undefined`);
-      }
+    async function getArrayTasks() {
+      return Array.isArray(obj)
+        ? schema.length !== obj.length
+          ? skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
+          : await Seq.of(schema)
+              .map((rhs, i) => {
+                const lhs = obj[i];
+                return traverse(rhs, options, false)(lhs, context, `${key}_${i}`);
+              })
+        : skip(`Schema is an array but property is a non-array.`)
     }
 
-    else if (typeof schema === "function") {
-      childTasks.push(schema(obj, context, key));
+
+    async function getFunctionTasks() {
+      return [schema(obj, context, key)];
     }
 
     /*
@@ -97,35 +91,53 @@ export function traverse(schema, options = {}, newContext = true) {
 
       const runnables = isRunningChildTasks ? childTasks : tasks;
 
-      let unfinished = [], finished = [];
-      for (const gen of runnables) {
-        const val = await gen;
-        if (typeof val === "function") {
-          unfinished.push(val());
-        } else {
-          finished.push(val);
-        }
-      }
+      const { finished, unfinished } = await Seq.of(runnables)
+        .map(async gen => await gen)
+        .reduce((acc, item) => typeof item === "function"
+            ? { finished: acc.finished, unfinished: acc.unfinished.concat(item()) }
+            : { finished: acc.finished.concat(item), unfinished: acc.unfinished },
+          { finished: [], unfinished: [] }
+        );
 
-      for (const item of finished) {
-        if (item.type === "skip" || item.type === "error") {
-          return item;
-        }
+      const { state, nonResult } = await Seq.of(finished)
+        .reduce(
+          (acc, item) => item.type === "return"
+            ? isRunningChildTasks
+                ? Object.assign(acc, { state: { ...acc.state, ...item.value } })
+                : Object.assign(acc, { state: item.value })
+            : { nonResult: item },
+          context,
+          (acc, item) => item.type !== "return"
+        );
 
-        if (item.type === "return") {
-          context.state = isRunningChildTasks ? { ...context.state, ...item.value } : item.value;
-        } else {
-          throw new Error(`Unknown result ${item}.`);
-        }
-      }
+      //context.state = _context.state;
 
-      if (childTasks.length || unfinished.length) {
-        return async () => { return isRunningChildTasks ? run(unfinished, tasks) : run([], unfinished); }
-      } else {
-        return ret(context.state);
-      }
+      return nonResult
+        ? nonResult
+        : childTasks.length || unfinished.length
+          ? isRunningChildTasks
+            ? run(unfinished, tasks)
+            : run([], unfinished)
+          : ret(context.state);
     }
 
-    return async () => { return run(childTasks, tasks); }
+    return !mustRun
+      ? skip(`Predicate returned false.`)
+      : (async () => {
+        const tasks = await Seq.of(options.builders)
+          .map(async builder => await getTask(builder))
+          .toArray();
+
+        const childTasks = typeof schema === "object"
+          ? await getObjectTasks()
+          : Array.isArray(schema)
+            ? await getArrayTasks()
+            : typeof schema === "function"
+              ? await getFunctionTasks()
+              : [];
+
+        return async () => run(childTasks, tasks);
+      })();
+
   }
 }
