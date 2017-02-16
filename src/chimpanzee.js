@@ -14,6 +14,7 @@ export {
   object as object,
   func as func
 } from "./types";
+export { regex as regex } from "./regex";
 
 export async function match(traverseResult) {
   const result = await traverseResult;

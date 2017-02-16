@@ -13,7 +13,6 @@ describe("chimpanzee", () => {
       const fixture = require(`./fixtures/${dir}/fixture`);
       const result = await match(fixture.schema(fixture.input));
       const expected = require(`./fixtures/${dir}/expected`);
-
       if (isError) {
         result.type.should.equal("error");
         result.message.should.deepEqual(expected.result);
@@ -29,6 +28,8 @@ describe("chimpanzee", () => {
   }
 
   const tests = [
+    ['any', 'any', false, true],
+    ['any-negative', 'any-negative', false, false],
     ['simple-capture', 'simple-capture', false, true],
     ['capture-if', 'capture-if', false, true],
     ['capture-if-negative', 'capture-if-negative', false, false],
@@ -42,7 +43,6 @@ describe("chimpanzee", () => {
     ['nested-array-capture', 'nested-array-capture', false, true],
     ['modifier', 'modifier', false, true],
     ['object-modifier', 'object-modifier', false, true],
-    ['any', 'any', false, true],
     ['map', 'map', false, true],
     ['empty', 'empty', false, true],
     ['empty-negative', 'empty-negative', false, false],
@@ -68,8 +68,10 @@ describe("chimpanzee", () => {
     ['func-negative', 'func-negative', false, false],
     ['object', 'object', false, true],
     ['object-negative', 'object-negative', false, false],
-    ['exists', 'exists', false, false],        
-    //['exists-negative', 'exists-negative', false, false],
+    ['regex', 'regex', false, true],
+    ['regex-negative', 'regex-negative', false, false],
+    ['exists', 'exists', false, true],
+    ['exists-negative', 'exists-negative', false, false],
   ];
 
   for (const test of tests) {

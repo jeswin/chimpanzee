@@ -9,6 +9,6 @@ export function exists(predicate, gen) {
       ? gen
         ? inner
         : ret({})
-      : skip("Predicate returned false.");
+      : skip("Does not exist.");
   }
 }
