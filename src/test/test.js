@@ -58,6 +58,18 @@ describe("chimpanzee", () => {
     ['traverse-wrapper', 'traverse-wrapper', false, true],
     ['optional', 'optional', false, true],
     ['deep', 'deep', false, true],
+    ['number', 'number', false, true],
+    ['number-negative', 'number-negative', false, false],
+    ['string', 'string', false, true],
+    ['string-negative', 'string-negative', false, false],
+    ['bool', 'bool', false, true],
+    ['bool-negative', 'bool-negative', false, false],
+    ['func', 'func', false, true],
+    ['func-negative', 'func-negative', false, false],
+    ['object', 'object', false, true],
+    ['object-negative', 'object-negative', false, false],
+    ['exists', 'exists', false, false],        
+    //['exists-negative', 'exists-negative', false, false],
   ];
 
   for (const test of tests) {
