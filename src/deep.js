@@ -11,7 +11,6 @@ export function deep(gen, options = {}) {
     obj = objectModifier ? objectModifier(obj) : obj;
     const result = await match(gen(obj, context, key));
 
-    console.log("RRR", result, obj);
     return result.type === "return"
       ? result
       : typeof obj === "object"

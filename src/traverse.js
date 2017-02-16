@@ -63,7 +63,7 @@ export function traverse(schema, options = {}, newContext = true) {
               [],
               (acc, x) => x && ["skip", "error"].includes(x.type)
             )
-        : skip(`Cannot traverse undefined.`)
+        : [skip(`Cannot traverse undefined.`)]
     }
 
     async function getArrayTasks() {
@@ -75,7 +75,7 @@ export function traverse(schema, options = {}, newContext = true) {
                 const lhs = obj[i];
                 return traverse(rhs, options, false)(lhs, context, `${key}_${i}`);
               })
-        : skip(`Schema is an array but property is a non-array.`)
+        : [skip(`Schema is an array but property is a non-array.`)]
     }
 
 
@@ -90,7 +90,6 @@ export function traverse(schema, options = {}, newContext = true) {
       const isRunningChildTasks = childTasks.length;
 
       const runnables = isRunningChildTasks ? childTasks : tasks;
-
       const { finished, unfinished } = await Seq.of(runnables)
         .map(async gen => await gen)
         .reduce((acc, item) => typeof item === "function"
@@ -99,6 +98,7 @@ export function traverse(schema, options = {}, newContext = true) {
           { finished: [], unfinished: [] }
         );
 
+      //Mutation. Global state for traversal.
       const { state, nonResult } = await Seq.of(finished)
         .reduce(
           (acc, item) => item.type === "return"
@@ -109,8 +109,6 @@ export function traverse(schema, options = {}, newContext = true) {
           context,
           (acc, item) => item.type !== "return"
         );
-
-      //context.state = _context.state;
 
       return nonResult
         ? nonResult
