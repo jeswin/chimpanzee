@@ -19,61 +19,81 @@
 //     : { item: something }
 // }
 //
+// export function optional(item) {
+//
+// }
+//
+// export function repeating(item) {
+//
+// }
+//
+// export function unordered(item) {
+//
+// }
+//
 // export function array(list) {
+//   return async function(obj, context, key) {
+//     const needle = { value: 0 };
+//     return !Array.isArray(obj)
+//       ? (await Seq.of(list)
+//           reduce((acc, gen) =>
+//             typeof gen === "function"
+//               ? (x => ({ results: acc.results.concat(x.result), needle = x.needle })(await gen(obj, context, key, acc.needle))
+//               : {
+//                   results: acc.results.concat(await traverse(gen, undefined, false)(obj[acc.needle], context, `${key}_${i}`))
+//                   needle: acc.needle++
+//                 },
+//             { results: [], needle: 0 }
+//
+//           )
+//         ).results;
+//       : error(`Expected array but got ${typeof obj}.`)
+//   }
+// }
+//
+//
+//
+//   function async findUnordered() {
+//     const { type, item } = _unwrap(item);
+//
+//     return type === "repeating"
+//       ? options.concat(type, item, type.min, type.max, needle)
+//       : type === "optional"
+//         ? options.concat()
+//         : type
+//           ? error(`Unordered array item can only be repeating or non-repeating. Got ${type2}.`)
+//           : await findJustUnordered()
+//   }
+//
+//   function async findRepeating() {
+//     const { type, item } = _unwrap(item);
+//
+//     return type === "optional"
+//       ? await findRepeatingOptional()
+//       : type === "repeating"
+//
+//
+//         ? error(`Repeating array item can only be optional or mandatory. Got ${type}.`)
+//         : await findJustRepeating();
+//
+//       }
+//       else if (type) {
+//         error(``)
+//       }
+//       else {
+//         const match = findRepeating();
+//       }
+//   }
+//
+//
+//
 //   return async function(obj, context, key) {
 //
 //     function getMatcher() {
 //       const { type, item } = _unwrap(_gen);
 //
-//       const match = type === "unordered"
-//         ? findUnordered(item)
-//         : type === "repeating"
-//           ? findRepeating(item)
-//           : type === "optional"
-//             ? findOptional(item)
-//             : findItem(item)
-//
-//     }
 //
 //
-//
-//       }
-//       }
-//       else if (type === "optional") {
-//         const match = findOptional();
-//       }
-//       else {
-//         const match = findItem();
-//       }
-//     }
-//
-//     function async findUnordered() {
-//       const { type, item } = _unwrap(item);
-//
-//       return type === "repeating"
-//         ? await findUnorderedRepeating(item, type.min, type.max, needle)
-//         : type
-//           ? error(`Unordered array item can only be repeating or non-repeating. Got ${type2}.`)
-//           : await findJustUnordered()
-//     }
-//
-//     function async findRepeating() {
-//       const { type, item } = _unwrap(item);
-//       return type === "optional"
-//         ? await findRepeatingOptional()
-//         : type === "repeating"
-//
-//           ? error(`Repeating array item can only be optional or mandatory. Got ${type2}.`)
-//           : await findJustRepeating();
-//
-//         }
-//         else if (type2) {
-//           throw new Error()
-//         }
-//         else {
-//           const match = findRepeating();
-//         }
-//     }
 //
 //   function async findJustUnordered(gen, needle) {
 //       for (const item of obj) {
