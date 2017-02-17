@@ -20,7 +20,11 @@
 // }
 //
 // export function optional(item) {
-//
+//   return async function(obj, context, key, needle) {
+//     return typeof item === "function"
+//       ? true
+//       : regular()
+//   }
 // }
 //
 // export function repeating(item) {
@@ -31,22 +35,25 @@
 //
 // }
 //
+// export async function regular(schema, obj, context, key) {
+//   return await traverse(schema, undefined, false)(obj, context, key)
+// }
+//
 // export function array(list) {
 //   return async function(obj, context, key) {
-//     const needle = { value: 0 };
 //     return !Array.isArray(obj)
-//       ? (await Seq.of(list)
-//           reduce((acc, gen) =>
+//       ? (x => x.error || ret(x.results))(await Seq.of(list)
+//           .reduce((acc, gen, i) =>
 //             typeof gen === "function"
-//               ? (x => ({ results: acc.results.concat(x.result), needle = x.needle })(await gen(obj, context, key, acc.needle))
+//               ? (x => ({ results: acc.results.concat(x.result), error: x.error, needle: x.needle }))(await gen(obj, context, key, acc.needle))
 //               : {
-//                   results: acc.results.concat(await traverse(gen, undefined, false)(obj[acc.needle], context, `${key}_${i}`))
-//                   needle: acc.needle++
+//                   results: await regular(gen, obj[acc.needle], context, `${key}_${i}`),
+//                   needle: acc.needle + 1
 //                 },
-//             { results: [], needle: 0 }
-//
+//             { results: [], needle: 0 },
+//             (acc, item) => item.error //breaks if true
 //           )
-//         ).results;
+//         )
 //       : error(`Expected array but got ${typeof obj}.`)
 //   }
 // }
