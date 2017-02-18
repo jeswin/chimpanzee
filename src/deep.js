@@ -1,37 +1,53 @@
 import { match } from "./chimpanzee";
 import { ret, skip } from "./wrap";
 import { Seq } from "lazily-async";
+import { waitFor } from "./utils";
 
 export function deep(gen, options = {}) {
-  const repeating = options.repeating || false;
-  const objectModifier = options.objectModifier;
-  const modifier = options.modifier;
-
   return async function(obj, context, key) {
-    obj = objectModifier ? objectModifier(obj) : obj;
-    const result = await match(gen(obj, context, key));
+    async function traverseObject(keys) {
+      return keys.length
+        ? await waitFor(
+            await deep(gen, options)(
+              options.modifier
+                ? await options.modifier(obj, key[0])
+                : obj[keys[0]],
+              context,
+              key
+            ),
+            async result => result.type === "return"
+              ? result
+              : await traverseObject(keys.slice(1))
+        )
+        : skip("Not found in deep.")
+    }
 
-    return result.type === "return"
-      ? result
-      : typeof obj === "object"
-          ? await Seq.of(Object.keys(obj))
-              .map(async key => {
-                const item = obj[key]
-                const result = await match(deep(gen, options)(item, context, key))
-                return result && result.type === "return" ? result : undefined
-              })
-              .filter(x => x)
-              .first()
-            || skip("Not found in deep.")
-          : Array.isArray(obj)
-            ? await Seq.of(obj)
-                .map(async item => {
-                  const result = await match(deep(gen, options)(item, context, key))
-                  return result && result.type === "return" ? result : undefined
-                })
-                .filter(k => k)
-                .first()
-              || skip("Not found in deep.")
-            : skip("Not found in deep.")
+    async function traverseArray(items) {
+      return items.length
+        ? await waitFor(
+            await deep(gen, options)(
+              items[0],
+              context,
+              key
+            ),
+            async result => result.type === "return"
+              ? result
+              : await traverseArray(items.slice(1))
+        )
+        : skip("Not found in deep.")
+    }
+
+    return await waitFor(
+      await gen(obj, context, key),
+      async result =>
+        result.type === "return"
+          ? result
+          : typeof obj === "object"
+            ? await traverseObject(Object.keys(obj))
+            : Array.isArray(obj)
+              ? await traverseArray(obj)
+              : skip("Not found in deep.")
+    );
+
   }
 }

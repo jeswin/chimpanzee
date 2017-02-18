@@ -28,9 +28,9 @@ export function traverse(schema, options = {}, newContext = true) {
 
             return (
               (await Seq.of(predicates)
-                .map(async predicate => !(await predicate.fn(obj, context, key))
-                  ? predicate.invalid()
-                  : undefined)
+                .map(async predicate => (await predicate.fn(obj, context, key))
+                  ? undefined
+                  : predicate.invalid())
                 .first(x => x)
               )
               || ret(await builder.get(obj, context, key))

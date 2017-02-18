@@ -19,150 +19,128 @@
 //     : { item: something }
 // }
 //
-// export function optional(item) {
-//   return async function(obj, context, key, needle) {
-//     return typeof item === "function"
-//       ? true
-//       : regular()
+// function assertNeedle(needle, op) {
+//   return typeof needle === "undefined"
+//     ? {
+//       error: error(`Needle missing. Did you call ${op}() outside an array() function?`)
+//     }
+//     : undefined
 //   }
 // }
 //
-// export function repeating(item) {
+// /*
+//   Unordered does not change the needle.
+//   Searching for "4" in
+//   [1, 2, 3, 4, 5, 6, 67]
+//             ^needle
+//   returns 4, with needle moved to 5.
 //
+//   If not found, skip() is not returned.
+//   ie, it is optional.
+// */
+// export function optional(gen) {
+//   return async function(obj, context, key, needle) {
+//     const result = assertNeedle(needle, "optional") ||
+//       typeof gen === "function"
+//         ? await gen(obj, context, key, needle)
+//         : regular(obj, context, key, needle);
+//
+//     return result.error
+//       ? result
+//       : result.skip
+//         ? {
+//           value: [],
+//           needle
+//         }
+//         : {
+//           value: result.value,
+//           needle: result.needle
+//         }
+//   }
 // }
 //
+// /*
+//   Unordered does not change the needle.
+//   Searching for "1" in
+//   [1, 4, 4, 4, 4, 5, 6, 67]
+//             ^needle
+//   returns [4, 4], with needle moved to 5.
+// */
+// export function repeating(gen) {
+//   return async function(obj, context, key, needle) {
+//     const results = assertNeedle(needle, "repeating") ||
+//       await Seq.of(obj)
+//         .slice(needle)
+//         .reduce(async (acc, item, i) => {
+//           const results = typeof gen === "function"
+//             ? await gen(obj, context, key, needle)
+//             : regular()
+//           return {}
+//         });
+//
+//     return result.error
+//       ? result
+//       : {
+//         value: result.value,
+//         needle: result.needle
+//       }
+//   }
+// }
+//
+// /*
+//   Unordered does not change the needle.
+//   Searching for "1" in
+//   [1, 2, 4, 5, 6, 67]
+//          ^needle
+//   returns 1, with needle still pointing at 4.
+// */
 // export function unordered(item) {
+//   return async function(obj, context, key, needle) {
+//     const results = await Seq.of(obj)
+//       .reduce(async (acc, item, i) => {
+//         const results = typeof gen === "function"
+//           ? await gen(obj, context, key, needle)
+//           : regular()
+//         return {}
+//       })
 //
+//     return result.error
+//       ? result
+//       : {
+//         value: result.value,
+//         needle: needle
+//       };
+//   }
 // }
 //
-// export async function regular(schema, obj, context, key) {
-//   return await traverse(schema, undefined, false)(obj, context, key)
+// /*
+//   Regular item, not a function. Like an object or a number.
+// */
+// export async function regular(schema, obj, context, key, needle) {
+//   return {
+//     value: [await match(traverse(schema, undefined, false)(obj, context, key))],
+//     needle: needle + 1
+//   }
 // }
 //
+// /*
+//   You'd call this like
+// */
 // export function array(list) {
 //   return async function(obj, context, key) {
 //     return !Array.isArray(obj)
 //       ? (x => x.error || ret(x.results))(await Seq.of(list)
 //           .reduce((acc, gen, i) =>
 //             typeof gen === "function"
-//               ? (x => ({ results: acc.results.concat(x.result), error: x.error, needle: x.needle }))(await gen(obj, context, key, acc.needle))
+//               ? (x => ({ results: acc.results.concat([x.result]), error: x.error, needle: x.needle }))(await gen(obj, context, key, acc.needle))
 //               : {
 //                   results: await regular(gen, obj[acc.needle], context, `${key}_${i}`),
 //                   needle: acc.needle + 1
-//                 },
+//               },
 //             { results: [], needle: 0 },
 //             (acc, item) => item.error //breaks if true
 //           )
 //         )
 //       : error(`Expected array but got ${typeof obj}.`)
-//   }
-// }
-//
-//
-//
-//   function async findUnordered() {
-//     const { type, item } = _unwrap(item);
-//
-//     return type === "repeating"
-//       ? options.concat(type, item, type.min, type.max, needle)
-//       : type === "optional"
-//         ? options.concat()
-//         : type
-//           ? error(`Unordered array item can only be repeating or non-repeating. Got ${type2}.`)
-//           : await findJustUnordered()
-//   }
-//
-//   function async findRepeating() {
-//     const { type, item } = _unwrap(item);
-//
-//     return type === "optional"
-//       ? await findRepeatingOptional()
-//       : type === "repeating"
-//
-//
-//         ? error(`Repeating array item can only be optional or mandatory. Got ${type}.`)
-//         : await findJustRepeating();
-//
-//       }
-//       else if (type) {
-//         error(``)
-//       }
-//       else {
-//         const match = findRepeating();
-//       }
-//   }
-//
-//
-//
-//   return async function(obj, context, key) {
-//
-//     function getMatcher() {
-//       const { type, item } = _unwrap(_gen);
-//
-//
-//
-//
-//   function async findJustUnordered(gen, needle) {
-//       for (const item of obj) {
-//         const result = await match(gen(item, context, key));
-//         if (result && result.type === "return") {
-//           return { result: result.value, needle }
-//         }
-//       }
-//       return { skip: "Unordered item not found" }
-//     }
-//
-//     function async findUnorderedRepeating(gen, min, max, needle) {
-//       const results = [];
-//       for (const item of obj) {
-//         const result = await match(gen(item, context, key));
-//         if (result && result.type === "return") {
-//           results.push(result.value)
-//         }
-//       }
-//
-//
-//
-//       return ((!min || results.length >= min) && (!max || results.length <= max)) ?
-//         { result: results, needle } : { skip: "Unordered item not found" };
-//     }
-//
-//     function async findRepeating(gen, min, max, needle) {
-//       for (const i = needle; i++; i < obj.length) {
-//         const item = obj[i];
-//         const result = await match(gen(item, context, key));
-//         if (result && result.type === "return") {
-//           results.push(result.value)
-//         } else {
-//
-//         }
-//       }
-//     }
-//
-//     function async findrepeatingOptional() {
-//
-//     }
-//
-//     function async findOptional() {
-//
-//     }
-//
-//     function async findItem() {
-//
-//     }
-//
-//     if (Array.isArray(obj)) {
-//       const results = [];
-//
-//       let arrayNeedle = 0;
-//       for (const _gen of list) {
-//         const { matcher } = getMatcher(_gen);
-//
-//       }
-//
-//     }
-//     else {
-//       return skip("Not an array.")
-//     }
 //   }
 // }
