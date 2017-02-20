@@ -11,14 +11,14 @@ export function isWrapped(wrapped) {
   return wrapped.__isWrapped;
 }
 
-export function error(message) {
-  return { type: "error", message };
+export function error(message, params) {
+  return { type: "error", ...params, message };
 }
 
-export function skip(message) {
-  return { type: "skip", message };
+export function skip(message, params) {
+  return { type: "skip", ...params, message };
 }
 
-export function ret(value) {
-  return { type: "return", value }
+export function ret(value, params) {
+  return { type: "return", ...params, value }
 }

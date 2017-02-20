@@ -21,20 +21,29 @@ export function traverse(schema, options = {}, newContext = true) {
         const readyToRun = !builder.precondition || (await builder.precondition(obj, context, key));
         return readyToRun
           ? await (async () => {
-            const predicates =
-              (!builder.predicates ? [] : builder.predicates.map(p =>
-                ({ fn: p.predicate, invalid: () => skip(p.message || `Predicate returned false.`) })))
-              .concat(!builder.asserts ? [] : builder.asserts.map(a => ({ fn: a.predicate, invalid: () => error(a.error) })));
+            const predicates = !builder.predicates
+              ? []
+              : builder.predicates.map(p => ({
+                fn: p.predicate,
+                invalid: () => skip(p.message || `Predicate returned false.`)
+              }));
+
+            const assertions = !builder.asserts
+              ? []
+              : builder.asserts.map(a => ({
+                fn: a.predicate,
+                invalid: () => error(a.error)
+              }));
 
             return (
-              (await Seq.of(predicates)
-                .map(async predicate => (await predicate.fn(obj, context, key))
-                  ? undefined
-                  : predicate.invalid())
+              await Seq.of(predicates.concat(assertions))
+                .map(async predicate =>
+                  (await predicate.fn(obj, context, key))
+                    ? undefined
+                    : predicate.invalid())
                 .first(x => x)
               )
-              || ret(await builder.get(obj, context, key))
-            )
+              || ret(await builder.get(obj, context, key));
           })()
           : fn
       }
