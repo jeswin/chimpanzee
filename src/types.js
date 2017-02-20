@@ -1,6 +1,6 @@
 import { match, captureIf } from "./chimpanzee";
 import { ret, skip } from "./wrap";
-import { waitFor } from "./utils";
+import { waitForSchema } from "./utils";
 
 export function number(name) {
   return checkType("number", name);
@@ -24,8 +24,11 @@ export function func(name) {
 
 function checkType(type, name) {
   return async function(obj, context, key) {
-    return await waitFor(
-      await captureIf(obj => typeof obj === type, name)(obj, context, key),
+    return await waitForSchema(
+      captureIf(obj => typeof obj === type, name),
+      obj,
+      context,
+      key,
       result =>
         result.type === "skip"
           ? skip(`Expected ${type} but got ${typeof obj}.`)

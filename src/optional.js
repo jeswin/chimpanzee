@@ -1,11 +1,14 @@
 import { match } from "./chimpanzee";
 import { ret } from "./wrap";
-import { waitFor } from "./utils";
+import { waitForSchema } from "./utils";
 
-export function optional(gen, swallowErrors) {
+export function optional(schema, swallowErrors) {
   return async function(obj, context, key) {
-    return await waitFor(
-      await gen(obj, context, key),
+    return await waitForSchema(
+      schema,
+      obj,
+      context,
+      key,
       result =>
         result.type === "return"
           ? result

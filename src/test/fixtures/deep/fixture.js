@@ -14,7 +14,8 @@ export const input = {
           level5a: {
             prop3: "world"
           }
-        }
+        },
+        level4b: "yoyo"
       }
     }
   }

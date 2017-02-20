@@ -1,18 +1,21 @@
 import { traverse, predicate, match } from "./chimpanzee";
 import { ret, skip } from "./wrap";
-import { waitFor } from "./utils";
+import { waitForSchema } from "./utils";
 
-export function exists(predicate, gen) {
+export function exists(predicate, schema) {
   predicate = predicate || (x => typeof x !== "undefined");
 
   return async function(obj, context, key) {
     return await predicate(obj)
-      ? await waitFor(
-          gen
-            ? await gen(obj, context, key)
-            : ret({}),
+      ? schema
+        ? await waitForSchema(
+          schema,
+          obj,
+          context,
+          key,
           inner => inner
         )
+        : ret({})
       : skip("Does not exist.")
   }
 }
