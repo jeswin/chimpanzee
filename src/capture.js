@@ -1,5 +1,3 @@
-import { traverse } from "./traverse";
-import { match } from "./chimpanzee";
 import { ret, skip } from "./wrap";
 import { waitForSchema } from "./utils";
 
@@ -10,7 +8,7 @@ export function capture(name, schema) {
 export function captureIf(predicate, name, schema) {
   return async function(obj, context, key) {
     const captured = predicate(obj)
-      ? { [name || key]: obj }
+      ? obj
       : undefined;
 
     return captured
@@ -21,9 +19,11 @@ export function captureIf(predicate, name, schema) {
         key,
         async inner =>
           !inner
-            ? ret(captured)
+            ? name
+              ? ret({ [name]: obj })
+              : ret(obj, { unnamed: true })
             : inner.type === "return"
-              ? ret({ ...captured, ...inner.value })
+              ? ret({ [name || key]: obj, ...inner.value })
               : inner
       ))
       : skip("Predicate returned false.")

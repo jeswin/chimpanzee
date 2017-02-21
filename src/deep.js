@@ -1,17 +1,14 @@
-import { match } from "./chimpanzee";
 import { ret, skip } from "./wrap";
 import { Seq } from "lazily-async";
 import { waitForSchema } from "./utils";
 
-export function deep(schema, options = {}) {
+export function deep(schema) {
   return async function(obj, context, key) {
     async function traverseObject(keys) {
       return keys.length
         ? await waitForSchema(
-          deep(schema, options),
-          options.modifier
-            ? await options.modifier(obj, key[0])
-            : obj[keys[0]],
+          deep(schema),
+          obj[keys[0]],
           context,
           key,
           async result => result.type === "return"

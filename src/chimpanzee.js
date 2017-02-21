@@ -4,9 +4,9 @@ export { any as any } from "./any";
 export { map as map } from "./map";
 export { optional as optional } from "./optional";
 export { deep as deep } from "./deep";
-//export { array as array, repeating as repeating, unordered as unordered, optional as optional } from "./array";
 export { empty as empty } from "./empty";
 export { exists as exists } from "./exists";
+export { repeating as repeating, unordered as unordered, array as array } from "./array";
 export {
   number as number,
   bool as bool,

@@ -1,4 +1,4 @@
-import { match, captureIf } from "./chimpanzee";
+import { captureIf } from "./capture";
 import { ret, skip } from "./wrap";
 import { waitForSchema } from "./utils";
 

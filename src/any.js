@@ -1,4 +1,3 @@
-import { match } from "./chimpanzee";
 import { ret, skip } from "./wrap";
 import { Seq } from "lazily-async";
 import { waitForSchema } from "./utils";

@@ -12,7 +12,7 @@ export function traverse(schema, options = {}, newContext = true) {
       ? { state: {}, parent: _context }
       : _context || { state: {} };
 
-    const obj = options.objectModifier ? (await options.objectModifier(_obj)) : _obj;
+    const obj = options.modifier ? (await options.modifier(_obj, key)) : _obj;
 
     const mustRun = !options.predicate || await options.predicate(obj);
 
@@ -52,26 +52,25 @@ export function traverse(schema, options = {}, newContext = true) {
     async function getObjectTasks() {
       return typeof obj !== "undefined"
         ? await Seq.of(Object.keys(schema))
-            .map(async key => {
-              const lhs = options.modifier ? (await options.modifier(obj, key)) : obj[key];
-              const rhs = schema[key];
+          .map(async key => {
+            const lhs = obj[key];
+            const rhs = schema[key];
 
-              return (["string", "number", "boolean"].includes(typeof rhs))
-                ? lhs !== rhs
-                  ? skip(`Expected ${rhs} but got ${lhs}.`)
-                  : undefined
+            return (
+              ["string", "number", "boolean"].includes(typeof rhs)
+                ? traverse(rhs, options, false)(lhs, context, key)
                 : typeof rhs === "object"
                   ? traverse(rhs, options, false)(lhs, context, key)
                   : typeof rhs === "function"
-                    ? rhs(lhs, context, key)
-                    : error(`Cannot traverse ${typeof rhs}.`)
-            })
-            .filter(x => x)
-            .reduce(
-              (acc, x) => !["skip", "error"].includes(x.type) ? acc.concat(x) : [x],
-              [],
-              (acc, x) => x && ["skip", "error"].includes(x.type)
-            )
+                    ? traverse(rhs, options, false)(lhs, context, key)
+                    : error(`Cannot traverse ${typeof rhs}.`))
+          })
+          .filter(x => x)
+          .reduce(
+            (acc, x) => !["skip", "error"].includes(x.type) ? acc.concat(x) : [x],
+            [],
+            (acc, x) => x && ["skip", "error"].includes(x.type)
+          )
         : [skip(`Cannot traverse undefined.`)]
     }
 
@@ -80,10 +79,10 @@ export function traverse(schema, options = {}, newContext = true) {
         ? schema.length !== obj.length
           ? skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
           : await Seq.of(schema)
-              .map((rhs, i) => {
-                const lhs = obj[i];
-                return traverse(rhs, options, false)(lhs, context, `${key}_${i}`);
-              })
+            .map((rhs, i) => {
+              const lhs = obj[i];
+              return traverse(rhs, options, false)(lhs, context, `${key}_${i}`);
+            })
         : [skip(`Schema is an array but property is a non-array.`)]
     }
 
@@ -108,16 +107,21 @@ export function traverse(schema, options = {}, newContext = true) {
         );
 
       //Mutation. Global state for traversal.
-      const { state, nonResult } = await Seq.of(finished)
-        .reduce(
-          (acc, item) => item.type === "return"
-            ? isRunningChildTasks
-                ? Object.assign(acc, { state: { ...acc.state, ...item.value } })
-                : Object.assign(acc, { state: item.value })
-            : { nonResult: item },
-          context,
-          (acc, item) => item.type !== "return"
-        );
+      const { state, nonResult } =
+        await Seq.of(finished)
+          .reduce(
+            (acc, item) => item.type === "return"
+              ? isRunningChildTasks
+                ? item.unnamed
+                  ? Object.assign(acc, { state: { ...acc.state, [key]: item.value } })
+                  : Object.assign(acc, { state: { ...acc.state, ...item.value } })
+                : item.unnamed
+                  ? Object.assign(acc, { state: { [key]: item.value } })
+                  : Object.assign(acc, { state: item.value })
+              : { nonResult: item },
+            context,
+            (acc, item) => item.type !== "return"
+          );
 
       return nonResult
         ? nonResult
@@ -135,13 +139,16 @@ export function traverse(schema, options = {}, newContext = true) {
           .map(async builder => await getTask(builder))
           .toArray();
 
-        const childTasks = typeof schema === "object"
-          ? await getObjectTasks()
-          : Array.isArray(schema)
-            ? await getArrayTasks()
-            : typeof schema === "function"
-              ? await getFunctionTasks()
-              : [];
+        const childTasks =
+          ["string", "number", "boolean"].includes(typeof schema)
+            ? await getPrimitiveTasks()
+            typeof schema === "object"
+              ? await getObjectTasks()
+              : Array.isArray(schema)
+                ? await getArrayTasks()
+                : typeof schema === "function"
+                  ? await getFunctionTasks()
+                  : [];
 
         return async () => run(childTasks, tasks);
       })();

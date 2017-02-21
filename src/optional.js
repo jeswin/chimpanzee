@@ -1,4 +1,3 @@
-import { match } from "./chimpanzee";
 import { ret } from "./wrap";
 import { waitForSchema } from "./utils";
 

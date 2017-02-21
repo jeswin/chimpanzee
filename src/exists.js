@@ -1,4 +1,4 @@
-import { traverse, predicate, match } from "./chimpanzee";
+import { traverse } from "./traverse";
 import { ret, skip } from "./wrap";
 import { waitForSchema } from "./utils";
 

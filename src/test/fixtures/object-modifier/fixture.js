@@ -2,7 +2,9 @@ import { traverse, capture } from "../../../chimpanzee";
 
 export const input = {
   node: {
-    prop1: "hello",
+    prop1: {
+      node: "hello"
+    },
     nested: {
       node: {
         prop2: "world"
@@ -16,4 +18,4 @@ export const schema = traverse({
   nested: {
     prop2: capture()
   }
-}, { objectModifier: obj => obj.node })
+}, { modifier: obj => obj.node })

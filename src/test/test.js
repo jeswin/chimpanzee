@@ -13,6 +13,7 @@ describe("chimpanzee", () => {
       const fixture = require(`./fixtures/${dir}/fixture`);
       const result = await match(fixture.schema(fixture.input));
       const expected = require(`./fixtures/${dir}/expected`);
+      console.log(result);
       if (isError) {
         result.type.should.equal("error");
         result.message.should.deepEqual(expected.result);
@@ -72,6 +73,7 @@ describe("chimpanzee", () => {
     ['regex-negative', 'regex-negative', false, false],
     ['exists', 'exists', false, true],
     ['exists-negative', 'exists-negative', false, false],
+    //['array', 'array', false, true],
   ];
 
   for (const test of tests) {
