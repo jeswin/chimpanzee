@@ -49,22 +49,17 @@ export function traverse(schema, options = {}, newContext = true) {
       }
     }
 
+    async function getPrimitiveTasks() {
+      return schema !== obj
+        ? skip(`Expected ${schema} but got ${obj}.`)
+        : undefined;
+    }
+
     async function getObjectTasks() {
       return typeof obj !== "undefined"
         ? await Seq.of(Object.keys(schema))
-          .map(async key => {
-            const lhs = obj[key];
-            const rhs = schema[key];
-
-            return (
-              ["string", "number", "boolean"].includes(typeof rhs)
-                ? traverse(rhs, options, false)(lhs, context, key)
-                : typeof rhs === "object"
-                  ? traverse(rhs, options, false)(lhs, context, key)
-                  : typeof rhs === "function"
-                    ? traverse(rhs, options, false)(lhs, context, key)
-                    : error(`Cannot traverse ${typeof rhs}.`))
-          })
+          .map(async key =>
+            await traverse(schema[key], options, false)(obj[key], context, key))
           .filter(x => x)
           .reduce(
             (acc, x) => !["skip", "error"].includes(x.type) ? acc.concat(x) : [x],
@@ -81,14 +76,14 @@ export function traverse(schema, options = {}, newContext = true) {
           : await Seq.of(schema)
             .map((rhs, i) => {
               const lhs = obj[i];
-              return traverse(rhs, options, false)(lhs, context, `${key}_${i}`);
+              return await traverse(rhs, options, false)(lhs, context, `${key}_${i}`);
             })
         : [skip(`Schema is an array but property is a non-array.`)]
     }
 
 
     async function getFunctionTasks() {
-      return [schema(obj, context, key)];
+      return [await schema(obj, context, key)];
     }
 
     /*
