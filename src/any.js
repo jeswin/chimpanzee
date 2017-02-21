@@ -3,14 +3,13 @@ import { Seq } from "lazily-async";
 import { waitForSchema } from "./utils";
 
 export function any(schemas) {
-  return async function(obj, context, key) {
+  return async function(obj, context) {
     return schemas.length
       ? await (async function run(schemas) {
         return await waitForSchema(
           schemas[0],
           obj,
           context,
-          key,
           async result =>
             result.type === "return"
               ? result

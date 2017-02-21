@@ -51,8 +51,8 @@ export function traverse(schema, options = {}, newContext = true) {
 
     async function getPrimitiveTasks() {
       return schema !== obj
-        ? skip(`Expected ${schema} but got ${obj}.`)
-        : undefined;
+        ? [skip(`Expected ${schema} but got ${obj}.`)]
+        : ret({});
     }
 
     async function getObjectTasks() {
@@ -74,9 +74,12 @@ export function traverse(schema, options = {}, newContext = true) {
         ? schema.length !== obj.length
           ? skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
           : await Seq.of(schema)
-            .map((rhs, i) => {
-              const lhs = obj[i];
-              return await traverse(rhs, options, false)(lhs, context, `${key}_${i}`);
+            .map(async (rhs, i) => {
+              return await traverse(rhs, options, false)(
+                obj[i],
+                context,
+                `${key}_${i}`
+              );
             })
         : [skip(`Schema is an array but property is a non-array.`)]
     }
@@ -137,7 +140,7 @@ export function traverse(schema, options = {}, newContext = true) {
         const childTasks =
           ["string", "number", "boolean"].includes(typeof schema)
             ? await getPrimitiveTasks()
-            typeof schema === "object"
+            : typeof schema === "object"
               ? await getObjectTasks()
               : Array.isArray(schema)
                 ? await getArrayTasks()
