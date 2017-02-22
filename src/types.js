@@ -23,12 +23,11 @@ export function func(name) {
 }
 
 function checkType(type, name) {
-  return async function(obj, context, key) {
+  return async function(obj, context) {
     return await waitForSchema(
       captureIf(obj => typeof obj === type, name),
       obj,
       context,
-      key,
       result =>
         result.type === "skip"
           ? skip(`Expected ${type} but got ${typeof obj}.`)

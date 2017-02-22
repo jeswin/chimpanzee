@@ -1,20 +1,19 @@
-import { ret } from "./wrap";
+import { ret, none } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function optional(schema, swallowErrors) {
-  return async function(obj, context, key) {
+  return async function(obj, context) {
     return await waitForSchema(
       schema,
       obj,
       context,
-      key,
       result =>
         result.type === "return"
           ? result
           : result.type === "error"
-            ? (swallowErrors ? ret({}) : result)
+            ? (swallowErrors ? none() : result)
             : result.type === "skip"
-              ? ret({})
+              ? none()
               : error(`Unknown result ${result.type}.`)
     );
   }

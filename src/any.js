@@ -1,4 +1,4 @@
-import { ret, skip } from "./wrap";
+import { ret, skip, none } from "./wrap";
 import { Seq } from "lazily-async";
 import { waitForSchema } from "./utils";
 
@@ -18,6 +18,6 @@ export function any(schemas) {
                 : skip("None of the items matched.")
         );
       })(schemas)
-      : ret({});
+      : none();
   }
 }

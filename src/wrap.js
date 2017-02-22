@@ -22,3 +22,7 @@ export function skip(message, params) {
 export function ret(value, params) {
   return { type: "return", ...params, value }
 }
+
+export function none() {
+  return ret(undefined, { empty: true })
+}

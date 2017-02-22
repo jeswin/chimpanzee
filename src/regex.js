@@ -3,7 +3,7 @@ import { ret, skip } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function regex(regex, name) {
-  return async function run(obj, context, key) {
+  return async function run(obj, context) {
     return await waitForSchema(
       captureIf(obj =>
         typeof regex === "string"
@@ -13,7 +13,6 @@ export function regex(regex, name) {
       ),
       obj,
       context,
-      key,
       result =>
         result.type === "skip"
           ? skip(`Did not match regex.`)

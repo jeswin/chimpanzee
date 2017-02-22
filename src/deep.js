@@ -3,14 +3,13 @@ import { Seq } from "lazily-async";
 import { waitForSchema } from "./utils";
 
 export function deep(schema) {
-  return async function(obj, context, key) {
+  return async function(obj, context) {
     async function traverseObject(keys) {
       return keys.length
         ? await waitForSchema(
           deep(schema),
           obj[keys[0]],
           context,
-          key,
           async result => result.type === "return"
             ? result
             : await traverseObject(keys.slice(1))
@@ -24,7 +23,6 @@ export function deep(schema) {
           deep(schema, options),
           items[0],
           context,
-          key,
           async result => result.type === "return"
             ? result
             : await traverseArray(items.slice(1))
@@ -36,7 +34,6 @@ export function deep(schema) {
       schema,
       obj,
       context,
-      key,
       async result =>
         result.type === "return"
           ? result

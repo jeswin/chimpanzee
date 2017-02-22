@@ -11,12 +11,12 @@ export async function waitFor(gen, then = x => x) {
   })(gen)
 }
 
-export async function waitForSchema(schema, obj, context, key, then) {
+export async function waitForSchema(schema, obj, context, then) {
   return await waitFor(
     schema
       ? typeof schema === "function"
-        ? await schema(obj, context, key)
-        : await traverse(schema)(obj, context, key)
+        ? await schema(obj, context)
+        : await traverse(schema)(obj, context)
       : undefined,
     then
   )
