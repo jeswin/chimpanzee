@@ -122,12 +122,9 @@ export function traverse(schema, options = {}, inner = false) {
       console.log("mergeFunctionChildTasks ->", context, result);
       return result.type === "return"
         ? !result.empty
-          ? updateState(
+          ? Object.assign(
             context,
-            undefined,
-            state => 
-              ({ state: result.name ? { [result.name]: result.value } : result.value }),
-            result.name ? { name: result.name } : {}
+            { state: result }
           )
           : context
         : { nonResult: result }
