@@ -1,9 +1,9 @@
-import { ret, skip, none } from "./wrap";
-import { Seq } from "lazily-async";
+import { ret, skip, none, wrap } from "./wrap";
+import { Seq } from "lazily";
 import { waitForSchema } from "./utils";
 
 export function any(schemas) {
-  return function(obj, context) {
+  function fn(obj, context) {
     return schemas.length
       ? (function run(schemas) {
         return waitForSchema(
@@ -20,4 +20,5 @@ export function any(schemas) {
       })(schemas)
       : none();
   }
+  return wrap(fn);
 }

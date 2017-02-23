@@ -1,8 +1,8 @@
-import { ret, none } from "./wrap";
+import { ret, none, wrap } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function optional(schema, swallowErrors) {
-  return function(obj, context) {
+  function fn(obj, context) {
     return waitForSchema(
       schema,
       obj,
@@ -17,4 +17,6 @@ export function optional(schema, swallowErrors) {
               : error(`Unknown result ${result.type}.`)
     );
   }
+
+  return wrap(fn)
 }

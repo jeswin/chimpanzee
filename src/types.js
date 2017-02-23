@@ -1,5 +1,5 @@
 import { captureIf } from "./capture";
-import { ret, skip } from "./wrap";
+import { ret, skip, wrap } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function number(name) {
@@ -23,7 +23,7 @@ export function func(name) {
 }
 
 function checkType(type, name) {
-  return function(obj, context) {
+  function fn(obj, context) {
     return waitForSchema(
       captureIf(obj => typeof obj === type, name),
       obj,
@@ -34,4 +34,6 @@ function checkType(type, name) {
           : result
     )
   }
+
+  return wrap(fn)
 }

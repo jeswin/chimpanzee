@@ -1,9 +1,9 @@
 import { traverse } from "./traverse";
-import { ret } from "./wrap";
+import { ret, wrap } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function map(schema, mapper) {
-  return function(obj, context) {
+  function fn(obj, context) {
     return waitForSchema(
       schema,
       obj,
@@ -14,4 +14,6 @@ export function map(schema, mapper) {
           : result
     );
   }
+
+  return wrap(fn)
 }

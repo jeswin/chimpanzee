@@ -1,7 +1,9 @@
-import { skip, ret, none } from "./wrap";
+import { skip, ret, none, wrap } from "./wrap";
 
 export function empty() {
-  return function(obj, context) {
+  function fn(obj, context) {
     return obj === undefined ? none() : skip("Not empty.");
   }
+
+  return wrap(fn);
 }

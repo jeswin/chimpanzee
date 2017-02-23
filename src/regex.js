@@ -1,9 +1,9 @@
 import { captureIf } from "./capture";
-import { ret, skip } from "./wrap";
+import { ret, skip, wrap } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function regex(regex, name) {
-  return function run(obj, context) {
+  function fn(obj, context) {
     return waitForSchema(
       captureIf(obj =>
         typeof regex === "string"
@@ -19,4 +19,6 @@ export function regex(regex, name) {
           : result
     );
   }
+
+  return wrap(fn)
 }

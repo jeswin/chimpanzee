@@ -1,4 +1,4 @@
-import { skip, error, ret, none } from "./wrap";
+import { skip, error, ret, none, wrap, unwrap, isWrapped } from "./wrap";
 import { Seq } from "lazily";
 
 //DEBUG only
@@ -8,13 +8,13 @@ function getSchemaType(schema) {
   return (
     ["string", "number", "boolean"].includes(typeof schema)
       ? "primitive"
-      : Array.isArray(schema)
-        ? "array"
-        : typeof schema === "object"
-          ? "object"
-            : typeof schema === "function"
-              ? "function"
-              : typeof schema
+      : isWrapped(schema)
+        ? "function"
+        : Array.isArray(schema)
+          ? "array"
+          : typeof schema === "object"
+            ? "object"
+            : typeof schema
   );
 }
 
@@ -24,7 +24,7 @@ export function traverse(schema, options = {}, inner = false) {
   options.ctr = ctr++;
   options.builders = options.builders || [{ get: (obj, { state }) => state }];
 
-  return function(_obj, context = {}, key) {
+  function fn(_obj, context = {}, key) {
     function getTask(builder) {
       const task = function fn() {
         const readyToRun = !builder.precondition || (builder.precondition(obj, context));
@@ -72,10 +72,10 @@ export function traverse(schema, options = {}, inner = false) {
             const childSchema = schema[key];
             const childItem = obj[key];
             return {
-              task: traverse
-                (childSchema, { modifier: options.modifier, parentCtr: options.ctr }, true)
+              task: unwrap
+                (traverse(childSchema, { modifier: options.modifier, parentCtr: options.ctr }, true))
                 (childItem, getSchemaType(childSchema) === "object" ? context : { parent: context }, key),
-              key
+              key: childSchema.alias || key
             }
           })
           .reduce(
@@ -92,8 +92,8 @@ export function traverse(schema, options = {}, inner = false) {
           ? skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
           : Seq.of(schema)
             .map((rhs, i) => ({
-              task: traverse
-                (rhs, { modifier: options.modifier, parentCtr: options.ctr }, false)
+              task: unwrap
+                (traverse(rhs, { modifier: options.modifier, parentCtr: options.ctr }, false))
                 (obj[i], { parent: context }),
               key: i
             }))
@@ -103,13 +103,7 @@ export function traverse(schema, options = {}, inner = false) {
 
 
     function getFunctionTasks() {
-      return [{ task: schema(obj, context) }];
-    }
-
-    //Mutation. Global state for traversal.
-    function updateState(context, initialState, updater, params) {
-      const state = context.state || initialState;
-      return Object.assign(context, updater(state), params);
+      return [{ task: unwrap(schema)(obj, context) }];
     }
 
     /*
@@ -124,7 +118,7 @@ export function traverse(schema, options = {}, inner = false) {
         ? !result.empty
           ? Object.assign(
             context,
-            { state: result }
+            { state: result.value },
           )
           : context
         : { nonResult: result }
@@ -142,10 +136,9 @@ export function traverse(schema, options = {}, inner = false) {
             console.log("mergeObjectChildTasks ->", acc, result, key);
             return result.type === "return"
               ? !result.empty
-                ? updateState(
+                ? Object.assign(
                   acc,
-                  {},
-                  state => ({ state: { ...acc.state, [result.name || key]: result.value } })
+                  { state: { ...(acc.state || {}), [key]: result.value } }
                 )
                 : acc
               : { nonResult: result }
@@ -165,8 +158,8 @@ export function traverse(schema, options = {}, inner = false) {
             return result.type === "return"
               ? !result.empty
                 ? result.name
-                  ? updateState(acc, [], state => ({ state: state.concat({ [result.name]: result.value }) }))
-                  : updateState(acc, [], state => ({ state: state.concat(result.value) }))
+                  ? Object.assign(acc, { state: (state || []).concat({ [result.name]: result.value }) })
+                  : Object.assign(acc, { state: (state || []).concat(result.value) })
                 : acc
               : { nonResult: result }
           },
@@ -190,7 +183,7 @@ export function traverse(schema, options = {}, inner = false) {
             console.log("mergeTasks ->", acc, result, key);
             return result.type === "return"
               ? !result.empty
-                ? updateState(acc, undefined, state => ({ state: result.value }))
+                ? Object.assign(acc, { state: result.value })
                 : acc
               : { nonResult: result }
           },
@@ -235,7 +228,7 @@ export function traverse(schema, options = {}, inner = false) {
 
       console.log("finished", finished);
 
-      const { state, name, nonResult } =
+      const { state, nonResult } =
         finished.length
           ? isRunningChildTasks
             ? methods[schemaType].mergeChildTasks(finished)
@@ -272,4 +265,6 @@ export function traverse(schema, options = {}, inner = false) {
       };
 
   }
+
+  return wrap(fn)
 }

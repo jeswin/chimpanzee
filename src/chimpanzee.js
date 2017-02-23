@@ -1,5 +1,11 @@
+import { unwrap } from "./wrap";
 export { traverse as traverse } from "./traverse";
-export { capture as capture, captureIf as captureIf } from "./capture";
+export {
+  capture as capture,
+  captureIf as captureIf,
+  captureWithSchema as captureWithSchema,
+  captureIfWithSchema as captureIfWithSchema
+} from "./capture";
 export { any as any } from "./any";
 export { map as map } from "./map";
 export { optional as optional } from "./optional";
@@ -16,7 +22,12 @@ export {
 } from "./types";
 export { regex as regex } from "./regex";
 
-export function match(traverseResult) {
+export function match(schema, args) {
+  const fn = unwrap(schema);
+  return _match(fn(args))
+}
+
+function _match(traverseResult) {
   const result = traverseResult;
-  return typeof result === "function" ? match(result()) : result;
+  return typeof result === "function" ? _match(result()) : result;
 }

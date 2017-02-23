@@ -1,11 +1,11 @@
 import { traverse } from "./traverse";
-import { ret, skip, none } from "./wrap";
+import { ret, skip, none, wrap } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function exists(predicate, schema) {
   predicate = predicate || (x => typeof x !== "undefined");
 
-  return function(obj, context) {
+  function fn(obj, context) {
     return predicate(obj)
       ? schema
         ? waitForSchema(
@@ -17,4 +17,6 @@ export function exists(predicate, schema) {
         : none()
       : skip("Does not exist.")
   }
+
+  return wrap(fn);
 }

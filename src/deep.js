@@ -1,9 +1,9 @@
-import { ret, skip } from "./wrap";
-import { Seq } from "lazily-async";
+import { ret, skip, wrap } from "./wrap";
+import { Seq } from "lazily";
 import { waitForSchema } from "./utils";
 
-export function deep(schema) {
-  return function(obj, context) {
+export function deep(schema, alias) {
+  function fn(obj, context) {
     function traverseObject(keys) {
       return keys.length
         ? waitForSchema(
@@ -43,6 +43,7 @@ export function deep(schema) {
               ? traverseArray(obj)
               : skip("Not found in deep.")
     );
-
   }
+
+  return wrap(fn, { alias });
 }
