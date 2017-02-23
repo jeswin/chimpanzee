@@ -1,7 +1,7 @@
-import { skip, ret } from "./wrap";
+import { skip, ret, none } from "./wrap";
 
 export function empty() {
   return function(obj, context) {
-    return obj === undefined ? ret(context.state) : skip("Not empty.");
+    return obj === undefined ? none() : skip("Not empty.");
   }
 }

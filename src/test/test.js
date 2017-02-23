@@ -31,7 +31,7 @@ describe("chimpanzee", () => {
   const tests = [
     ['any', 'any', false, true],
     // ['any-negative', 'any-negative', false, false],
-    // ['array', 'array', false, true],
+    //['array', 'array', false, true],
     // ['array-simple', 'array-simple', false, true],
     // ['async-builder-assert', 'async-builder-assert', true, true],
     // ['async-builder-predicate', 'async-builder-predicate', false, false],

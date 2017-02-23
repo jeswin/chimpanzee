@@ -107,10 +107,10 @@ export function traverse(schema, options = {}, inner = false) {
     }
 
     //Mutation. Global state for traversal.
-    function updateState(context, initialState, updater) {
+    function updateState(context, initialState, updater, params) {
       const state = context.state || initialState;
-      return Object.assign(context, updater(state));
-      }
+      return Object.assign(context, updater(state), params);
+    }
 
     /*
       Function will not have multiple child tasks.
@@ -122,13 +122,21 @@ export function traverse(schema, options = {}, inner = false) {
       console.log("mergeFunctionChildTasks ->", context, result);
       return result.type === "return"
         ? !result.empty
-          ? result.name
-            ? updateState(context, undefined, state => ({ state: { [result.name]: result.value } }))
-            : updateState(context, undefined, state => ({ state: result.value }) )
+          ? updateState(
+            context,
+            undefined,
+            state => 
+              ({ state: result.name ? { [result.name]: result.value } : result.value }),
+            result.name ? { name: result.name } : {}
+          )
           : context
         : { nonResult: result }
     }
 
+    /*
+      Child tasks of objects will always return an object.
+      Which will need to be spread.
+    */
     function mergeObjectChildTasks(finished) {
       console.log("22 >>>", finished);
       return Seq.of(finished)
@@ -140,9 +148,7 @@ export function traverse(schema, options = {}, inner = false) {
                 ? updateState(
                   acc,
                   {},
-                  state => typeof acc.state === "object"
-                    ? { state: { ...acc.state, [result.name || key]: result.value } }
-                    : { state: { [result.name || key]: result.value } }
+                  state => ({ state: { ...acc.state, [result.name || key]: result.value } })
                 )
                 : acc
               : { nonResult: result }
@@ -152,6 +158,9 @@ export function traverse(schema, options = {}, inner = false) {
         );
     }
 
+    /*
+      Array child tasks will always return an array.
+    */
     function mergeArrayChildTasks(finished) {
       return Seq.of(finished)
         .reduce(
@@ -185,7 +194,7 @@ export function traverse(schema, options = {}, inner = false) {
             return result.type === "return"
               ? !result.empty
                 ? updateState(acc, undefined, state => ({ state: result.value }))
-                : updateState(acc, undefined, state => ({ state: undefined }))
+                : acc
               : { nonResult: result }
           },
           context,
@@ -229,7 +238,7 @@ export function traverse(schema, options = {}, inner = false) {
 
       console.log("finished", finished);
 
-      const { state, nonResult } =
+      const { state, name, nonResult } =
         finished.length
           ? isRunningChildTasks
             ? methods[schemaType].mergeChildTasks(finished)
