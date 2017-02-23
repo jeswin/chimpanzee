@@ -10,8 +10,8 @@ export const schema = traverse(
   },
   {
     builders: [{
-      predicates: [{ predicate: async (obj, context) => context.state.prop1 !== "hello", message: "prop1 cannot be hello" }],
-      get: async (obj, context) => ({ prop1: context.state.prop1 + " world" })
+      predicates: [{ predicate: (obj, context) => context.state.prop1 !== "hello", message: "prop1 cannot be hello" }],
+      get: (obj, context) => ({ prop1: context.state.prop1 + " world" })
     }]
   }
 )

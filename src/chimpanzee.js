@@ -16,7 +16,7 @@ export {
 } from "./types";
 export { regex as regex } from "./regex";
 
-export async function match(traverseResult) {
-  const result = await traverseResult;
-  return typeof result === "function" ? await match(result()) : result;
+export function match(traverseResult) {
+  const result = traverseResult;
+  return typeof result === "function" ? match(result()) : result;
 }

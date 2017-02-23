@@ -12,15 +12,15 @@
 // export function repeating(_schema, { min, max }) {
 //   return wrap(function(needle) {
 //     const schema = createArraySchema(_schema, needle);
-//     return async function(obj, context, key) {
-//       const matches = await Seq.of(obj.slice(needle))
-//         .reduce(async (acc, item) =>
-//           await waitForSchema(
+//     return function(obj, context, key) {
+//       const matches = Seq.of(obj.slice(needle))
+//         .reduce((acc, item) =>
+//           waitForSchema(
 //             schema,
 //             items[0],
 //             context,
 //             key,
-//             async result =>
+//             result =>
 //               result.type === "return"
 //                 ? acc.concat(result.value)
 //                 : result
@@ -46,18 +46,18 @@
 // export function unordered(_schema) {
 //   return wrap(function(needle) {
 //     const schema = createArraySchema(_schema, needle);
-//     return async function(obj, context, key) {
-//       return await (async function run(items) {
+//     return function(obj, context, key) {
+//       return (function run(items) {
 //         return items.length
-//           ? await waitForSchema(
+//           ? waitForSchema(
 //             schema,
 //             items[0],
 //             context,
 //             key,
-//             async result =>
+//             result =>
 //               result.type === "return"
 //                 ? ret(result.value, { needle })
-//                 : await run(items.slice(1))
+//                 : run(items.slice(1))
 //           )
 //           : skip("Unordered item was not found.")
 //       })(obj);
@@ -74,8 +74,8 @@
 //     ? schema
 //     : traverse(schema);
 //   return needle =>
-//     async (obj, context, key) => console.log(">>1", context, needle, obj[needle]) ||
-//       ret((await _schema(obj[needle], context, key)).value, { needle: needle + 1 });
+//     (obj, context, key) => console.log(">>1", context, needle, obj[needle]) ||
+//       ret((_schema(obj[needle], context, key)).value, { needle: needle + 1 });
 // }
 //
 //
@@ -89,19 +89,19 @@
 //   You'd call this like
 // */
 // export function array(list, name) {
-//   return async function(obj, context, key) {
+//   return function(obj, context, key) {
 //     return Array.isArray(obj)
-//       ? (await (async function run(schemas, results, needle) {
-//         await waitForSchema(
+//       ? ((function run(schemas, results, needle) {
+//         waitForSchema(
 //           createArraySchema(schemas[0], needle),
 //           obj,
 //           context,
 //           `${key}_${needle}`,
-//           async result => console.log("?RES", schemas.length, result) ||
+//           result => console.log("?RES", schemas.length, result) ||
 //             ["skip", "error"].includes(result.type)
 //               ? result
 //               : schemas.length > 1
-//                 ? (await run(
+//                 ? (run(
 //                   schemas.slice(1),
 //                   results.concat([result.value]),
 //                   result.needle

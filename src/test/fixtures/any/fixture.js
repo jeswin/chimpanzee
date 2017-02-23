@@ -1,15 +1,19 @@
 import { traverse, capture, any } from "../../../chimpanzee";
 
 export const input = {
-  prop2: "world"
+  level1: {
+    level2: "world"
+  }
 }
 
 const schema1 = traverse({
-  prop1: capture("hello")
+  level4: capture("hello")
 })
 
 const schema2 = traverse({
-  prop2: capture("hello")
+  level1: {
+    level2: capture("hello")
+  }
 });
 
 export const schema = any([schema1, schema2]);

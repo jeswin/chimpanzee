@@ -23,8 +23,8 @@ export function func(name) {
 }
 
 function checkType(type, name) {
-  return async function(obj, context) {
-    return await waitForSchema(
+  return function(obj, context) {
+    return waitForSchema(
       captureIf(obj => typeof obj === type, name),
       obj,
       context,

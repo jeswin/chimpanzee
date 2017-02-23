@@ -9,9 +9,9 @@ sourceMapSupport.install();
 
 describe("chimpanzee", () => {
   function run([description, dir, isError, isMatch]) {
-    it(`${description}`, async () => {
+    it(`${description}`, () => {
       const fixture = require(`./fixtures/${dir}/fixture`);
-      const result = await match(fixture.schema(fixture.input));
+      const result = match(fixture.schema(fixture.input));
       const expected = require(`./fixtures/${dir}/expected`);
       console.log("RES::::", result);
       if (isError) {
@@ -29,7 +29,7 @@ describe("chimpanzee", () => {
   }
 
   const tests = [
-    // ['any', 'any', false, true],
+    ['any', 'any', false, true],
     // ['any-negative', 'any-negative', false, false],
     // ['array', 'array', false, true],
     // ['array-simple', 'array-simple', false, true],
@@ -70,7 +70,7 @@ describe("chimpanzee", () => {
     // ['reference-parent-state', 'reference-parent-state', false, true],
     // ['regex', 'regex', false, true],
     // ['regex-negative', 'regex-negative', false, false],
-    ['simple-capture', 'simple-capture', false, true],
+    // ['simple-capture', 'simple-capture', false, true],
     // ['string', 'string', false, true],
     // ['string-negative', 'string-negative', false, false],
     // ['traverse-wrapper', 'traverse-wrapper', false, true],

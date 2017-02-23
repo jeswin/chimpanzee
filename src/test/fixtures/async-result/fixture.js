@@ -10,7 +10,7 @@ export const schema = traverse(
   },
   {
     builders: [{
-      get: async (obj, context) => ({ prop1: context.state.prop1 + " world" })
+      get: (obj, context) => ({ prop1: context.state.prop1 + " world" })
     }]
   }
 )

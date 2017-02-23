@@ -5,10 +5,10 @@ import { waitForSchema } from "./utils";
 export function exists(predicate, schema) {
   predicate = predicate || (x => typeof x !== "undefined");
 
-  return async function(obj, context) {
-    return await predicate(obj)
+  return function(obj, context) {
+    return predicate(obj)
       ? schema
-        ? await waitForSchema(
+        ? waitForSchema(
           schema,
           obj,
           context,

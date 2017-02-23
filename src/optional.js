@@ -2,8 +2,8 @@ import { ret, none } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function optional(schema, swallowErrors) {
-  return async function(obj, context) {
-    return await waitForSchema(
+  return function(obj, context) {
+    return waitForSchema(
       schema,
       obj,
       context,

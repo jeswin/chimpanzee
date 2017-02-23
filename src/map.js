@@ -3,8 +3,8 @@ import { ret } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function map(schema, mapper) {
-  return async function(obj, context) {
-    return await waitForSchema(
+  return function(obj, context) {
+    return waitForSchema(
       schema,
       obj,
       context,

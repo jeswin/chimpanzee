@@ -3,8 +3,8 @@ import { ret, skip } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function regex(regex, name) {
-  return async function run(obj, context) {
-    return await waitForSchema(
+  return function run(obj, context) {
+    return waitForSchema(
       captureIf(obj =>
         typeof regex === "string"
           ? typeof obj === "string" && new RegExp(regex).test(obj)

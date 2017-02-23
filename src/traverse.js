@@ -1,6 +1,5 @@
 import { skip, error, ret, none } from "./wrap";
 import { Seq } from "lazily";
-import { Seq as AsyncSeq } from "lazily-async";
 
 //DEBUG only
 let ctr = 0;
@@ -25,12 +24,12 @@ export function traverse(schema, options = {}, inner = false) {
   options.ctr = ctr++;
   options.builders = options.builders || [{ get: (obj, { state }) => state }];
 
-  return async function(_obj, context = {}) {
+  return function(_obj, context = {}, key) {
     function getTask(builder) {
-      const task = async function fn() {
-        const readyToRun = !builder.precondition || (await builder.precondition(obj, context));
+      const task = function fn() {
+        const readyToRun = !builder.precondition || (builder.precondition(obj, context));
         return readyToRun
-          ? await (async () => {
+          ? (() => {
             const predicates = !builder.predicates
               ? []
               : builder.predicates.map(p => ({
@@ -46,14 +45,14 @@ export function traverse(schema, options = {}, inner = false) {
               }));
 
             return (
-              await AsyncSeq.of(predicates.concat(assertions))
-                .map(async predicate =>
-                  (await predicate.fn(obj, context))
+              Seq.of(predicates.concat(assertions))
+                .map(predicate =>
+                  (predicate.fn(obj, context))
                     ? undefined
                     : predicate.invalid())
                 .first(x => x)
               )
-              || ret(await builder.get(obj, context));
+              || ret(builder.get(obj, context));
           })()
           : fn
       }
@@ -69,13 +68,16 @@ export function traverse(schema, options = {}, inner = false) {
     function getObjectTasks() {
       return typeof obj !== "undefined"
         ? Seq.of(Object.keys(schema))
-          .map(key => ({
-            task: traverse(schema[key], { modifier: options.modifier, parentCtr: options.ctr }, true)(
-              obj[key],
-              { parent: context }
-            ),
-            key
-          }))
+          .map(key => {
+            const childSchema = schema[key];
+            const childItem = obj[key];
+            return {
+              task: traverse
+                (childSchema, { modifier: options.modifier, parentCtr: options.ctr }, true)
+                (childItem, getSchemaType(childSchema) === "object" ? context : { parent: context }, key),
+              key
+            }
+          })
           .reduce(
             (acc, x) => !["skip", "error"].includes(x.type) ? acc.concat(x) : [x],
             [],
@@ -90,10 +92,9 @@ export function traverse(schema, options = {}, inner = false) {
           ? skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
           : Seq.of(schema)
             .map((rhs, i) => ({
-              task: traverse(rhs, { modifier: options.modifier, parentCtr: options.ctr }, true)(
-                obj[i],
-                { parent: context }
-              ),
+              task: traverse
+                (rhs, { modifier: options.modifier, parentCtr: options.ctr }, false)
+                (obj[i], { parent: context }),
               key: i
             }))
             .toArray()
@@ -102,15 +103,14 @@ export function traverse(schema, options = {}, inner = false) {
 
 
     function getFunctionTasks() {
-      return [{ task: schema(obj, !inner ? context : { parent: context }) }];
+      return [{ task: schema(obj, context) }];
     }
 
     //Mutation. Global state for traversal.
     function updateState(context, initialState, updater) {
-      const state = context.state  || initialState;
-      Object.assign(context, updater(state));
-      return context;
-    }
+      const state = context.state || initialState;
+      return Object.assign(context, updater(state));
+      }
 
     /*
       Function will not have multiple child tasks.
@@ -130,15 +130,20 @@ export function traverse(schema, options = {}, inner = false) {
     }
 
     function mergeObjectChildTasks(finished) {
+      console.log("22 >>>", finished);
       return Seq.of(finished)
         .reduce(
           (acc, { result, key }) => {
             console.log("mergeObjectChildTasks ->", acc, result, key);
             return result.type === "return"
               ? !result.empty
-                ? result.name
-                  ? updateState(acc, {}, state => ({ state: { ...acc.state, [result.name]: result.value } }))
-                  : updateState(acc, {}, state => ({ state: { ...acc.state, [key]: result.value } }))
+                ? updateState(
+                  acc,
+                  {},
+                  state => typeof acc.state === "object"
+                    ? { state: { ...acc.state, [result.name || key]: result.value } }
+                    : { state: { [result.name || key]: result.value } }
+                )
                 : acc
               : { nonResult: result }
           },
@@ -155,7 +160,7 @@ export function traverse(schema, options = {}, inner = false) {
               ? !result.empty
                 ? result.name
                   ? updateState(acc, [], state => ({ state: state.concat({ [result.name]: result.value }) }))
-                  : updateState(acc, [], state => ({ state : state.concat(result.value) }))
+                  : updateState(acc, [], state => ({ state: state.concat(result.value) }))
                 : acc
               : { nonResult: result }
           },
@@ -172,6 +177,7 @@ export function traverse(schema, options = {}, inner = false) {
     }
 
     function mergeTasks(finished) {
+      console.log("MERGING ->", finished);
       return Seq.of(finished)
         .reduce(
           (acc, { result, key }) => {
@@ -209,51 +215,54 @@ export function traverse(schema, options = {}, inner = false) {
     /*
       tasks must run only after childTasks are complete.
     */
-    async function run(childTasks, tasks) {
+    function run(childTasks, tasks) {
       const isRunningChildTasks = childTasks.length;
 
       const runnables = isRunningChildTasks ? childTasks : tasks;
-      const { finished, unfinished } = await AsyncSeq.of(runnables)
-        .map(async ({ task, key }) => ({ task: await task, key }))
+      const { finished, unfinished } = Seq.of(runnables)
+        .map(({ task, key }) => ({ task: task, key }))
         .reduce((acc, { task, key }) => typeof task === "function"
             ? { finished: acc.finished, unfinished: acc.unfinished.concat({ task: task(), key }) }
             : { finished: acc.finished.concat({ result: task, key }), unfinished: acc.unfinished },
           { finished: [], unfinished: [] }
         );
 
+      console.log("finished", finished);
+
       const { state, nonResult } =
         finished.length
           ? isRunningChildTasks
-            ? await methods[schemaType].mergeChildTasks(finished)
-            : await mergeTasks(finished)
+            ? methods[schemaType].mergeChildTasks(finished)
+            : mergeTasks(finished)
           : {};
 
-      console.log("state....", (childTasks.length || unfinished.length), isRunningChildTasks, state, "....", context);
+      console.log("state....", schemaType, !(childTasks.length || unfinished.length) ? "RETURNING" : "LOOPING", isRunningChildTasks, state, "....", context);
 
+      console.log();
       return nonResult
         ? nonResult
         : childTasks.length || unfinished.length
           ? isRunningChildTasks
             ? run(unfinished, tasks)
             : run([], unfinished)
-          : !typeof state === "undefined"
+          : (schemaType !== "object" || !inner) && typeof state !== "undefined"
             ? ret(state)
             : none();
     }
 
-    const obj = options.modifier ? (await options.modifier(_obj)) : _obj;
-    const mustRun = !options.predicate || await options.predicate(obj);
+    const obj = options.modifier ? (options.modifier(_obj, key)) : _obj;
+    const mustRun = !options.predicate || options.predicate(obj);
 
     return !mustRun
       ? skip(`Predicate returned false.`)
-      : async () => {
-        const tasks = await AsyncSeq.of(options.builders)
+      : () => {
+        const tasks = Seq.of(options.builders)
           .map(builder => getTask(builder))
           .toArray();
 
         const childTasks = methods[schemaType].getChildTasks()
 
-        return await run(childTasks, tasks);
+        return run(childTasks, tasks);
       };
 
   }
