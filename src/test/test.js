@@ -29,10 +29,10 @@ describe("chimpanzee", () => {
   }
 
   const tests = [
-  //   ['any', 'any', false, true],
-  //   ['any-negative', 'any-negative', false, false],
-    //['array', 'array', false, true],
-    ['array-simple', 'array-simple', false, true],
+    // ['any', 'any', false, true],
+    // ['any-negative', 'any-negative', false, false],
+    // ['array', 'array', false, true],
+    // ['array-simple', 'array-simple', false, true],
     // ['async-builder-assert', 'async-builder-assert', true, true],
     // ['async-builder-predicate', 'async-builder-predicate', false, false],
     // ['async-precondition', 'async-precondition', false, true],
@@ -70,7 +70,7 @@ describe("chimpanzee", () => {
     // ['reference-parent-state', 'reference-parent-state', false, true],
     // ['regex', 'regex', false, true],
     // ['regex-negative', 'regex-negative', false, false],
-    // ['simple-capture', 'simple-capture', false, true],
+    ['simple-capture', 'simple-capture', false, true],
     // ['string', 'string', false, true],
     // ['string-negative', 'string-negative', false, false],
     // ['traverse-wrapper', 'traverse-wrapper', false, true],
