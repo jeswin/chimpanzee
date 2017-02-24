@@ -18,13 +18,14 @@ function getSchemaType(schema) {
   );
 }
 
-export function traverse(schema, options = {}, inner = false) {
+export function traverse(schema, params = {}, inner = false) {
+  params = typeof params === "string" ? { key: params } : params;
+  params.ctr = ctr++;
+  params.builders = params.builders || [{ get: (obj, { state }) => state }];
+
   const schemaType = getSchemaType(schema);
 
-  options.ctr = ctr++;
-  options.builders = options.builders || [{ get: (obj, { state }) => state }];
-
-  function fn(_obj, context = {}, key) {
+  function fn(obj, context = {}, key) {
     function getTask(builder) {
       const task = function fn() {
         const readyToRun = !builder.precondition || (builder.precondition(obj, context));
@@ -70,12 +71,15 @@ export function traverse(schema, options = {}, inner = false) {
         ? Seq.of(Object.keys(schema))
           .map(key => {
             const childSchema = schema[key];
-            const childItem = obj[key];
+            const childItem = params.modifier ? (params.modifier(obj, key)) : obj[key];
+            console.log(".....childSchema", childSchema);
             return {
               task: unwrap
-                (traverse(childSchema, { modifier: options.modifier, parentCtr: options.ctr }, true))
+                (traverse(childSchema, { modifier: params.modifier, parentCtr: params.ctr }, true))
                 (childItem, getSchemaType(childSchema) === "object" ? context : { parent: context }, key),
-              key: childSchema.alias || key
+              params: childSchema.params
+                ? { ...childSchema.params, key: childSchema.params.key || key }
+                : { key }
             }
           })
           .reduce(
@@ -93,9 +97,9 @@ export function traverse(schema, options = {}, inner = false) {
           : Seq.of(schema)
             .map((rhs, i) => ({
               task: unwrap
-                (traverse(rhs, { modifier: options.modifier, parentCtr: options.ctr }, false))
+                (traverse(rhs, { modifier: params.modifier, parentCtr: params.ctr }, false))
                 (obj[i], { parent: context }),
-              key: i
+              params: schema.params
             }))
             .toArray()
         : [skip(`Schema is an array but property is a non-array.`)]
@@ -132,13 +136,15 @@ export function traverse(schema, options = {}, inner = false) {
       console.log("22 >>>", finished);
       return Seq.of(finished)
         .reduce(
-          (acc, { result, key }) => {
-            console.log("mergeObjectChildTasks ->", acc, result, key);
+          (acc, { result, params }) => {
+            console.log("mergeObjectChildTasks ->", acc, result, params);
             return result.type === "return"
               ? !result.empty
                 ? Object.assign(
                   acc,
-                  { state: { ...(acc.state || {}), [key]: result.value } }
+                  params.replace
+                    ? { state: { ...(acc.state || {}), ...result.value } }
+                    : { state: { ...(acc.state || {}), [params.key]: result.value } }
                 )
                 : acc
               : { nonResult: result }
@@ -154,12 +160,10 @@ export function traverse(schema, options = {}, inner = false) {
     function mergeArrayChildTasks(finished) {
       return Seq.of(finished)
         .reduce(
-          (acc, { result, key }) => {
+          (acc, { result, params }) => {
             return result.type === "return"
               ? !result.empty
-                ? result.name
-                  ? Object.assign(acc, { state: (state || []).concat({ [result.name]: result.value }) })
-                  : Object.assign(acc, { state: (state || []).concat(result.value) })
+                ? Object.assign(acc, { state: (acc.state || []).concat([result.value]) })
                 : acc
               : { nonResult: result }
           },
@@ -179,8 +183,8 @@ export function traverse(schema, options = {}, inner = false) {
       console.log("MERGING ->", finished);
       return Seq.of(finished)
         .reduce(
-          (acc, { result, key }) => {
-            console.log("mergeTasks ->", acc, result, key);
+          (acc, { result, params }) => {
+            console.log("mergeTasks ->", acc, result, params);
             return result.type === "return"
               ? !result.empty
                 ? Object.assign(acc, { state: result.value })
@@ -219,10 +223,9 @@ export function traverse(schema, options = {}, inner = false) {
 
       const runnables = isRunningChildTasks ? childTasks : tasks;
       const { finished, unfinished } = Seq.of(runnables)
-        .map(({ task, key }) => ({ task: task, key }))
-        .reduce((acc, { task, key }) => typeof task === "function"
-            ? { finished: acc.finished, unfinished: acc.unfinished.concat({ task: task(), key }) }
-            : { finished: acc.finished.concat({ result: task, key }), unfinished: acc.unfinished },
+        .reduce((acc, { task, params }) => typeof task === "function"
+            ? { finished: acc.finished, unfinished: acc.unfinished.concat({ task: task(), params }) }
+            : { finished: acc.finished.concat({ result: task, params }), unfinished: acc.unfinished },
           { finished: [], unfinished: [] }
         );
 
@@ -249,13 +252,12 @@ export function traverse(schema, options = {}, inner = false) {
             : none();
     }
 
-    const obj = options.modifier ? (options.modifier(_obj, key)) : _obj;
-    const mustRun = !options.predicate || options.predicate(obj);
+    const mustRun = !params.predicate || params.predicate(obj);
 
     return !mustRun
       ? skip(`Predicate returned false.`)
       : () => {
-        const tasks = Seq.of(options.builders)
+        const tasks = Seq.of(params.builders)
           .map(builder => getTask(builder))
           .toArray();
 
@@ -266,5 +268,5 @@ export function traverse(schema, options = {}, inner = false) {
 
   }
 
-  return wrap(fn)
+  return wrap(fn, { params })
 }

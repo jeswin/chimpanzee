@@ -1,7 +1,9 @@
 import { ret, none, wrap } from "./wrap";
 import { waitForSchema } from "./utils";
 
-export function optional(schema, swallowErrors) {
+export function optional(schema, params = {}) {
+  params = typeof params === "string" ? { key: params } : params;
+
   function fn(obj, context) {
     return waitForSchema(
       schema,
@@ -11,12 +13,12 @@ export function optional(schema, swallowErrors) {
         result.type === "return"
           ? result
           : result.type === "error"
-            ? (swallowErrors ? none() : result)
+            ? (params.swallowErrors ? none() : result)
             : result.type === "skip"
               ? none()
               : error(`Unknown result ${result.type}.`)
     );
   }
 
-  return wrap(fn)
+  return wrap(fn, { params })
 }

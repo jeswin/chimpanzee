@@ -2,7 +2,9 @@ import { ret, skip, none, wrap } from "./wrap";
 import { Seq } from "lazily";
 import { waitForSchema } from "./utils";
 
-export function any(schemas) {
+export function any(schemas, params) {
+  params = typeof params === "string" ? { key: params } : params;
+
   function fn(obj, context) {
     return schemas.length
       ? (function run(schemas) {
@@ -20,5 +22,6 @@ export function any(schemas) {
       })(schemas)
       : none();
   }
-  return wrap(fn);
+
+  return wrap(fn, { params });
 }

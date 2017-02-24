@@ -16,6 +16,6 @@ export const schema = traverse(
       level2: any([
         traverse({ prop2a: capture() }),
         traverse({ prop2b: capture() }),
-      ])
+      ], { replace: true })
     }
   })

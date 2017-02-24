@@ -2,7 +2,9 @@ import { ret, skip, wrap } from "./wrap";
 import { Seq } from "lazily";
 import { waitForSchema } from "./utils";
 
-export function deep(schema, alias) {
+export function deep(schema, params) {
+  params = typeof params === "string" ? { key: params } : params;
+  
   function fn(obj, context) {
     function traverseObject(keys) {
       return keys.length
@@ -45,5 +47,5 @@ export function deep(schema, alias) {
     );
   }
 
-  return wrap(fn, { alias });
+  return wrap(fn, { params });
 }

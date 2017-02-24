@@ -1,27 +1,28 @@
 import { ret, skip, wrap } from "./wrap";
 import { waitForSchema } from "./utils";
 
-export function capture(name) {
-  return captureIf(obj => typeof obj !== "undefined", name);
+export function capture(params) {
+  return captureIf(obj => typeof obj !== "undefined", params);
 }
 
-export function captureIf(predicate, name) {
+export function captureIf(predicate, params) {
+  return take(predicate, undefined, params)
+}
+
+export function captureWithSchema(schema, params) {
+  return captureIfWithSchema(obj => typeof obj !== "undefined", schema, params);
+}
+
+export function captureIfWithSchema(predicate, schema, params) {
+  return take(predicate, schema, params)
+}
+
+export function take(predicate, schema, params) {
+  params = typeof params === "string" ? { key: params } : params;
+
   function fn(obj, context) {
     return predicate(obj)
-      ? ret(obj)
-      : skip("Predicate returned false.")
-  }
-  return wrap(fn, { alias: name });
-}
-
-export function captureWithSchema(schema, name) {
-  return captureIfWithSchema(obj => typeof obj !== "undefined", schema, name);
-}
-
-export function captureIfWithSchema(predicate, schema, name) {
-  function fn(obj, context) {
-    return predicate(obj)
-      ? schema
+      ? typeof schema !== "undefined"
         ? waitForSchema(
           schema,
           obj,
@@ -34,5 +35,6 @@ export function captureIfWithSchema(predicate, schema, name) {
         : ret(obj)
       : skip("Predicate returned false.")
   }
-  return wrap(fn, { alias: name });
+
+  return wrap(fn, { params });
 }

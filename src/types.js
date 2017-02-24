@@ -2,30 +2,32 @@ import { captureIf } from "./capture";
 import { ret, skip, wrap } from "./wrap";
 import { waitForSchema } from "./utils";
 
-export function number(name) {
-  return checkType("number", name);
+export function number(params) {
+  return checkType("number", params);
 }
 
-export function bool(name) {
-  return checkType("boolean", name);
+export function bool(params) {
+  return checkType("boolean", params);
 }
 
-export function string(name) {
-  return checkType("string", name);
+export function string(params) {
+  return checkType("string", params);
 }
 
-export function object(name) {
-  return checkType("object", name);
+export function object(params) {
+  return checkType("object", params);
 }
 
-export function func(name) {
-  return checkType("function", name);
+export function func(params) {
+  return checkType("function", params);
 }
 
-function checkType(type, name) {
+function checkType(type, params) {
+  params = typeof params === "string" ? { key: params } : params;
+
   function fn(obj, context) {
     return waitForSchema(
-      captureIf(obj => typeof obj === type, name),
+      captureIf(obj => typeof obj === type, params),
       obj,
       context,
       result =>
@@ -35,5 +37,5 @@ function checkType(type, name) {
     )
   }
 
-  return wrap(fn)
+  return wrap(fn, { params })
 }
