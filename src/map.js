@@ -1,5 +1,5 @@
 import { traverse } from "./traverse";
-import { ret, wrap } from "./wrap";
+import { ret, wrap, getType } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function map(schema, mapper, params) {
@@ -11,7 +11,7 @@ export function map(schema, mapper, params) {
       obj,
       context,
       result =>
-        result.type === "return"
+        getType(result) === "return"
           ? ret(mapper(result.value))
           : result
     );

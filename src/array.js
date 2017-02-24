@@ -1,4 +1,4 @@
-// import { wrap, unwrap, skip, ret, isWrapped } from "./wrap";
+// import { wrap, unwrap, skip, ret, isWrapped, getType } from "./wrap";
 // import { traverse } from "./traverse";
 // import { waitForSchema, pipe } from "./utils";
 //
@@ -21,7 +21,7 @@
 //             context,
 //             key,
 //             result =>
-//               result.type === "return"
+//               getType(result) === "return"
 //                 ? acc.concat(result.value)
 //                 : result
 //           ),
@@ -55,7 +55,7 @@
 //             context,
 //             key,
 //             result =>
-//               result.type === "return"
+//               getType(result) === "return"
 //                 ? ret(result.value, { needle })
 //                 : run(items.slice(1))
 //           )

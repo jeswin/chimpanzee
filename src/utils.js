@@ -1,5 +1,5 @@
 import { traverse } from "./traverse";
-import { isWrapped, unwrap } from "./wrap";
+import { isWrapped, unwrap, getType } from "./wrap";
 
 export function waitFor(gen, then = x => x) {
   return (function run(gen) {

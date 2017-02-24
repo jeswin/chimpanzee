@@ -1,26 +1,35 @@
+function except(message) {
+  throw new Error(message);
+}
+
 export function wrap(item, meta) {
-  return { __isWrapped: true, __item: item, ...meta };
+  return {  __wrappedItem: item, ...meta };
 }
 
 export function unwrap(wrapped) {
-  const { __isWrapped, __item } = wrapped;
-  return __isWrapped ? __item : error("This is not a wrapped object.");
+  return wrapped.__wrappedItem || except("This is not a wrapped object.");
 }
 
 export function isWrapped(wrapped) {
-  return wrapped.__isWrapped;
+  return typeof wrapped.__wrappedItem !== "undefined";
+}
+
+export function getType(wrapped) {
+  return isWrapped(wrapped)
+    ? wrapped.type
+    : undefined
 }
 
 export function error(message, params) {
-  return { type: "error", ...params, message };
+  return wrap({ ...params, message }, { type: "error" })
 }
 
 export function skip(message, params) {
-  return { type: "skip", ...params, message };
+  return wrap({ ...params, message }, { type: "skip" })
 }
 
 export function ret(value, params) {
-  return { type: "return", ...params, value }
+  return wrap({ ...params, value }, { type: "return" })
 }
 
 export function none() {

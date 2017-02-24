@@ -1,4 +1,4 @@
-import { ret, skip, wrap } from "./wrap";
+import { ret, skip, wrap, getType } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function capture(params) {
@@ -28,7 +28,7 @@ export function take(predicate, schema, params) {
           obj,
           context,
           result =>
-            console.log("..............>", obj, result) || result.type === "return"
+            getType(result) === "return"
               ? ret({ ...obj, ...result.value })
               : skip("Capture failed in inner schema.")
         )

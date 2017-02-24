@@ -1,4 +1,4 @@
-import { ret, skip, none, wrap } from "./wrap";
+import { ret, skip, none, wrap, getType } from "./wrap";
 import { Seq } from "lazily";
 import { waitForSchema } from "./utils";
 
@@ -13,7 +13,7 @@ export function any(schemas, params) {
           obj,
           context,
           result =>
-            result.type === "return"
+            getType(result) === "return"
               ? result
               : schemas.length > 1
                 ? () => run(schemas.slice(1))

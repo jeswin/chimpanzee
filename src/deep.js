@@ -1,4 +1,4 @@
-import { ret, skip, wrap } from "./wrap";
+import { ret, skip, wrap, getType } from "./wrap";
 import { Seq } from "lazily";
 import { waitForSchema } from "./utils";
 
@@ -12,7 +12,7 @@ export function deep(schema, params) {
           deep(schema),
           obj[keys[0]],
           context,
-          result => result.type === "return"
+          result => getType(result) === "return"
             ? result
             : traverseObject(keys.slice(1))
         )
@@ -25,7 +25,7 @@ export function deep(schema, params) {
           deep(schema, options),
           items[0],
           context,
-          result => result.type === "return"
+          result => getType(result) === "return"
             ? result
             : traverseArray(items.slice(1))
         )
@@ -37,7 +37,7 @@ export function deep(schema, params) {
       obj,
       context,
       result =>
-        result.type === "return"
+        getType(result) === "return"
           ? result
           : typeof obj === "object"
             ? traverseObject(Object.keys(obj))

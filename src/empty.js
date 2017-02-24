@@ -1,4 +1,4 @@
-import { skip, ret, none, wrap } from "./wrap";
+import { skip, ret, none, wrap, getType } from "./wrap";
 
 export function empty() {
   function fn(obj, context) {

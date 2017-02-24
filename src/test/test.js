@@ -13,7 +13,6 @@ describe("chimpanzee", () => {
       const fixture = require(`./fixtures/${dir}/fixture`);
       const result = match(fixture.schema, fixture.input);
       const expected = require(`./fixtures/${dir}/expected`);
-      console.log("RES::::", result);
       if (isError) {
         result.type.should.equal("error");
         result.message.should.deepEqual(expected.result);
@@ -29,14 +28,10 @@ describe("chimpanzee", () => {
   }
 
   const tests = [
-    // ['any', 'any', false, true],
+    ['any', 'any', false, true],
     // ['any-negative', 'any-negative', false, false],
-    //['array', 'array', false, true],
+    // ['array', 'array', false, true],
     // ['array-simple', 'array-simple', false, true],
-    // ['async-builder-assert', 'async-builder-assert', true, true],
-    // ['async-builder-predicate', 'async-builder-predicate', false, false],
-    // ['async-precondition', 'async-precondition', false, true],
-    // ['async-result', 'async-result', false, true],
     // ['bool', 'bool', false, true],
     // ['bool-negative', 'bool-negative', false, false],
     // ['builder-assert', 'builder-assert', true, true],
@@ -53,11 +48,11 @@ describe("chimpanzee", () => {
     // ['func-negative', 'func-negative', false, false],
     // ['map', 'map', false, true],
     // ['match-negative', 'match-negative', false, false],
-    //['modifier', 'modifier', false, true],
-    //['named-capture', 'named-capture', false, true],
+    // ['modifier', 'modifier', false, true],
+    // ['named-capture', 'named-capture', false, true],
     // ['nested-any', 'nested-any', false, true],
     // ['nested-array-simple', 'nested-array-simple', false, true],
-    ['nested-array-simple-capture', 'nested-array-simple-capture', false, true],
+    // ['nested-array-simple-capture', 'nested-array-simple-capture', false, true],
     // ['nested-capture', 'nested-capture', false, true],
     // ['nested-named-capture', 'nested-named-capture', false, true],
     // ['number', 'number', false, true],
@@ -66,7 +61,7 @@ describe("chimpanzee", () => {
     // ['object-modifier', 'object-modifier', false, true],
     // ['object-negative', 'object-negative', false, false],
     // ['optional', 'optional', false, true],
-    // //['precondition', 'precondition', false, true],
+    // ['precondition', 'precondition', false, true],
     // ['reference-parent-state', 'reference-parent-state', false, true],
     // ['regex', 'regex', false, true],
     // ['regex-negative', 'regex-negative', false, false],

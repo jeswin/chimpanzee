@@ -1,4 +1,4 @@
-import { skip, error, ret, none, wrap, unwrap, isWrapped } from "./wrap";
+import { skip, error, ret, none, wrap, unwrap, isWrapped, getType } from "./wrap";
 import { Seq } from "lazily";
 
 //DEBUG only
@@ -25,7 +25,9 @@ export function traverse(schema, params = {}, inner = false) {
 
   const schemaType = getSchemaType(schema);
 
-  function fn(obj, context = {}, key) {
+  function fn(_obj, context = {}, key) {
+    const obj = params.objectModifier ? params.objectModifier(_obj) : _obj;
+
     function getTask(builder) {
       const task = function fn() {
         const readyToRun = !builder.precondition || (builder.precondition(obj, context));
@@ -72,7 +74,6 @@ export function traverse(schema, params = {}, inner = false) {
           .map(key => {
             const childSchema = schema[key];
             const childItem = params.modifier ? (params.modifier(obj, key)) : obj[key];
-            console.log(".....childSchema", childSchema);
             return {
               task: unwrap
                 (traverse(childSchema, { modifier: params.modifier, parentCtr: params.ctr }, true))
@@ -83,9 +84,9 @@ export function traverse(schema, params = {}, inner = false) {
             }
           })
           .reduce(
-            (acc, x) => !["skip", "error"].includes(x.type) ? acc.concat(x) : [x],
+            (acc, x) => !["skip", "error"].includes(getType(x.task)) ? acc.concat(x) : [x.task],
             [],
-            (acc, x) => x && ["skip", "error"].includes(x.type)
+            (acc, x) => x && ["skip", "error"].includes(getType(x.task))
           )
         : [{ task: skip(`Cannot traverse undefined.`) }]
     }
@@ -117,8 +118,7 @@ export function traverse(schema, params = {}, inner = false) {
     */
     function mergeFunctionChildTasks(finished) {
       const result = finished[0].result;
-      console.log("mergeFunctionChildTasks ->", context, result);
-      return result.type === "return"
+      return getType(result) === "return"
         ? !result.empty
           ? Object.assign(
             context,
@@ -133,12 +133,10 @@ export function traverse(schema, params = {}, inner = false) {
       Which will need to be spread.
     */
     function mergeObjectChildTasks(finished) {
-      console.log("22 >>>", finished);
       return Seq.of(finished)
         .reduce(
           (acc, { result, params }) => {
-            console.log("mergeObjectChildTasks ->", acc, result, params);
-            return result.type === "return"
+            return getType(result) === "return"
               ? !result.empty
                 ? Object.assign(
                   acc,
@@ -161,7 +159,7 @@ export function traverse(schema, params = {}, inner = false) {
       return Seq.of(finished)
         .reduce(
           (acc, { result, params }) => {
-            return result.type === "return"
+            return getType(result) === "return"
               ? !result.empty
                 ? Object.assign(acc, { state: (acc.state || []).concat([result.value]) })
                 : acc
@@ -174,18 +172,16 @@ export function traverse(schema, params = {}, inner = false) {
 
     function mergePrimitiveChildTasks(finished, isRunningChildTasks) {
       const result = finished[0].result;
-      return result.type === "return"
+      return getType(result) === "return"
         ? context
         : { nonResult: result }
     }
 
     function mergeTasks(finished) {
-      console.log("MERGING ->", finished);
       return Seq.of(finished)
         .reduce(
           (acc, { result, params }) => {
-            console.log("mergeTasks ->", acc, result, params);
-            return result.type === "return"
+            return getType(result) === "return"
               ? !result.empty
                 ? Object.assign(acc, { state: result.value })
                 : acc
@@ -229,8 +225,6 @@ export function traverse(schema, params = {}, inner = false) {
           { finished: [], unfinished: [] }
         );
 
-      console.log("finished", finished);
-
       const { state, nonResult } =
         finished.length
           ? isRunningChildTasks
@@ -238,15 +232,12 @@ export function traverse(schema, params = {}, inner = false) {
             : mergeTasks(finished)
           : {};
 
-      console.log("state....", schemaType, !(childTasks.length || unfinished.length) ? "RETURNING" : "LOOPING", isRunningChildTasks, state, "....", context);
-
-      console.log();
       return nonResult
         ? nonResult
         : childTasks.length || unfinished.length
           ? isRunningChildTasks
-            ? run(unfinished, tasks)
-            : run([], unfinished)
+            ? () => run(unfinished, tasks)
+            : () => run([], unfinished)
           : (schemaType !== "object" || !inner) && typeof state !== "undefined"
             ? ret(state)
             : none();

@@ -16,14 +16,15 @@ export const schema = traverse(
         prop1: capture()
       },
       {
+        replace: true,
         builders: [{
-          precondition: (obj, context) =>  context.parent.state && context.parent.state.prop2,
+          precondition: (obj, context) => context.parent.state && context.parent.state.prop2,
           get: (obj, context) => ({ prop3: `${context.state.prop1} ${context.parent.state.prop2}` })
         }]
-      }
+      },
     ),
     level2: {
-      prop2: capture({ key: "prop2", replace: true }),
+      prop2: capture(),
     },
   }
 )

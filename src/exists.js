@@ -1,5 +1,5 @@
 import { traverse } from "./traverse";
-import { ret, skip, none, wrap } from "./wrap";
+import { ret, skip, none, wrap, getType } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function exists(predicate, schema) {

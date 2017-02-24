@@ -1,4 +1,4 @@
-import { ret, none, wrap } from "./wrap";
+import { ret, none, wrap, getType } from "./wrap";
 import { waitForSchema } from "./utils";
 
 export function optional(schema, params = {}) {
@@ -10,11 +10,11 @@ export function optional(schema, params = {}) {
       obj,
       context,
       result =>
-        result.type === "return"
+        getType(result) === "return"
           ? result
-          : result.type === "error"
+          : getType(result) === "error"
             ? (params.swallowErrors ? none() : result)
-            : result.type === "skip"
+            : getType(result) === "skip"
               ? none()
               : error(`Unknown result ${result.type}.`)
     );

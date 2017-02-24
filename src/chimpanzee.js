@@ -1,4 +1,4 @@
-import { unwrap } from "./wrap";
+import { unwrap, getType } from "./wrap";
 export { traverse as traverse } from "./traverse";
 export {
   capture as capture,
