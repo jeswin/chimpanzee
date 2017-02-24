@@ -28,7 +28,7 @@ export function take(predicate, schema, params) {
           obj,
           context,
           result =>
-            getType(result) === "return"
+            result instanceof Result
               ? ret({ ...obj, ...result.value })
               : skip("Capture failed in inner schema.")
         )

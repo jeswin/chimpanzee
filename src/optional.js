@@ -10,7 +10,7 @@ export function optional(schema, params = {}) {
       obj,
       context,
       result =>
-        getType(result) === "return"
+        result instanceof Result
           ? result
           : getType(result) === "error"
             ? (params.swallowErrors ? none() : result)

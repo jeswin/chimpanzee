@@ -13,7 +13,7 @@ export function any(schemas, params) {
           obj,
           context,
           result =>
-            getType(result) === "return"
+            result instanceof Result
               ? result
               : schemas.length > 1
                 ? () => run(schemas.slice(1))

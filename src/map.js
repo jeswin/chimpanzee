@@ -11,7 +11,7 @@ export function map(schema, mapper, params) {
       obj,
       context,
       result =>
-        getType(result) === "return"
+        result instanceof Result
           ? ret(mapper(result.value))
           : result
     );

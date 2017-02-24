@@ -118,7 +118,7 @@ export function traverse(schema, params = {}, inner = false) {
     */
     function mergeFunctionChildTasks(finished) {
       const result = finished[0].result;
-      return getType(result) === "return"
+      return result instanceof Result
         ? !result.empty
           ? Object.assign(
             context,
@@ -136,7 +136,7 @@ export function traverse(schema, params = {}, inner = false) {
       return Seq.of(finished)
         .reduce(
           (acc, { result, params }) => {
-            return getType(result) === "return"
+            return result instanceof Result
               ? !result.empty
                 ? Object.assign(
                   acc,
@@ -159,7 +159,7 @@ export function traverse(schema, params = {}, inner = false) {
       return Seq.of(finished)
         .reduce(
           (acc, { result, params }) => {
-            return getType(result) === "return"
+            return result instanceof Result
               ? !result.empty
                 ? Object.assign(acc, { state: (acc.state || []).concat([result.value]) })
                 : acc
@@ -172,7 +172,7 @@ export function traverse(schema, params = {}, inner = false) {
 
     function mergePrimitiveChildTasks(finished, isRunningChildTasks) {
       const result = finished[0].result;
-      return getType(result) === "return"
+      return result instanceof Result
         ? context
         : { nonResult: result }
     }
@@ -181,7 +181,7 @@ export function traverse(schema, params = {}, inner = false) {
       return Seq.of(finished)
         .reduce(
           (acc, { result, params }) => {
-            return getType(result) === "return"
+            return result instanceof Result
               ? !result.empty
                 ? Object.assign(acc, { state: result.value })
                 : acc

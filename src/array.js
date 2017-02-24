@@ -21,7 +21,7 @@
 //             context,
 //             key,
 //             result =>
-//               getType(result) === "return"
+//               result instanceof Result
 //                 ? acc.concat(result.value)
 //                 : result
 //           ),
@@ -55,7 +55,7 @@
 //             context,
 //             key,
 //             result =>
-//               getType(result) === "return"
+//               result instanceof Result
 //                 ? ret(result.value, { needle })
 //                 : run(items.slice(1))
 //           )

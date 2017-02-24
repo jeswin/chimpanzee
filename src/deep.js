@@ -4,7 +4,7 @@ import { waitForSchema } from "./utils";
 
 export function deep(schema, params) {
   params = typeof params === "string" ? { key: params } : params;
-  
+
   function fn(obj, context) {
     function traverseObject(keys) {
       return keys.length
@@ -12,7 +12,7 @@ export function deep(schema, params) {
           deep(schema),
           obj[keys[0]],
           context,
-          result => getType(result) === "return"
+          result => result instanceof Result
             ? result
             : traverseObject(keys.slice(1))
         )
@@ -25,7 +25,7 @@ export function deep(schema, params) {
           deep(schema, options),
           items[0],
           context,
-          result => getType(result) === "return"
+          result => result instanceof Result
             ? result
             : traverseArray(items.slice(1))
         )
@@ -37,7 +37,7 @@ export function deep(schema, params) {
       obj,
       context,
       result =>
-        getType(result) === "return"
+        result instanceof Result
           ? result
           : typeof obj === "object"
             ? traverseObject(Object.keys(obj))
