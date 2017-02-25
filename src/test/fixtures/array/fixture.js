@@ -1,4 +1,4 @@
-import { traverse, capture, repeating, unordered, array, bool, string, number } from "../../../chimpanzee";
+import { traverse, capture, array, bool, string, number } from "../../../chimpanzee";
 
 export const input = {
   level1: {

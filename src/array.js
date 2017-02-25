@@ -16,28 +16,34 @@ class ArrayItem {
             ^needle
   returns [4, 4], with needle moved to 5.
 */
-export function repeatingItem(_schema, { min, max }) {
-  min = min || 0;
-  return new ArrayItem((needle) => {
-    const schema = toRegularSchema(_schema, needle);
+export function repeatingItem(_schema, opts = {}) {
+  const min = opts.min || 0;
+  const max = opts.max;
+  const schema = toNeedledSchema(_schema);
+  return new ArrayItem(needle => {
     return new Schema((obj, context, key) =>
       (function run(items, results, needle) {
+        const completed = (result, needle) =>
+          console.log("---->", result, needle) ||
+          results.length >= min && (!max || results.length <= max)
+            ? { result: new Return(results.concat(result.value)), needle }
+            : { result: new Skip("Incorrect number of matches") }
+
         return waitForSchema(
-          schema,
-          items[0],
+          schema(needle),
+          items,
           context,
           ({ result, needle }) =>
+            console.log("007", result, needle) ||
             result instanceof Skip || result instanceof Fault
-              ? { result }
-              : items.length > 1
+              ? completed(result, needle)
+              : items.length > needle
                 ? run(
-                  items.slice(1),
+                  items,
                   results.concat([result.value]),
                   needle
                 )
-                : results.length >= min && (!max || results.length <= max)
-                  ? { result: new Return(results), needle }
-                  : { result: new Skip("Incorrect number of matches") }
+                : completed(result, needle)
 
         )
       })(obj.slice(needle), [], needle)
@@ -54,27 +60,23 @@ export function repeatingItem(_schema, { min, max }) {
   We don't care about the needle.
 */
 export function unorderedItem(_schema) {
-  return new ArrayItem((needle) => {
-    const schema = toRegularSchema(_schema, needle);
+  const schema = toNeedledSchema(_schema);
+  return new ArrayItem(needle => {
     return new Schema((obj, context, key) =>
-      (function run(items) {
+      (function run(items, i) {
         return waitForSchema(
-          schema,
-          items[0],
+          schema(i),
+          items,
           context,
           ({ result }) =>
             result instanceof Return
               ? { result, needle }
-              : items.length > 1
-                ? run(
-                  items.slice(1),
-                  results.concat([result.value]),
-                  needle
-                )
-                : { result: new Skip(`Unordered item was not found.`) }
+              : items.length > i
+                ? run(items, i++)
+                : { result: new Skip(`Unordered item was not found.`), needle }
 
         )
-      })(obj.slice(needle))
+      })(obj, 0)
     )
   })
 }
@@ -85,17 +87,17 @@ export function unorderedItem(_schema) {
   The needle is incrementd by 1 if found, otherwise it remains the same.
 */
 export function optionalItem(_schema) {
-  return new ArrayItem((needle) => {
-    const schema = toRegularSchema(_schema, needle);
+  const schema = toNeedledSchema(_schema);
+  return new ArrayItem(needle => {
     return (obj, context, key) =>
       waitForSchema(
         schema,
-        items[0],
+        obj[needle],
         context,
         ({ result }) =>
           result instanceof Return
             ? { result, needle: needle + 1 }
-            : { result: new Empty() }
+            : { result: new Empty(), needle }
       )
   })
 }
@@ -112,19 +114,19 @@ function regularItem(schema) {
         schema,
         obj[needle],
         context,
-        result => ({
-          result,
-          needle: needle + 1
-        })
+        result =>
+          result instanceof Return
+            ? { result, needle: needle + 1 }
+            : { result, needle }
       )
-    );
+    )
 }
 
 
-function toRegularSchema(schema, needle) {
+function toNeedledSchema(schema) {
   return schema instanceof ArrayItem
-    ? schema.fn(needle)
-    : regularItem(schema)(needle)
+    ? schema.fn
+    : regularItem(schema)
 }
 
 /*
@@ -136,8 +138,9 @@ export function array(list, params) {
   const fn = function(obj, context, key) {
     return Array.isArray(obj)
       ? (function run(schemas, results, needle) {
+        const schema = toNeedledSchema(schemas[0]);
         return waitForSchema(
-          toRegularSchema(schemas[0], needle),
+          schema(needle),
           obj,
           context,
           ({ result, needle }) =>

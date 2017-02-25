@@ -32,7 +32,10 @@ describe("chimpanzee", () => {
   const tests = [
     // ['any', 'any', "return"],
     // ['any-negative', 'any-negative', "skip"],
-    ['array', 'array', "return"],
+    // ['array', 'array', "return"],
+    // ['array-repeating', 'array-repeating', "return"],
+    // ['array-unordered', 'array-unordered', "return"],
+    ['array-mixed', 'array-mixed', "return"],
     // ['native-array-simple', 'native-array-simple', "return"],
     // ['bool', 'bool', "return"],
     // ['bool-negative', 'bool-negative', "skip"],
