@@ -1,7 +1,7 @@
 export const result = {
   level1: [
-    true,
-    "two",
-    3
+    20,
+    "HELLO",
+    true
   ]
 }

@@ -18,6 +18,10 @@ export function captureIfWithSchema(predicate, schema, params) {
   return take(predicate, schema, params)
 }
 
+export function literal(what, params) {
+  return captureIf(x => x === what, params);
+}
+
 export function take(predicate, schema, params) {
   params = typeof params === "string" ? { key: params } : params;
 

@@ -24,19 +24,17 @@ export function repeatingItem(_schema, opts = {}) {
     return new Schema((obj, context, key) =>
       (function run(items, results, needle) {
         const completed = (result, needle) =>
-          console.log("---->", result, needle) ||
           results.length >= min && (!max || results.length <= max)
-            ? { result: new Return(results.concat(result.value)), needle }
-            : { result: new Skip("Incorrect number of matches") }
+            ? { result: new Return(results.concat(result ? [result.value] : [])), needle }
+            : { result: new Skip("Incorrect number of matches.") }
 
         return waitForSchema(
           schema(needle),
           items,
           context,
           ({ result, needle }) =>
-            console.log("007", result, needle) ||
             result instanceof Skip || result instanceof Fault
-              ? completed(result, needle)
+              ? completed(undefined, needle)
               : items.length > needle
                 ? run(
                   items,
@@ -46,7 +44,7 @@ export function repeatingItem(_schema, opts = {}) {
                 : completed(result, needle)
 
         )
-      })(obj.slice(needle), [], needle)
+      })(obj, [], needle)
     )
   })
 }
@@ -72,7 +70,7 @@ export function unorderedItem(_schema) {
             result instanceof Return
               ? { result, needle }
               : items.length > i
-                ? run(items, i++)
+                ? run(items, i + 1)
                 : { result: new Skip(`Unordered item was not found.`), needle }
 
         )
@@ -89,16 +87,16 @@ export function unorderedItem(_schema) {
 export function optionalItem(_schema) {
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
-    return (obj, context, key) =>
+    return new Schema((obj, context, key) =>
       waitForSchema(
-        schema,
-        obj[needle],
+        schema(needle),
+        obj,
         context,
         ({ result }) =>
           result instanceof Return
             ? { result, needle: needle + 1 }
             : { result: new Empty(), needle }
-      )
+      ))
   })
 }
 

@@ -3,7 +3,9 @@ export {
   capture as capture,
   captureIf as captureIf,
   captureWithSchema as captureWithSchema,
-  captureIfWithSchema as captureIfWithSchema
+  captureIfWithSchema as captureIfWithSchema,
+  literal as literal,
+  take as take
 } from "./capture";
 export { any as any } from "./any";
 export { map as map } from "./map";
