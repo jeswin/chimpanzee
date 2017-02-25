@@ -1,4 +1,4 @@
-import { Return, Empty, Skip, Fault } from "./results";
+import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { Seq } from "lazily";
 
@@ -56,7 +56,7 @@ export function traverse(schema, params = {}, inner = false) {
                     : predicate.invalid())
                 .first(x => x)
               )
-              || new Return(builder.get(obj, context));
+              || new Match(builder.get(obj, context));
           })()
           : fn
       }
@@ -117,7 +117,7 @@ export function traverse(schema, params = {}, inner = false) {
     */
     function mergeFunctionChildTasks(finished) {
       const result = finished[0].result;
-      return result instanceof Return
+      return result instanceof Match
         ? !(result instanceof Empty)
           ? Object.assign(
             context,
@@ -135,7 +135,7 @@ export function traverse(schema, params = {}, inner = false) {
       return Seq.of(finished)
         .reduce(
           (acc, { result, params }) => {
-            return result instanceof Return
+            return result instanceof Match
               ? !(result instanceof Empty)
                 ? Object.assign(
                   acc,
@@ -147,7 +147,7 @@ export function traverse(schema, params = {}, inner = false) {
               : { invalidResult: result }
           },
           context,
-          (acc, { result }) => !(result instanceof Return)
+          (acc, { result }) => !(result instanceof Match)
         );
     }
 
@@ -158,20 +158,20 @@ export function traverse(schema, params = {}, inner = false) {
       return Seq.of(finished)
         .reduce(
           (acc, { result, params }) => {
-            return result instanceof Return
+            return result instanceof Match
               ? !(result instanceof Empty)
                 ? Object.assign(acc, { state: (acc.state || []).concat([result.value]) })
                 : acc
               : { invalidResult: result }
           },
           context,
-          (acc, { result }) => !(result instanceof Return)
+          (acc, { result }) => !(result instanceof Match)
         );
     }
 
     function mergePrimitiveChildTasks(finished, isRunningChildTasks) {
       const result = finished[0].result;
-      return result instanceof Return
+      return result instanceof Match
         ? context
         : { invalidResult: result }
     }
@@ -180,14 +180,14 @@ export function traverse(schema, params = {}, inner = false) {
       return Seq.of(finished)
         .reduce(
           (acc, { result, params }) => {
-            return result instanceof Return
+            return result instanceof Match
               ? !(result instanceof Empty)
                 ? Object.assign(acc, { state: result.value })
                 : acc
               : { invalidResult: result }
           },
           context,
-          (acc, { result }) => !(result instanceof Return)
+          (acc, { result }) => !(result instanceof Match)
         );
     }
 
@@ -238,7 +238,7 @@ export function traverse(schema, params = {}, inner = false) {
             ? () => run(unfinished, tasks)
             : () => run([], unfinished)
           : (schemaType !== "object" || !inner) && typeof state !== "undefined"
-            ? new Return(state)
+            ? new Match(state)
             : new Empty();
     }
 

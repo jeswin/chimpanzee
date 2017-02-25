@@ -1,5 +1,5 @@
 import { Seq } from "lazily";
-import { Return, Empty, Skip, Fault } from "./results";
+import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
@@ -13,7 +13,7 @@ export function deep(schema, params) {
           deep(schema),
           obj[keys[0]],
           context,
-          result => result instanceof Return
+          result => result instanceof Match
             ? result
             : traverseObject(keys.slice(1))
         )
@@ -26,7 +26,7 @@ export function deep(schema, params) {
           deep(schema, options),
           items[0],
           context,
-          result => result instanceof Return
+          result => result instanceof Match
             ? result
             : traverseArray(items.slice(1))
         )
@@ -38,7 +38,7 @@ export function deep(schema, params) {
       obj,
       context,
       result =>
-        result instanceof Return
+        result instanceof Match
           ? result
           : typeof obj === "object"
             ? traverseObject(Object.keys(obj))

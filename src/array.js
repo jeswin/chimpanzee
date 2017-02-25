@@ -1,6 +1,6 @@
 import { traverse } from "./traverse";
 import { waitForSchema } from "./utils";
-import { Return, Empty, Skip, Fault } from "./results";
+import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 
 class ArrayItem {
@@ -25,7 +25,7 @@ export function repeatingItem(_schema, opts = {}) {
       (function run(items, results, needle) {
         const completed = (result, needle) =>
           results.length >= min && (!max || results.length <= max)
-            ? { result: new Return(results.concat(result ? [result.value] : [])), needle }
+            ? { result: new Match(results.concat(result ? [result.value] : [])), needle }
             : { result: new Skip("Incorrect number of matches.") }
 
         return waitForSchema(
@@ -67,7 +67,7 @@ export function unorderedItem(_schema) {
           items,
           context,
           ({ result }) =>
-            result instanceof Return
+            result instanceof Match
               ? { result, needle }
               : items.length > i
                 ? run(items, i + 1)
@@ -93,7 +93,7 @@ export function optionalItem(_schema) {
         obj,
         context,
         ({ result }) =>
-          result instanceof Return
+          result instanceof Match
             ? { result, needle: needle + 1 }
             : { result: new Empty(), needle }
       ))
@@ -113,7 +113,7 @@ function regularItem(schema) {
         obj[needle],
         context,
         result =>
-          result instanceof Return
+          result instanceof Match
             ? { result, needle: needle + 1 }
             : { result, needle }
       )
@@ -154,7 +154,7 @@ export function array(list, params) {
                   ),
                   needle
                 )
-                : new Return(results.concat(result.value))
+                : new Match(results.concat(result.value))
         )
       })(list, [], 0)
       : new Fault(`Expected array but got ${typeof obj}.`)

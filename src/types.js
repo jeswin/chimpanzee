@@ -1,5 +1,5 @@
 import { captureIf } from "./capture";
-import { Return, Empty, Skip, Fault } from "./results";
+import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { waitForSchema } from "./utils";
 

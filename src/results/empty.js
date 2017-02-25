@@ -1,6 +1,6 @@
-import Return from "./return";
+import Match from "./match";
 
-export default class Empty extends Return {
+export default class Empty extends Match {
   constructor() {
     super();
   }

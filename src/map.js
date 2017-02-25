@@ -1,5 +1,5 @@
 import { traverse } from "./traverse";
-import { Return, Empty, Skip, Fault } from "./results";
+import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
@@ -12,8 +12,8 @@ export function map(schema, mapper, params) {
       obj,
       context,
       result =>
-        result instanceof Return
-          ? new Return(mapper(result.value))
+        result instanceof Match
+          ? new Match(mapper(result.value))
           : result
     );
   }

@@ -3,7 +3,7 @@ import should from "should";
 import fs from "fs";
 import path from "path";
 import sourceMapSupport from 'source-map-support';
-import { Return, Skip, Fault } from "../results";
+import { Match, Skip, Fault } from "../results";
 import { match } from "../chimpanzee";
 
 sourceMapSupport.install();
@@ -15,7 +15,7 @@ describe("chimpanzee", () => {
       const result = match(fixture.schema, fixture.input);
       const expected = require(`./fixtures/${dir}/expected`);
       if (resultType === "return") {
-        result.should.be.an.instanceOf(Return);
+        result.should.be.an.instanceOf(Match);
         result.value.should.deepEqual(expected.result);
       }
       else if (resultType === "skip") {

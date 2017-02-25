@@ -1,4 +1,4 @@
-import { Return, Empty, Skip, Fault } from "./results";
+import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { Seq } from "lazily";
 import { waitForSchema } from "./utils";
@@ -14,7 +14,7 @@ export function any(schemas, params) {
           obj,
           context,
           result =>
-            result instanceof Return
+            result instanceof Match
               ? result
               : schemas.length > 1
                 ? () => run(schemas.slice(1))

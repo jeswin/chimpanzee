@@ -1,5 +1,5 @@
 import { traverse } from "./traverse";
-import { Return, Empty, Skip, Fault } from "./results";
+import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 
 export function waitFor(gen, then = x => x) {

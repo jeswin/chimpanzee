@@ -1,4 +1,4 @@
-import { Return, Empty, Skip, Fault } from "./results";
+import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
@@ -11,7 +11,7 @@ export function optional(schema, params = {}) {
       obj,
       context,
       result =>
-        result instanceof Return
+        result instanceof Match
           ? result
           : result instanceof Error
             ? (params.swallowErrors ? new Empty() : result)

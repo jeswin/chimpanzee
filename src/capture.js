@@ -1,4 +1,4 @@
-import { Return, Empty, Skip, Fault } from "./results";
+import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
@@ -33,11 +33,11 @@ export function take(predicate, schema, params) {
           obj,
           context,
           result =>
-            result instanceof Return
-              ? new Return({ ...obj, ...result.value })
+            result instanceof Match
+              ? new Match({ ...obj, ...result.value })
               : new Skip("Capture failed in inner schema.")
         )
-        : new Return(obj)
+        : new Match(obj)
       : new Skip("Predicate returned false.")
   }
 
