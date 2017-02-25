@@ -11,7 +11,6 @@ export { optional as optional } from "./optional";
 export { deep as deep } from "./deep";
 export { empty as empty } from "./empty";
 export { exists as exists } from "./exists";
-export { repeating as repeating, unordered as unordered, array as array } from "./array";
 export {
   number as number,
   bool as bool,
@@ -20,6 +19,13 @@ export {
   func as func
 } from "./types";
 export { regex as regex } from "./regex";
+
+export {
+  repeatingItem as repeatingItem,
+  unorderedItem as unorderedItem,
+  optionalItem as optionalItem,
+  array as array
+} from "./array";
 
 export function match(schema, args) {
   return _match(schema.fn(args))
