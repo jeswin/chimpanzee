@@ -1,9 +1,10 @@
-import { skip, ret, none, wrap, getType } from "./wrap";
+import { Return, Empty, Skip, Fault } from "./results";
+import Schema from "./schema";
 
 export function empty() {
   function fn(obj, context) {
-    return obj === undefined ? none() : skip("Not empty.");
+    return obj === undefined ? new Empty() : new Skip("Not empty.");
   }
 
-  return wrap(fn);
+  return new Schema(fn)
 }

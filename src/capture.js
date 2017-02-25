@@ -1,4 +1,5 @@
-import { ret, skip, wrap, getType } from "./wrap";
+import { Return, Empty, Skip, Fault } from "./results";
+import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
 export function capture(params) {
@@ -28,13 +29,13 @@ export function take(predicate, schema, params) {
           obj,
           context,
           result =>
-            result instanceof Result
-              ? ret({ ...obj, ...result.value })
-              : skip("Capture failed in inner schema.")
+            result instanceof Return
+              ? new Return({ ...obj, ...result.value })
+              : new Skip("Capture failed in inner schema.")
         )
-        : ret(obj)
-      : skip("Predicate returned false.")
+        : new Return(obj)
+      : new Skip("Predicate returned false.")
   }
 
-  return wrap(fn, { params });
+  return new Schema(fn, params);
 }

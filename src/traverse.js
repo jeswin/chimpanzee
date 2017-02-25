@@ -1,4 +1,5 @@
-import { skip, error, ret, none, wrap, unwrap, isWrapped, getType } from "./wrap";
+import { Return, Empty, Skip, Fault } from "./results";
+import Schema from "./schema";
 import { Seq } from "lazily";
 
 //DEBUG only
@@ -8,7 +9,7 @@ function getSchemaType(schema) {
   return (
     ["string", "number", "boolean"].includes(typeof schema)
       ? "primitive"
-      : isWrapped(schema)
+      : schema instanceof Schema
         ? "function"
         : Array.isArray(schema)
           ? "array"
@@ -37,25 +38,25 @@ export function traverse(schema, params = {}, inner = false) {
               ? []
               : builder.predicates.map(p => ({
                 fn: p.predicate,
-                invalid: () => skip(p.message || `Predicate returned false.`)
+                invalid: () => new Skip(p.message || `Predicate returned false.`)
               }));
 
             const assertions = !builder.asserts
               ? []
               : builder.asserts.map(a => ({
                 fn: a.predicate,
-                invalid: () => error(a.error)
+                invalid: () => new Fault(a.error)
               }));
 
             return (
               Seq.of(predicates.concat(assertions))
                 .map(predicate =>
-                  (predicate.fn(obj, context))
+                  predicate.fn(obj, context)
                     ? undefined
                     : predicate.invalid())
                 .first(x => x)
               )
-              || ret(builder.get(obj, context));
+              || new Return(builder.get(obj, context));
           })()
           : fn
       }
@@ -64,8 +65,8 @@ export function traverse(schema, params = {}, inner = false) {
 
     function getPrimitiveTasks() {
       return schema !== obj
-        ? [{ task: skip(`Expected ${schema} but got ${obj}.`) }]
-        : [{ task: none() }]
+        ? [{ task: new Skip(`Expected ${schema} but got ${obj}.`) }]
+        : [{ task: new Empty() }]
     }
 
     function getObjectTasks() {
@@ -73,42 +74,40 @@ export function traverse(schema, params = {}, inner = false) {
         ? Seq.of(Object.keys(schema))
           .map(key => {
             const childSchema = schema[key];
-            const childItem = params.modifier ? (params.modifier(obj, key)) : obj[key];
+            const childItem = params.modifier ? params.modifier(obj, key) : obj[key];
             return {
-              task: unwrap
-                (traverse(childSchema, { modifier: params.modifier, parentCtr: params.ctr }, true))
-                (childItem, getSchemaType(childSchema) === "object" ? context : { parent: context }, key),
+              task: traverse(childSchema, { modifier: params.modifier, parentCtr: params.ctr }, true)
+                .fn(childItem, getSchemaType(childSchema) === "object" ? context : { parent: context }, key),
               params: childSchema.params
                 ? { ...childSchema.params, key: childSchema.params.key || key }
                 : { key }
             }
           })
           .reduce(
-            (acc, x) => !["skip", "error"].includes(getType(x.task)) ? acc.concat(x) : [x.task],
+            (acc, x) => !(x.task instanceof Skip || x.task instanceof Fault) ? acc.concat(x) : [x.task],
             [],
-            (acc, x) => x && ["skip", "error"].includes(getType(x.task))
+            (acc, x) => x.task instanceof Skip || x.task instanceof Fault
           )
-        : [{ task: skip(`Cannot traverse undefined.`) }]
+        : [{ task: new Skip(`Cannot traverse undefined.`) }]
     }
 
     function getArrayTasks() {
       return Array.isArray(obj)
         ? schema.length !== obj.length
-          ? skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
+          ? new Skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
           : Seq.of(schema)
             .map((rhs, i) => ({
-              task: unwrap
-                (traverse(rhs, { modifier: params.modifier, parentCtr: params.ctr }, false))
-                (obj[i], { parent: context }),
+              task: traverse(rhs, { modifier: params.modifier, parentCtr: params.ctr }, false)
+                .fn(obj[i], { parent: context }),
               params: schema.params
             }))
             .toArray()
-        : [skip(`Schema is an array but property is a non-array.`)]
+        : [Skip(`Schema is an array but property is a non-array.`)]
     }
 
 
     function getFunctionTasks() {
-      return [{ task: unwrap(schema)(obj, context) }];
+      return [{ task: schema.fn(obj, context) }];
     }
 
     /*
@@ -118,14 +117,14 @@ export function traverse(schema, params = {}, inner = false) {
     */
     function mergeFunctionChildTasks(finished) {
       const result = finished[0].result;
-      return result instanceof Result
-        ? !result.empty
+      return result instanceof Return
+        ? !(result instanceof Empty)
           ? Object.assign(
             context,
             { state: result.value },
           )
           : context
-        : { nonResult: result }
+        : { invalidResult: result }
     }
 
     /*
@@ -136,8 +135,8 @@ export function traverse(schema, params = {}, inner = false) {
       return Seq.of(finished)
         .reduce(
           (acc, { result, params }) => {
-            return result instanceof Result
-              ? !result.empty
+            return result instanceof Return
+              ? !(result instanceof Empty)
                 ? Object.assign(
                   acc,
                   params.replace
@@ -145,10 +144,10 @@ export function traverse(schema, params = {}, inner = false) {
                     : { state: { ...(acc.state || {}), [params.key]: result.value } }
                 )
                 : acc
-              : { nonResult: result }
+              : { invalidResult: result }
           },
           context,
-          (acc, { result }) => result.type !== "return"
+          (acc, { result }) => !(result instanceof Return)
         );
     }
 
@@ -159,36 +158,36 @@ export function traverse(schema, params = {}, inner = false) {
       return Seq.of(finished)
         .reduce(
           (acc, { result, params }) => {
-            return result instanceof Result
-              ? !result.empty
+            return result instanceof Return
+              ? !(result instanceof Empty)
                 ? Object.assign(acc, { state: (acc.state || []).concat([result.value]) })
                 : acc
-              : { nonResult: result }
+              : { invalidResult: result }
           },
           context,
-          (acc, { result }) => result.type !== "return"
+          (acc, { result }) => !(result instanceof Return)
         );
     }
 
     function mergePrimitiveChildTasks(finished, isRunningChildTasks) {
       const result = finished[0].result;
-      return result instanceof Result
+      return result instanceof Return
         ? context
-        : { nonResult: result }
+        : { invalidResult: result }
     }
 
     function mergeTasks(finished) {
       return Seq.of(finished)
         .reduce(
           (acc, { result, params }) => {
-            return result instanceof Result
-              ? !result.empty
+            return result instanceof Return
+              ? !(result instanceof Empty)
                 ? Object.assign(acc, { state: result.value })
                 : acc
-              : { nonResult: result }
+              : { invalidResult: result }
           },
           context,
-          (acc, { result }) => result.type !== "return"
+          (acc, { result }) => !(result instanceof Return)
         );
     }
 
@@ -225,28 +224,28 @@ export function traverse(schema, params = {}, inner = false) {
           { finished: [], unfinished: [] }
         );
 
-      const { state, nonResult } =
+      const { state, invalidResult } =
         finished.length
           ? isRunningChildTasks
             ? methods[schemaType].mergeChildTasks(finished)
             : mergeTasks(finished)
           : {};
 
-      return nonResult
-        ? nonResult
+      return invalidResult
+        ? invalidResult
         : childTasks.length || unfinished.length
           ? isRunningChildTasks
             ? () => run(unfinished, tasks)
             : () => run([], unfinished)
           : (schemaType !== "object" || !inner) && typeof state !== "undefined"
-            ? ret(state)
-            : none();
+            ? new Return(state)
+            : new Empty();
     }
 
     const mustRun = !params.predicate || params.predicate(obj);
 
     return !mustRun
-      ? skip(`Predicate returned false.`)
+      ? new Skip(`Predicate returned false.`)
       : () => {
         const tasks = Seq.of(params.builders)
           .map(builder => getTask(builder))
@@ -259,5 +258,5 @@ export function traverse(schema, params = {}, inner = false) {
 
   }
 
-  return wrap(fn, { params })
+  return new Schema(fn, params)
 }

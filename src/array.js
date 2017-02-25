@@ -21,7 +21,7 @@
 //             context,
 //             key,
 //             result =>
-//               result instanceof Result
+//               result instanceof Return
 //                 ? acc.concat(result.value)
 //                 : result
 //           ),
@@ -29,8 +29,8 @@
 //           (acc, item) => item.type !== "return"
 //         )
 //       return (max && matches.length <= max)  || (min && matches.length >= min)
-//           ? ret(matches, { needle: needle + matches.length })
-//           : skip("Incorrect number of matches");
+//           ? new Return(matches, { needle: needle + matches.length })
+//           : new Skip("Incorrect number of matches");
 //     }
 //   })
 // }
@@ -55,11 +55,11 @@
 //             context,
 //             key,
 //             result =>
-//               result instanceof Result
-//                 ? ret(result.value, { needle })
+//               result instanceof Return
+//                 ? new Return(result.value, { needle })
 //                 : run(items.slice(1))
 //           )
-//           : skip("Unordered item was not found.")
+//           : new Skip("Unordered item was not found.")
 //       })(obj);
 //     }
 //   })
@@ -75,7 +75,7 @@
 //     : traverse(schema);
 //   return needle =>
 //     (obj, context, key) => console.log(">>1", context, needle, obj[needle]) ||
-//       ret((_schema(obj[needle], context, key)).value, { needle: needle + 1 });
+//       new Return((_schema(obj[needle], context, key)).value, { needle: needle + 1 });
 // }
 //
 //
@@ -106,9 +106,9 @@
 //                   results.concat([result.value]),
 //                   result.needle
 //                 ))
-//                 : true //console.log("RES", { [name || key]: results.map(i => ) }) || ret(results.concat([result.value]))
+//                 : true //console.log("RES", { [name || key]: results.map(i => ) }) || new Return(results.concat([result.value]))
 //         )
 //       })(list, [], 0))
-//       : error(`Expected array but got ${typeof obj}.`)
+//       : new Fault(`Expected array but got ${typeof obj}.`)
 //   }
 // }

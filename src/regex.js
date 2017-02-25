@@ -1,5 +1,6 @@
 import { captureIf } from "./capture";
-import { ret, skip, wrap, getType } from "./wrap";
+import { Return, Empty, Skip, Fault } from "./results";
+import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
 export function regex(regex, params) {
@@ -16,11 +17,11 @@ export function regex(regex, params) {
       obj,
       context,
       result =>
-        getType(result) === "skip"
-          ? skip(`Did not match regex.`)
+        result instanceof Skip
+          ? new Skip(`Did not match regex.`)
           : result
     );
   }
 
-  return wrap(fn, { params })
+  return new Schema(fn, params)
 }

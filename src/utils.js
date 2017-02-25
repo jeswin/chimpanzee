@@ -1,5 +1,6 @@
 import { traverse } from "./traverse";
-import { isWrapped, unwrap, getType } from "./wrap";
+import { Return, Empty, Skip, Fault } from "./results";
+import Schema from "./schema";
 
 export function waitFor(gen, then = x => x) {
   return (function run(gen) {
@@ -14,9 +15,9 @@ export function waitFor(gen, then = x => x) {
 
 export function waitForSchema(schema, obj, context, then) {
   return waitFor(
-    isWrapped(schema)
-      ? unwrap(schema)(obj, context)
-      : unwrap(traverse(schema))(obj, context),
+    schema instanceof Schema
+      ? schema.fn(obj, context)
+      : traverse(schema).fn(obj, context),
     then
   )
 }

@@ -1,4 +1,3 @@
-import { unwrap, getType } from "./wrap";
 export { traverse as traverse } from "./traverse";
 export {
   capture as capture,
@@ -23,8 +22,7 @@ export {
 export { regex as regex } from "./regex";
 
 export function match(schema, args) {
-  const fn = unwrap(schema);
-  return _match(fn(args))
+  return _match(schema.fn(args))
 }
 
 function _match(traverseResult) {

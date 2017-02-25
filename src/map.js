@@ -1,21 +1,22 @@
 import { traverse } from "./traverse";
-import { ret, wrap, getType } from "./wrap";
+import { Return, Empty, Skip, Fault } from "./results";
+import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
 export function map(schema, mapper, params) {
   params = typeof params === "string" ? { key: params } : params;
-  
+
   function fn(obj, context) {
     return waitForSchema(
       schema,
       obj,
       context,
       result =>
-        result instanceof Result
-          ? ret(mapper(result.value))
+        result instanceof Return
+          ? new Return(mapper(result.value))
           : result
     );
   }
 
-  return wrap(fn, { params })
+  return new Schema(fn, params)
 }

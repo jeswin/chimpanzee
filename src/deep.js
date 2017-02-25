@@ -1,5 +1,6 @@
-import { ret, skip, wrap, getType } from "./wrap";
 import { Seq } from "lazily";
+import { Return, Empty, Skip, Fault } from "./results";
+import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
 export function deep(schema, params) {
@@ -12,11 +13,11 @@ export function deep(schema, params) {
           deep(schema),
           obj[keys[0]],
           context,
-          result => result instanceof Result
+          result => result instanceof Return
             ? result
             : traverseObject(keys.slice(1))
         )
-        : skip("Not found in deep.")
+        : new Skip("Not found in deep.")
     }
 
     function traverseArray(items) {
@@ -25,11 +26,11 @@ export function deep(schema, params) {
           deep(schema, options),
           items[0],
           context,
-          result => result instanceof Result
+          result => result instanceof Return
             ? result
             : traverseArray(items.slice(1))
         )
-        : skip("Not found in deep.")
+        : new Skip("Not found in deep.")
     }
 
     return waitForSchema(
@@ -37,15 +38,15 @@ export function deep(schema, params) {
       obj,
       context,
       result =>
-        result instanceof Result
+        result instanceof Return
           ? result
           : typeof obj === "object"
             ? traverseObject(Object.keys(obj))
             : Array.isArray(obj)
               ? traverseArray(obj)
-              : skip("Not found in deep.")
+              : new Skip("Not found in deep.")
     );
   }
 
-  return wrap(fn, { params });
+  return new Schema(fn, params);
 }

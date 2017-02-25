@@ -1,5 +1,6 @@
 import { captureIf } from "./capture";
-import { ret, skip, wrap, getType } from "./wrap";
+import { Return, Empty, Skip, Fault } from "./results";
+import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
 export function number(params) {
@@ -31,11 +32,11 @@ function checkType(type, params) {
       obj,
       context,
       result =>
-        getType(result) === "skip"
-          ? skip(`Expected ${type} but got ${typeof obj}.`)
+        result instanceof Skip
+          ? new Skip(`Expected ${type} but got ${typeof obj}.`)
           : result
     )
   }
 
-  return wrap(fn, { params })
+  return new Schema(fn, params)
 }

@@ -1,4 +1,5 @@
-import { ret, skip, none, wrap, getType } from "./wrap";
+import { Return, Empty, Skip, Fault } from "./results";
+import Schema from "./schema";
 import { Seq } from "lazily";
 import { waitForSchema } from "./utils";
 
@@ -13,15 +14,15 @@ export function any(schemas, params) {
           obj,
           context,
           result =>
-            result instanceof Result
+            result instanceof Return
               ? result
               : schemas.length > 1
                 ? () => run(schemas.slice(1))
-                : skip("None of the items matched.")
+                : new Skip("None of the items matched.")
         );
       })(schemas)
-      : none();
+      : new Empty();
   }
 
-  return wrap(fn, { params });
+  return new Schema(fn, params);
 }

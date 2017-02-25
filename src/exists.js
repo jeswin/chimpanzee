@@ -1,5 +1,6 @@
 import { traverse } from "./traverse";
-import { ret, skip, none, wrap, getType } from "./wrap";
+import { Return, Empty, Skip, Fault } from "./results";
+import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
 export function exists(predicate, schema) {
@@ -14,9 +15,9 @@ export function exists(predicate, schema) {
           context,
           inner => inner
         )
-        : none()
-      : skip("Does not exist.")
+        : new Empty()
+      : new Skip("Does not exist.")
   }
 
-  return wrap(fn);
+  return new Schema(fn);
 }
