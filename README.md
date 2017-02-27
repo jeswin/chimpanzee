@@ -192,23 +192,6 @@ const schema = traverse({
 
 ```
 
-### Nested
-```
-const input = {
-  inner1: {
-   hello: "world"
-  }
-}
-
-const schema = traverse({
-  inner1: {
-    hello: capture()
-   }
-})
-
-//result is Match { value: { inner1: { hello: "world" } } }
-```
-
 ### Optional
 Matches if found. Does not emit a Skip() if not found.
 ```
@@ -226,6 +209,24 @@ const schema = traverse({
 });
 ```
 
+### Nested
+```
+const input = {
+  inner1: {
+   hello: "world"
+  }
+}
+
+const schema = traverse({
+  prop1: "HELLO"
+  inner1: traverse({
+    hello: capture()
+   })
+})
+
+//result is Match { value: { inner1: { hello: "world" } } }
+```
+
 ### Merging with Parent (replace flag)
 ```
 
@@ -235,11 +236,16 @@ const input = {
   }
 }
 
-const schema = traverse({
-  inner1: {
-    hello: capture()
-   }
-}, { replace: true })
+const schema = traverse(
+  {
+    inner1: traverse(
+      {
+        hello: capture()
+       }
+    )
+  },
+  { replace: true }
+)
 
 //result is Match { value: { hello: "world" } }
 ```
