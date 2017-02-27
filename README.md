@@ -1,7 +1,9 @@
 chimpanzee
 ==========
-Chimpanzee is a library for pattern matching tree, especially ASTs.
-This documentation covers the important features, but is not exhaustive.
+Chimpanzee is a library with which you can write a "Schema" for traversing trees structures and capturing values of certain nodes.
+This is especially useful for analyzing ASTs, which can be fairly large and complex. Schemas can be composed, allowing common structures to be abstracted out.
+
+This is still work in progress. The first non-beta version will come out along with the release of the parent project (Isotropy).
 
 Installation
 ------------
@@ -27,7 +29,19 @@ const result = match(schema, input);
 //result is Match { value: { hello: "world" } }
 ```
 
-## Simple capturing: capture()
+### Result Types
+The result of a match is one of four types.
+  - Match
+    - value: object
+  - Skip
+    - message: string
+  - Fault
+    - message: string
+  - Empty (is a Match, but has no value)
+
+
+### Simple capturing: capture()
+Allows you to capture the value of a node.
 ```
 const input = {
   hello: "world"
@@ -40,7 +54,8 @@ const schema = traverse({
 //result is Match { value: { hello: "world" } }
 ```
 
-## Named capturing: capture(alias)
+### Named capturing: capture(alias)
+Capture the value of a node and assign a name to it.
 ```
 const input = {
   hello: "world"
@@ -53,7 +68,7 @@ const schema = traverse({
 //result is Match { value: { prop1: "world" } }
 ```
 
-## Mismatched Tree
+### Mismatched Tree
 ```
 const input = {
   hello: "world"
@@ -67,7 +82,7 @@ const schema = traverse({
 //result is Skip { message: "Expected something to be defined." }
 ```
 
-## Capture with predicate: captureIf(predicate)
+### Capture with predicate: captureIf(predicate)
 ```
 const input = {
   hello: "world"
@@ -80,7 +95,7 @@ const schema = traverse({
 //result is Match { value: { hello: "world" } }
 ```
 
-## Capturing Types
+### Capturing Types
 ```
 const input = {
   name: "JPK",
@@ -99,7 +114,7 @@ const schema = traverse({
 })
 ```
 
-## Capture a Literal
+### Capture a Literal
 ```
 const input = {
   name: "JPK",
@@ -110,7 +125,7 @@ const schema = traverse({
 })
 ```
 
-## Matching Arrays
+### Matching Arrays
 ```
 const input = {
   myArray: [1, 2, 3]
@@ -119,7 +134,7 @@ const input = {
 const schema = traverse({ myArray: [number(), number(), number()] });
 ```
 
-## Array with repeating nodes
+### Array with repeating nodes
 ```
 const input = {
   level1: [
@@ -137,7 +152,7 @@ const schema = traverse({
 ```
 
 
-## Array with unordered nodes
+### Array with unordered nodes
 ```
 const input = {
   level1: [
@@ -156,7 +171,7 @@ const schema = traverse({
 ```
 
 
-## Array with optional nodes
+### Array with optional nodes
 ```
 const input = {
   level1: [
@@ -177,7 +192,7 @@ const schema = traverse({
 
 ```
 
-## Nested
+### Nested
 ```
 const input = {
   inner1: {
@@ -194,7 +209,7 @@ const schema = traverse({
 //result is Match { value: { inner1: { hello: "world" } } }
 ```
 
-## Optional
+### Optional
 Matches if found. Does not emit a Skip() if not found.
 ```
 const input = {
@@ -211,7 +226,7 @@ const schema = traverse({
 });
 ```
 
-## Merging with Parent (replace flag)
+### Merging with Parent (replace flag)
 ```
 
 const input = {
@@ -229,7 +244,7 @@ const schema = traverse({
 //result is Match { value: { hello: "world" } }
 ```
 
-## Capturing and traversing Child Schema (Parent-Child)
+### Capturing and traversing Child Schema (Parent-Child)
 ```
 const input = {
   level1: {
@@ -246,7 +261,7 @@ const schema = traverse({
 //result is Match { prop1: { level2: 'hello world', prop2: 'hello world' } }
 ```
 
-## Matching Any Schema: any(list)
+### Matching Any Schema: any(list)
 ```
 const input = {
   level1: {
@@ -267,7 +282,7 @@ schema2 = traverse({
 const schema = any([schema1, schema2]);
 ```
 
-## Matching nodes deeper in the tree: deep(schema)
+### Matching nodes deeper in the tree: deep(schema)
 ```
 const input = {
   level1: {
@@ -303,7 +318,7 @@ const schema = traverse({
 //result is Match { prop1: { prop3: 'world' } }
 ```
 
-## Matching undefined or empty: empty()
+### Matching undefined or empty: empty()
 ```
 const input = {
   prop1: "hello",
@@ -318,7 +333,7 @@ const schema = traverse({
 //result is Match export const result = { prop1: "hello" }
 ```
 
-## Matching the existence of a node: exists()
+### Matching the existence of a node: exists()
 ```
 export const input = {
   hello: "world",
@@ -333,7 +348,7 @@ export const schema = traverse({
 //This makes sure that hello exists. Or it returns a Skip.
 ```
 
-## Matching with Regex: regex()
+### Matching with Regex: regex()
 ```
 const input = {
   hello: "world"
@@ -344,7 +359,7 @@ const schema = traverse({
 })
 ```
 
-## Advanced
+### Advanced
 Property Modifier. Use this if your input tree isn't a simple object.
 ```
 const input = {
@@ -359,7 +374,7 @@ const schema = traverse({
 
 ```
 
-## Builders
+### Builders
 Advanced features which let you:
 - modify the result of the capture (builder.get)
 - Pause traversing until another subtree finishes (builder.precondition)
@@ -397,7 +412,7 @@ export const schema = traverse(
 )
 ```
 
-## Builder Asserts
+### Builder Asserts
 Generates a Fault which will stop the matching on the tree.
 ```
 export const input = {
@@ -419,7 +434,7 @@ export const schema = traverse(
 //This returns a Fault { message: "prop1 cannot be hello" }
 ```
 
-## Builder Predicates
+### Builder Predicates
 Similar to Asserts, but returns a Skip instead of Fault.
 ```
 export const input = {
