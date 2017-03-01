@@ -68,6 +68,23 @@ const schema = traverse({
 //result is Match { value: { prop1: "world" } }
 ```
 
+### Capture and modify: capture(predicate, modifier)
+Capture the value of a node and assign a name to it.
+```
+const input = {
+  hello: "world"
+}
+
+const schema = traverse({
+  hello: modify(
+    x => x === "world",
+    x => `${x}!!!`
+  )
+})
+
+//result is Match { value: { prop1: "world!!!" } }
+```
+
 ### Mismatched Tree
 ```
 const input = {

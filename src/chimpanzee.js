@@ -5,6 +5,7 @@ export {
   captureWithSchema as captureWithSchema,
   captureIfWithSchema as captureIfWithSchema,
   literal as literal,
+  modify as modify,
   take as take
 } from "./capture";
 export { any as any } from "./any";
