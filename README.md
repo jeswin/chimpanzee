@@ -25,7 +25,6 @@ const schema = traverse({
 })
 
 const result = match(schema, input);
-
 //result is Match { value: { hello: "world" } }
 ```
 
@@ -40,6 +39,23 @@ The result of a match is one of four types.
   - Empty (is a Match, but has no value)
 
 
+### Simple evaluation
+```
+import { traverse, Match } from "chimpanzee";
+
+const input = {
+  hello: "world"
+}
+
+const schema = traverse({
+  hello: item => Match(`${item}!!!`)
+})
+
+const result = match(schema, input);
+//result is Match { value: { hello: "world!!!" } }
+```
+
+
 ### Simple capturing: capture()
 Allows you to capture the value of a node.
 ```
@@ -51,6 +67,7 @@ const schema = traverse({
   hello: capture()
 })
 
+const result = match(schema, input);
 //result is Match { value: { hello: "world" } }
 ```
 
@@ -65,6 +82,7 @@ const schema = traverse({
   hello: capture("prop1")
 })
 
+const result = match(schema, input);
 //result is Match { value: { prop1: "world" } }
 ```
 
@@ -82,6 +100,7 @@ const schema = traverse({
   )
 })
 
+const result = match(schema, input);
 //result is Match { value: { prop1: "world!!!" } }
 ```
 
@@ -96,6 +115,7 @@ const schema = traverse({
   hello: capture()
 })
 
+const result = match(schema, input);
 //result is Skip { message: "Expected something to be defined." }
 ```
 
@@ -109,6 +129,7 @@ const schema = traverse({
   hello: captureIf(x => x === "world")
 })
 
+const result = match(schema, input);
 //result is Match { value: { hello: "world" } }
 ```
 
@@ -241,6 +262,7 @@ const schema = traverse({
    })
 })
 
+const result = match(schema, input);
 //result is Match { value: { inner1: { hello: "world" } } }
 ```
 
@@ -264,6 +286,7 @@ const schema = traverse(
   { replace: true }
 )
 
+const result = match(schema, input);
 //result is Match { value: { hello: "world" } }
 ```
 
@@ -276,11 +299,12 @@ const input = {
 }
 
 const schema = traverse({
-  level1: captureWithSchema(traverse({
+  level1: captureAndTraverse(traverse({
     level2: capture("prop2")
   }), "prop1")
 })
 
+const result = match(schema, input);
 //result is Match { prop1: { level2: 'hello world', prop2: 'hello world' } }
 ```
 
@@ -338,6 +362,7 @@ const schema = traverse({
   }
 })
 
+const result = match(schema, input);
 //result is Match { prop1: { prop3: 'world' } }
 ```
 
@@ -353,6 +378,7 @@ const schema = traverse({
   prop2: empty()
 })
 
+const result = match(schema, input);
 //result is Match export const result = { prop1: "hello" }
 ```
 
@@ -454,6 +480,7 @@ export const schema = traverse(
   }
 )
 
+const result = match(schema, input);
 //This returns a Fault { message: "prop1 cannot be hello" }
 ```
 
@@ -476,5 +503,6 @@ export const schema = traverse(
   }
 )
 
+const result = match(schema, input);
 //This returns a Skip { message: "prop1 cannot be hello" }
 ```

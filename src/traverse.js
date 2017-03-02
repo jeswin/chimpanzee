@@ -9,13 +9,15 @@ function getSchemaType(schema) {
   return (
     ["string", "number", "boolean"].includes(typeof schema)
       ? "primitive"
-      : schema instanceof Schema
+      : typeof schema === "function"
         ? "function"
-        : Array.isArray(schema)
-          ? "array"
-          : typeof schema === "object"
-            ? "object"
-            : typeof schema
+        : schema instanceof Schema
+          ? "schema"
+          : Array.isArray(schema)
+            ? "array"
+            : typeof schema === "object"
+              ? "object"
+              : typeof schema
   );
 }
 
@@ -31,7 +33,7 @@ export function traverse(schema, params = {}, inner = false) {
 
     function getTask(builder) {
       const task = function fn() {
-        const readyToRun = !builder.precondition || (builder.precondition(obj, context));
+        const readyToRun = !builder.precondition || (builder.precondition(obj, context, key));
         return readyToRun
           ? (() => {
             const predicates = !builder.predicates
@@ -51,12 +53,12 @@ export function traverse(schema, params = {}, inner = false) {
             return (
               Seq.of(predicates.concat(assertions))
                 .map(predicate =>
-                  predicate.fn(obj, context)
+                  predicate.fn(obj, context, key)
                     ? undefined
                     : predicate.invalid())
                 .first(x => x)
               )
-              || new Match(builder.get(obj, context));
+              || new Match(builder.get(obj, context, key));
           })()
           : fn
       }
@@ -106,8 +108,12 @@ export function traverse(schema, params = {}, inner = false) {
     }
 
 
+    function getSchemaTasks() {
+      return [{ task: schema.fn(obj, context, key) }];
+    }
+
     function getFunctionTasks() {
-      return [{ task: schema.fn(obj, context) }];
+      return [{ task: schema(obj, context, key) }];
     }
 
     /*
@@ -115,7 +121,7 @@ export function traverse(schema, params = {}, inner = false) {
       So, we can consider the first item in finished as the only item.
       There can be multiple tasks though.
     */
-    function mergeFunctionChildTasks(finished) {
+    function mergeChildTasks(finished) {
       const result = finished[0].result;
       return result instanceof Match
         ? !(result instanceof Empty)
@@ -193,8 +199,12 @@ export function traverse(schema, params = {}, inner = false) {
 
     const methods = {
       "function": {
-        mergeChildTasks: mergeFunctionChildTasks,
+        mergeChildTasks: mergeChildTasks,
         getChildTasks: getFunctionTasks
+      },
+      "schema": {
+        mergeChildTasks: mergeChildTasks,
+        getChildTasks: getSchemaTasks
       },
       "object": {
         mergeChildTasks: mergeObjectChildTasks,

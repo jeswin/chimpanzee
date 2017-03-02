@@ -53,6 +53,7 @@ describe("chimpanzee", () => {
     ['exists-negative', 'exists-negative', "skip"],
     ['func', 'func', "return"],
     ['func-negative', 'func-negative', "skip"],
+    ['function-schema', 'function-schema', "return"],
     ['literal', 'literal', "return"],
     ['literal-negative', 'literal-negative', "skip"],
     ['map', 'map', "return"],

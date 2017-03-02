@@ -19,12 +19,8 @@ export function modify(comparand, modifier, params) {
   )
 }
 
-export function captureWithSchema(schema, params) {
-  return captureIfWithSchema(obj => typeof obj !== "undefined", schema, params);
-}
-
-export function captureIfWithSchema(predicate, schema, params) {
-  return take(predicate, schema, params)
+export function captureAndTraverse(schema, params) {
+  return take(obj => typeof obj !== "undefined", schema, params);
 }
 
 export function literal(what, params) {
@@ -34,7 +30,7 @@ export function literal(what, params) {
 export function take(predicate, schema, params, options = {}) {
   params = typeof params === "string" ? { key: params } : params;
 
-  function fn(obj, context) {
+  function fn(obj, context, key) {
     return predicate(obj)
       ? typeof schema !== "undefined"
         ? waitForSchema(
