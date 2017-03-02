@@ -31,11 +31,13 @@ export {
 
 export { Match, Empty, Skip, Fault } from "./results";
 
-export function match(schema, args) {
-  return _match(schema.fn(args))
-}
+export { default as Schema } from "./schema";
 
 function _match(traverseResult) {
   const result = traverseResult;
   return typeof result === "function" ? _match(result()) : result;
+}
+
+export function match(schema, args) {
+  return _match(schema.fn(args))
 }
