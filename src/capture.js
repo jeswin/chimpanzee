@@ -24,7 +24,7 @@ export function captureAndTraverse(schema, params) {
 }
 
 export function literal(what, params) {
-  return take(x => x === what, undefined, params, { skipMessage: `Expected value to be ${what}.` });
+  return take(x => x === what, undefined, params, { skipMessage: x => `Expected value to be ${what} but got ${x}.` });
 }
 
 export function take(predicate, schema, params, options = {}) {
@@ -43,7 +43,7 @@ export function take(predicate, schema, params, options = {}) {
               : new Skip("Capture failed in inner schema.")
         )
         : new Match(options.modifier ? options.modifier(obj) : obj)
-      : new Skip(options.skipMessage || "Predicate returned false.")
+      : new Skip(options.skipMessage ? options.skipMessage(obj) : "Predicate returned false.")
   }
 
   return new Schema(fn, params);

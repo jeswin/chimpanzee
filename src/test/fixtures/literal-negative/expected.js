@@ -1,1 +1,1 @@
-export const result = "Expected value to be something."
+export const result = "Expected value to be something but got world."

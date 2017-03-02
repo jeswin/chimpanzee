@@ -7,8 +7,8 @@ let ctr = 0;
 
 function getSchemaType(schema) {
   return (
-    ["string", "number", "boolean"].includes(typeof schema)
-      ? "primitive"
+    ["string", "number", "boolean", "symbol"].includes(typeof schema)
+      ? "native"
       : typeof schema === "function"
         ? "function"
         : schema instanceof Schema
@@ -65,9 +65,10 @@ export function traverse(schema, params = {}, inner = false) {
       return { task };
     }
 
-    function getPrimitiveTasks() {
-      return schema !== obj
-        ? [{ task: new Skip(`Expected ${schema} but got ${obj}.`) }]
+    function getNativeTypeTasks() {
+      const comparand = params.value ? params.value(obj) : obj;
+      return schema !== comparand
+        ? [{ task: new Skip(`Expected ${schema} but got ${comparand}.`) }]
         : [{ task: new Empty() }]
     }
 
@@ -78,7 +79,7 @@ export function traverse(schema, params = {}, inner = false) {
             const childSchema = schema[key];
             const childItem = params.modifier ? params.modifier(obj, key) : obj[key];
             return {
-              task: traverse(childSchema, { modifier: params.modifier, parentCtr: params.ctr }, true)
+              task: traverse(childSchema, { value: params.value, modifier: params.modifier, parentCtr: params.ctr }, true)
                 .fn(childItem, getSchemaType(childSchema) === "object" ? context : { parent: context }, key),
               params: childSchema.params
                 ? { ...childSchema.params, key: childSchema.params.key || key }
@@ -99,7 +100,7 @@ export function traverse(schema, params = {}, inner = false) {
           ? new Skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
           : Seq.of(schema)
             .map((rhs, i) => ({
-              task: traverse(rhs, { modifier: params.modifier, parentCtr: params.ctr }, false)
+              task: traverse(rhs, { value: params.value, modifier: params.modifier, parentCtr: params.ctr }, false)
                 .fn(obj[i], { parent: context }),
               params: schema.params
             }))
@@ -175,7 +176,7 @@ export function traverse(schema, params = {}, inner = false) {
         );
     }
 
-    function mergePrimitiveChildTasks(finished, isRunningChildTasks) {
+    function mergeNativeTypeChildTasks(finished, isRunningChildTasks) {
       const result = finished[0].result;
       return result instanceof Match
         ? context
@@ -214,9 +215,9 @@ export function traverse(schema, params = {}, inner = false) {
         mergeChildTasks: mergeArrayChildTasks,
         getChildTasks: getArrayTasks,
       },
-      "primitive": {
-        mergeChildTasks: mergePrimitiveChildTasks,
-        getChildTasks: getPrimitiveTasks
+      "native": {
+        mergeChildTasks: mergeNativeTypeChildTasks,
+        getChildTasks: getNativeTypeTasks
       }
     }
 

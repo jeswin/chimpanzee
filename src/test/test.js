@@ -62,6 +62,7 @@ describe("chimpanzee", () => {
     ['modify-predicate', 'modify-predicate', "return"],
     ['modify-replace', 'modify-replace', "return"],
     ['named-capture', 'named-capture', "return"],
+    ['native-type-value-modifier', 'native-type-value-modifier', "return"],
     ['nested-any', 'nested-any', "return"],
     ['nested-native-array-simple', 'nested-native-array-simple', "return"],
     ['nested-native-array-simple-capture', 'nested-native-array-simple-capture', "return"],
