@@ -25,11 +25,12 @@ export function traverse(schema, params = {}, inner = false) {
   params = typeof params === "string" ? { key: params } : params;
   params.ctr = ctr++;
   params.builders = params.builders || [{ get: (obj, { state }) => state }];
+  params.modifiers = params.modifiers || {};
 
   const schemaType = getSchemaType(schema);
 
   function fn(_obj, context = {}, key) {
-    const obj = params.objectModifier ? params.objectModifier(_obj) : _obj;
+    const obj = params.modifiers.object ? params.modifiers.object(_obj) : _obj;
 
     function getTask(builder) {
       const task = function fn() {
@@ -66,7 +67,7 @@ export function traverse(schema, params = {}, inner = false) {
     }
 
     function getNativeTypeTasks() {
-      const comparand = params.value ? params.value(obj) : obj;
+      const comparand = params.modifiers.value ? params.modifiers.value(obj) : obj;
       return schema !== comparand
         ? [{ task: new Skip(`Expected ${schema} but got ${comparand}.`) }]
         : [{ task: new Empty() }]
@@ -77,9 +78,11 @@ export function traverse(schema, params = {}, inner = false) {
         ? Seq.of(Object.keys(schema))
           .map(key => {
             const childSchema = schema[key];
-            const childItem = params.modifier ? params.modifier(obj, key) : obj[key];
+            const childItem = params.modifiers.property && (!childSchema.params || !childSchema.params.unmodified)
+              ? params.modifiers.property(obj, key)
+              : obj[key];
             return {
-              task: traverse(childSchema, { value: params.value, modifier: params.modifier, parentCtr: params.ctr }, true)
+              task: traverse(childSchema, { value: params.value, modifiers: { property: params.modifiers.property, value: params.modifiers.value }, parentCtr: params.ctr }, true)
                 .fn(childItem, getSchemaType(childSchema) === "object" ? context : { parent: context }, key),
               params: childSchema.params
                 ? { ...childSchema.params, key: childSchema.params.key || key }
@@ -100,7 +103,7 @@ export function traverse(schema, params = {}, inner = false) {
           ? new Skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
           : Seq.of(schema)
             .map((rhs, i) => ({
-              task: traverse(rhs, { value: params.value, modifier: params.modifier, parentCtr: params.ctr }, false)
+              task: traverse(rhs, { value: params.value, modifiers: { property: params.modifiers.property, value: params.modifiers.value }, parentCtr: params.ctr }, false)
                 .fn(obj[i], { parent: context }),
               params: schema.params
             }))

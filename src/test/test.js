@@ -58,11 +58,9 @@ describe("chimpanzee", () => {
     ['literal-negative', 'literal-negative', "skip"],
     ['map', 'map', "return"],
     ['match-negative', 'match-negative', "skip"],
-    ['modifier', 'modifier', "return"],
     ['modify-predicate', 'modify-predicate', "return"],
     ['modify-replace', 'modify-replace', "return"],
     ['named-capture', 'named-capture', "return"],
-    ['native-type-value-modifier', 'native-type-value-modifier', "return"],
     ['nested-any', 'nested-any', "return"],
     ['nested-native-array-simple', 'nested-native-array-simple', "return"],
     ['nested-native-array-simple-capture', 'nested-native-array-simple-capture', "return"],
@@ -75,12 +73,15 @@ describe("chimpanzee", () => {
     ['object-negative', 'object-negative', "skip"],
     ['optional', 'optional', "return"],
     ['precondition', 'precondition', "return"],
+    ['property-modifier', 'property-modifier', "return"],
+    ['property-modifier-skip', 'property-modifier-skip', "return"],
     ['reference-parent-state', 'reference-parent-state', "return"],
     ['regex', 'regex', "return"],
     ['regex-negative', 'regex-negative', "skip"],
     ['string', 'string', "return"],
     ['string-negative', 'string-negative', "skip"],
     ['traverse-wrapper', 'traverse-wrapper', "return"],
+    ['value-modifier', 'value-modifier', "return"],
   ];
 
   for (const test of tests) {

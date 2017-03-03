@@ -10,5 +10,5 @@ export const schema = traverse(
   {
     prop1: capture(),
   },
-  { objectModifier: obj => obj.node }
+  { modifiers: { object: obj => obj.node } }
 )

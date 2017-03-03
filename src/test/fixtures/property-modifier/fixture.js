@@ -8,4 +8,4 @@ export const input = {
 
 export const schema = traverse({
   hello: capture()
-}, { modifier: (obj, key) => obj.getItem(key) })
+}, { modifiers: { property: (obj, key) => obj.getItem(key) } })
