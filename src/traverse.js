@@ -29,8 +29,8 @@ export function traverse(schema, params = {}, inner = false) {
 
   const schemaType = getSchemaType(schema);
 
-  function fn(_obj, context = {}, key) {
-    const obj = params.modifiers.object ? params.modifiers.object(_obj) : _obj;
+  function fn(originalObj, context = {}, key) {
+    const obj = params.modifiers.object ? params.modifiers.object(originalObj) : originalObj;
 
     function getTask(builder) {
       const task = function fn() {
@@ -78,9 +78,23 @@ export function traverse(schema, params = {}, inner = false) {
         ? Seq.of(Object.keys(schema))
           .map(key => {
             const childSchema = schema[key];
-            const childItem = params.modifiers.property && (!childSchema.params || !childSchema.params.unmodified)
-              ? params.modifiers.property(obj, key)
-              : obj[key];
+            const childUnmodified = childSchema.params && childSchema.params.unmodified || { object: false, property: false }
+
+            const childItem =
+              childUnmodified.object
+                ? childUnmodified.property
+                  ? originalObj[key]
+                  : params.modifiers.propertyOnUnmodified
+                    ? params.modifiers.propertyOnUnmodified(originalObj, key)
+                    : params.modifiers.property
+                      ? params.modifiers.property(originalObj, key)
+                      : originalObj[key]
+                : childUnmodified.property
+                  ? obj[key]
+                  : params.modifiers.property
+                    ? params.modifiers.property(obj, key)
+                    : obj[key];
+
             return {
               task: traverse(childSchema, { value: params.value, modifiers: { property: params.modifiers.property, value: params.modifiers.value }, parentCtr: params.ctr }, true)
                 .fn(childItem, getSchemaType(childSchema) === "object" ? context : { parent: context }, key),

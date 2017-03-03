@@ -5,5 +5,5 @@ export const input = {
 }
 
 export const schema = traverse({
-  hello: captureIf(x => true, { unmodified: true })
+  hello: captureIf(x => true, { unmodified: { property: true } })
 }, { modifiers: { property: x => `${x}!!!` } })

@@ -70,6 +70,7 @@ describe("chimpanzee", () => {
     ['number-negative', 'number-negative', "skip"],
     ['object', 'object', "return"],
     ['object-modifier', 'object-modifier', "return"],
+    ['object-modifier-skip', 'object-modifier-skip', "return"],
     ['object-negative', 'object-negative', "skip"],
     ['optional', 'optional', "return"],
     ['precondition', 'precondition', "return"],
