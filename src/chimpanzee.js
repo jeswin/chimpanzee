@@ -40,5 +40,5 @@ function _match(traverseResult) {
 }
 
 export function match(schema, args) {
-  return _match(schema.fn(args))
+  return _match(schema.fn(args, {}))
 }

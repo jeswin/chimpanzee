@@ -32,29 +32,21 @@ export function composite(schema, _paramsList, ownParams) {
 
   function fn(obj, context, key) {
     return schemas.length
-      ? (function run(schemas, acc) {
+      ? (function run(schemas) {
         return waitForSchema(
           schemas[0],
           obj,
           context,
           result =>
             result instanceof Match
-              ? (() => {
-                const merged = result instanceof Empty
-                  ? acc
-                  : !(acc instanceof Empty)
-                    ? new Match({ ...acc.value, ...result.value })
-                    : result;
-                return schemas.length > 1
-                  ? run(schemas.slice(1), merged)
-                  : merged;
-              })()
+              ? schemas.length > 1
+                ? run(schemas.slice(1))
+                : result
               : result
         );
-      })(schemas, new Empty())
+      })(schemas)
       : new Empty();
   }
 
   return new Schema(fn, ownParams);
-
 }
