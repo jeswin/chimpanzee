@@ -12,7 +12,7 @@ export const schema = composite(
   {
     something: "else",
     hello: capture({ key: "first" }),
-    prop: literal("nothing", { key: "second", options: "alt" })
+    prop: literal("nothing", { key: "second", selector: "alt" })
   },
   [
     { name: "default", modifiers: { object: x => x.node } },

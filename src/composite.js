@@ -10,8 +10,8 @@ function getSchema(schema, params) {
     .reduce(
       (acc, key) =>
         schema[key] instanceof Schema
-          ? params.name === schema[key].params.options ||
-          ((params.name === "default" || typeof params.name === "undefined") && (schema[key].params.options === "default" || typeof schema[key].params.options === "undefined"))
+          ? params.name === schema[key].params.selector ||
+          ((params.name === "default" || typeof params.name === "undefined") && (schema[key].params.selector === "default" || typeof schema[key].params.selector === "undefined"))
             ? { ...acc, [key]: schema[key] }
             : acc
           : typeof schema[key] === "object"
@@ -26,7 +26,7 @@ export function composite(schema, _paramsList, ownParams) {
   const normalizedParams = _paramsList.map(params => typeof params === "string" ? { key: params } : params);
   const paramsList = normalizedParams.some(params => params.name === "default" || typeof params.name === "undefined")
     ? normalizedParams
-    : normalizedParams.concat({})
+    : [{}].concat(normalizedParams)
 
   const schemas = paramsList.map(params => getSchema(schema, params))
 
