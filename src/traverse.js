@@ -2,9 +2,6 @@ import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { Seq } from "lazily";
 
-//DEBUG only
-let ctr = 0;
-
 function getSchemaType(schema) {
   return (
     ["string", "number", "boolean", "symbol"].includes(typeof schema)
@@ -23,7 +20,6 @@ function getSchemaType(schema) {
 
 export function traverse(schema, params = {}, inner = false) {
   params = typeof params === "string" ? { key: params } : params;
-  params.ctr = ctr++;
   params.builders = params.builders || [{ get: (obj, { state }) => state }];
   params.modifiers = params.modifiers || {};
 
@@ -96,7 +92,7 @@ export function traverse(schema, params = {}, inner = false) {
                     : obj[key];
 
             return {
-              task: traverse(childSchema, { value: params.value, modifiers: { property: params.modifiers.property, value: params.modifiers.value }, parentCtr: params.ctr }, true)
+              task: traverse(childSchema, { value: params.value, modifiers: { property: params.modifiers.property, value: params.modifiers.value } }, true)
                 .fn(childItem, getSchemaType(childSchema) === "object" ? context : { parent: context }, key),
               params: childSchema.params
                 ? { ...childSchema.params, key: childSchema.params.key || key }
@@ -117,7 +113,7 @@ export function traverse(schema, params = {}, inner = false) {
           ? new Skip(`Expected array of length ${schema.length} but got ${obj.length}.`)
           : Seq.of(schema)
             .map((rhs, i) => ({
-              task: traverse(rhs, { value: params.value, modifiers: { property: params.modifiers.property, value: params.modifiers.value }, parentCtr: params.ctr }, false)
+              task: traverse(rhs, { value: params.value, modifiers: { property: params.modifiers.property, value: params.modifiers.value } }, false)
                 .fn(obj[i], { parent: context }),
               params: schema.params
             }))

@@ -46,6 +46,7 @@ describe("chimpanzee", () => {
     ['capture-if-negative', 'capture-if-negative', "skip"],
     ['capture-parent-child', 'capture-parent-child', "return"],
     ['capture-simple', 'capture-simple', "return"],
+    ['composite', 'composite', "return"],
     ['deep', 'deep', "return"],
     ['empty', 'empty', "return"],
     ['empty-negative', 'empty-negative', "skip"],

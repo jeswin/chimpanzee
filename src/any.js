@@ -9,10 +9,11 @@ export function any(schemas, params) {
   function fn(obj, context) {
     return schemas.length
       ? (function run(schemas) {
+        const newContext = { ...context };
         return waitForSchema(
           schemas[0],
           obj,
-          context,
+          newContext,
           result =>
             result instanceof Match
               ? result

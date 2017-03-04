@@ -1,4 +1,5 @@
 export { traverse } from "./traverse";
+export { composite } from "./composite";
 export {
   capture,
   captureIf,

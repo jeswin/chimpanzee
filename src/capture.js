@@ -2,7 +2,7 @@ import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
-export function capture(params, options) {
+export function capture(params) {
   return captureIf(obj => typeof obj !== "undefined", params);
 }
 
