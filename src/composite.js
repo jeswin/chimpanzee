@@ -15,7 +15,7 @@ function getSchema(schema, params) {
             ? { ...acc, [key]: schema[key] }
             : acc
           : typeof schema[key] === "object"
-            ? { ...acc, [key]: getSchema(schema[key], params.name) }
+            ? { ...acc, [key]: getSchema(schema[key], params) }
             : acc,
       {}
     );
