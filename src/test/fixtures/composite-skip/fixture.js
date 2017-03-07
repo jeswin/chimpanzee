@@ -10,7 +10,6 @@ export const input = {
 
 export const schema = composite(
   {
-    something: "else",
     hello: capture({ key: "first" }),
     prop: literal("nothing", { key: "second", selector: "alt" })
   },

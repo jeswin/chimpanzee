@@ -4,23 +4,35 @@ import Schema from "./schema";
 import { Seq } from "lazily";
 import { waitForSchema } from "./utils";
 
+function getSchema(schema, paramName) {
+  const schemaName = schema.params && schema.params.selector
+    ? schema.params.selector
+    : "default";
 
-function getSchema(schema, params) {
-  const newSchema = Seq.of(Object.keys(schema))
-    .reduce(
-      (acc, key) =>
-        schema[key] instanceof Schema
-          ? params.name === schema[key].params.selector ||
-          ((params.name === "default" || typeof params.name === "undefined") && (schema[key].params.selector === "default" || typeof schema[key].params.selector === "undefined"))
-            ? { ...acc, [key]: schema[key] }
-            : acc
-          : typeof schema[key] === "object"
-            ? { ...acc, [key]: getSchema(schema[key], params) }
-            : acc,
-      {}
-    );
-  return traverse(newSchema, params);
+  return (
+    Array.isArray(schema)
+      ? schema.map(item => getSchema(item, paramName)).filter(x => x !== undefined)
+      : schema instanceof Schema
+        ? schemaName === paramName
+          ? schema
+          : undefined
+        : typeof schema === "object"
+          ? Seq.of(Object.keys(schema))
+            .reduce(
+              (acc, key) => {
+                const result = getSchema(schema[key], paramName);
+                return result !== undefined
+                  ? { ...acc, [key]: result }
+                  : acc
+              },
+              {}
+            )
+          : paramName === "default"
+            ? schema
+            : undefined
+  );
 }
+
 
 export function composite(schema, _paramsList, ownParams) {
   const normalizedParams = _paramsList.map(params => typeof params === "string" ? { key: params } : params);
@@ -28,7 +40,7 @@ export function composite(schema, _paramsList, ownParams) {
     ? normalizedParams
     : [{}].concat(normalizedParams)
 
-  const schemas = paramsList.map(params => getSchema(schema, params))
+  const schemas = paramsList.map(params => traverse(getSchema(schema, (params && params.name) || "default"), params))
 
   function fn(obj, context, key) {
     return schemas.length

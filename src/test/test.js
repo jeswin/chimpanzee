@@ -47,6 +47,7 @@ describe("chimpanzee", () => {
     ['capture-parent-child', 'capture-parent-child', "return"],
     ['capture-simple', 'capture-simple', "return"],
     ['composite', 'composite', "return"],
+    ['composite-complex', 'composite-complex', "return"],
     ['composite-skip', 'composite-skip', "skip"],
     ['deep', 'deep', "return"],
     ['empty', 'empty', "return"],

@@ -2,6 +2,7 @@ import { composite, capture } from "../../../chimpanzee";
 
 export const input = {
   node: {
+    something: "else",
     jeff: "buckley",
     hello: "world",
   },
