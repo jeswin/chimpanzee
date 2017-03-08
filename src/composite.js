@@ -60,5 +60,6 @@ export function composite(schema, _paramsList, ownParams) {
       : new Empty();
   }
 
-  return new Schema(fn, ownParams);
+  //return new Schema(fn, ownParams);
+  return traverse(fn, ownParams);
 }
