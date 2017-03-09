@@ -9,14 +9,9 @@ export function exists(predicate, schema) {
   function fn(obj, context) {
     return predicate(obj)
       ? schema
-        ? waitForSchema(
-          schema,
-          obj,
-          context,
-          inner => inner
-        )
-        : new Empty()
-      : new Skip("Does not exist.")
+          ? waitForSchema(schema, obj, context, inner => inner)
+          : new Empty()
+      : new Skip("Does not exist.");
   }
 
   return new Schema(fn);

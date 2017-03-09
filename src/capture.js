@@ -7,7 +7,7 @@ export function capture(params) {
 }
 
 export function captureIf(predicate, params) {
-  return take(predicate, undefined, params)
+  return take(predicate, undefined, params);
 }
 
 export function modify(comparand, modifier, params) {
@@ -16,7 +16,7 @@ export function modify(comparand, modifier, params) {
     undefined,
     params,
     { modifier: typeof modifier === "function" ? modifier : x => modifier }
-  )
+  );
 }
 
 export function captureAndTraverse(schema, params) {
@@ -24,7 +24,9 @@ export function captureAndTraverse(schema, params) {
 }
 
 export function literal(what, params) {
-  return take(x => x === what, undefined, params, { skipMessage: x => `Expected value to be ${what} but got ${x}.` });
+  return take(x => x === what, undefined, params, {
+    skipMessage: x => `Expected value to be ${what} but got ${x}.`
+  });
 }
 
 export function take(predicate, schema, params, options = {}) {
@@ -33,17 +35,26 @@ export function take(predicate, schema, params, options = {}) {
   function fn(obj, context, key) {
     return predicate(obj)
       ? typeof schema !== "undefined"
-        ? waitForSchema(
-          schema,
-          obj,
-          context,
-          result =>
-            result instanceof Match
-              ? new Match({ ...obj, ...(options.modifier ? options.modifier(result.value) : result.value) })
-              : new Skip("Capture failed in inner schema.")
-        )
-        : new Match(options.modifier ? options.modifier(obj) : obj)
-      : new Skip(options.skipMessage ? options.skipMessage(obj) : "Predicate returned false.")
+          ? waitForSchema(
+              schema,
+              obj,
+              context,
+              result =>
+                result instanceof Match
+                  ? new Match({
+                      ...obj,
+                      ...(options.modifier
+                        ? options.modifier(result.value)
+                        : result.value)
+                    })
+                  : new Skip("Capture failed in inner schema.")
+            )
+          : new Match(options.modifier ? options.modifier(obj) : obj)
+      : new Skip(
+          options.skipMessage
+            ? options.skipMessage(obj)
+            : "Predicate returned false."
+        );
   }
 
   return new Schema(fn, params);

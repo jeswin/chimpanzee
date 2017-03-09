@@ -8,20 +8,19 @@ export function regex(regex, params) {
 
   function fn(obj, context) {
     return waitForSchema(
-      captureIf(obj =>
-        typeof regex === "string"
-          ? typeof obj === "string" && new RegExp(regex).test(obj)
-          : typeof obj === "string" && regex.test(obj),
+      captureIf(
+        obj =>
+          typeof regex === "string"
+            ? typeof obj === "string" && new RegExp(regex).test(obj)
+            : typeof obj === "string" && regex.test(obj),
         params
       ),
       obj,
       context,
       result =>
-        result instanceof Skip
-          ? new Skip(`Did not match regex.`)
-          : result
+        result instanceof Skip ? new Skip(`Did not match regex.`) : result
     );
   }
 
-  return new Schema(fn, params)
+  return new Schema(fn, params);
 }

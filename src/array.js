@@ -25,8 +25,11 @@ export function repeatingItem(_schema, opts = {}) {
       (function run(items, results, needle) {
         const completed = (result, needle) =>
           results.length >= min && (!max || results.length <= max)
-            ? { result: new Match(results.concat(result ? [result.value] : [])), needle }
-            : { result: new Skip("Incorrect number of matches.") }
+            ? {
+                result: new Match(results.concat(result ? [result.value] : [])),
+                needle
+              }
+            : { result: new Skip("Incorrect number of matches.") };
 
         return waitForSchema(
           schema(needle),
@@ -36,17 +39,11 @@ export function repeatingItem(_schema, opts = {}) {
             result instanceof Skip || result instanceof Fault
               ? completed(undefined, needle)
               : items.length > needle
-                ? run(
-                  items,
-                  results.concat([result.value]),
-                  needle
-                )
-                : completed(result, needle)
-
-        )
-      })(obj, [], needle)
-    )
-  })
+                  ? run(items, results.concat([result.value]), needle)
+                  : completed(result, needle)
+        );
+      })(obj, [], needle));
+  });
 }
 
 /*
@@ -60,23 +57,20 @@ export function repeatingItem(_schema, opts = {}) {
 export function unorderedItem(_schema) {
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
-    return new Schema((obj, context, key) =>
-      (function run(items, i) {
-        return waitForSchema(
-          schema(i),
-          items,
-          context,
-          ({ result }) =>
-            result instanceof Match
-              ? { result, needle }
-              : items.length > i
+    return new Schema((obj, context, key) => (function run(items, i) {
+      return waitForSchema(
+        schema(i),
+        items,
+        context,
+        ({ result }) =>
+          result instanceof Match
+            ? { result, needle }
+            : items.length > i
                 ? run(items, i + 1)
                 : { result: new Skip(`Unordered item was not found.`), needle }
-
-        )
-      })(obj, 0)
-    )
-  })
+      );
+    })(obj, 0));
+  });
 }
 
 /*
@@ -96,11 +90,9 @@ export function optionalItem(_schema) {
           result instanceof Match
             ? { result, needle: needle + 1 }
             : { result: new Empty(), needle }
-      ))
-  })
+      ));
+  });
 }
-
-
 
 /*
   Not array types, viz optional, unordered or repeating.
@@ -116,15 +108,11 @@ function regularItem(schema) {
           result instanceof Match
             ? { result, needle: needle + 1 }
             : { result, needle }
-      )
-    )
+      ));
 }
 
-
 function toNeedledSchema(schema) {
-  return schema instanceof ArrayItem
-    ? schema.fn
-    : regularItem(schema)
+  return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
 }
 
 /*
@@ -136,28 +124,26 @@ export function array(list, params) {
   const fn = function(obj, context, key) {
     return Array.isArray(obj)
       ? (function run(schemas, results, needle) {
-        const schema = toNeedledSchema(schemas[0]);
-        return waitForSchema(
-          schema(needle),
-          obj,
-          context,
-          ({ result, needle }) =>
-            result instanceof Skip || result instanceof Fault
-              ? result
-              : schemas.length > 1
-                ? run(
-                  schemas.slice(1),
-                  results.concat(
-                    result instanceof Empty
-                      ? []
-                      : [result.value]
-                  ),
-                  needle
-                )
-                : new Match(results.concat(result.value))
-        )
-      })(list, [], 0)
-      : new Fault(`Expected array but got ${typeof obj}.`)
-  }
+          const schema = toNeedledSchema(schemas[0]);
+          return waitForSchema(
+            schema(needle),
+            obj,
+            context,
+            ({ result, needle }) =>
+              result instanceof Skip || result instanceof Fault
+                ? result
+                : schemas.length > 1
+                    ? run(
+                        schemas.slice(1),
+                        results.concat(
+                          result instanceof Empty ? [] : [result.value]
+                        ),
+                        needle
+                      )
+                    : new Match(results.concat(result.value))
+          );
+        })(list, [], 0)
+      : new Fault(`Expected array but got ${typeof obj}.`);
+  };
   return new Schema(fn, params);
 }

@@ -14,12 +14,12 @@ export function optional(schema, params = {}) {
         result instanceof Match
           ? result
           : result instanceof Error
-            ? (params.swallowErrors ? new Empty() : result)
-            : result instanceof Skip
-              ? new Empty()
-              : new Fault(`Unknown result ${result.type}.`)
+              ? params.swallowErrors ? new Empty() : result
+              : result instanceof Skip
+                  ? new Empty()
+                  : new Fault(`Unknown result ${result.type}.`)
     );
   }
 
-  return new Schema(fn, params)
+  return new Schema(fn, params);
 }

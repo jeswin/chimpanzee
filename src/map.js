@@ -12,11 +12,9 @@ export function map(schema, mapper, params) {
       obj,
       context,
       result =>
-        result instanceof Match
-          ? new Match(mapper(result.value))
-          : result
+        result instanceof Match ? new Match(mapper(result.value)) : result
     );
   }
 
-  return new Schema(fn, params)
+  return new Schema(fn, params);
 }

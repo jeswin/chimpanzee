@@ -14,21 +14,10 @@ export { optional } from "./optional";
 export { deep } from "./deep";
 export { empty } from "./empty";
 export { exists } from "./exists";
-export {
-  number,
-  bool,
-  string,
-  object,
-  func
-} from "./types";
+export { number, bool, string, object, func } from "./types";
 export { regex } from "./regex";
 
-export {
-  repeatingItem,
-  unorderedItem,
-  optionalItem,
-  array
-} from "./array";
+export { repeatingItem, unorderedItem, optionalItem, array } from "./array";
 
 export { Match, Empty, Skip, Fault } from "./results";
 
@@ -40,5 +29,5 @@ function _match(traverseResult) {
 }
 
 export function match(schema, args) {
-  return _match(schema.fn(args, {}))
+  return _match(schema.fn(args, {}));
 }

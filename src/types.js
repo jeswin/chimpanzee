@@ -35,8 +35,8 @@ function checkType(type, params) {
         result instanceof Skip
           ? new Skip(`Expected ${type} but got ${typeof obj}.`)
           : result
-    )
+    );
   }
 
-  return new Schema(fn, params)
+  return new Schema(fn, params);
 }

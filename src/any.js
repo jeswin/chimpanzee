@@ -9,19 +9,19 @@ export function any(schemas, params) {
   function fn(obj, context) {
     return schemas.length
       ? (function run(schemas) {
-        const newContext = { ...context };
-        return waitForSchema(
-          schemas[0],
-          obj,
-          newContext,
-          result =>
-            result instanceof Match
-              ? result
-              : schemas.length > 1
-                ? () => run(schemas.slice(1))
-                : new Skip("None of the items matched.")
-        );
-      })(schemas)
+          const newContext = { ...context };
+          return waitForSchema(
+            schemas[0],
+            obj,
+            newContext,
+            result =>
+              result instanceof Match
+                ? result
+                : schemas.length > 1
+                    ? () => run(schemas.slice(1))
+                    : new Skip("None of the items matched.")
+          );
+        })(schemas)
       : new Empty();
   }
 
