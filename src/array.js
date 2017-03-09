@@ -128,7 +128,7 @@ export function array(list, params) {
           return waitForSchema(
             schema(needle),
             obj,
-            context,
+            { parent: context },
             ({ result, needle }) =>
               result instanceof Skip || result instanceof Fault
                 ? result
