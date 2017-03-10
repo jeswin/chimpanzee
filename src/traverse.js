@@ -54,7 +54,13 @@ export function traverse(schema, params = {}, inner = false) {
                       ? undefined
                       : predicate.invalid()
                 )
-                .first(x => x) || new Match(builder.get(obj, context, key));
+                .first(x => x) ||
+                (result =>
+                  [Match, Skip, Fault].some(
+                    resultType => result instanceof resultType
+                  )
+                    ? result
+                    : new Match(result))(builder.get(obj, context, key));
             })()
           : fn;
       };
@@ -279,16 +285,15 @@ export function traverse(schema, params = {}, inner = false) {
 
       const runnables = isRunningChildTasks ? childTasks : tasks;
       const { finished, unfinished } = Seq.of(runnables).reduce(
-        (acc, { task, params }) =>
-          typeof task === "function"
-            ? {
-                finished: acc.finished,
-                unfinished: acc.unfinished.concat({ task: task(), params })
-              }
-            : {
-                finished: acc.finished.concat({ result: task, params }),
-                unfinished: acc.unfinished
-              },
+        (acc, { task, params }) => typeof task === "function"
+          ? {
+              finished: acc.finished,
+              unfinished: acc.unfinished.concat({ task: task(), params })
+            }
+          : {
+              finished: acc.finished.concat({ result: task, params }),
+              unfinished: acc.unfinished
+            },
         { finished: [], unfinished: [] }
       );
 
