@@ -408,6 +408,38 @@ const schema = traverse({
 })
 ```
 
+### Composite Schemas: composite(schema, traversalParams, [ownParams])
+Let's you apply multiple traversal strategies on a single tree.
+Traversal options are specified via a selector. { selector: <name> }
+
+In the following example the property "prop" is traversed without any modifiers,
+since the selector is set to "alt".
+
+If ownParams are set, the consolidated result of traversals can be modified again.
+```
+const input = {
+  node: {
+    something: "else",
+    jeff: "buckley",
+    hello: "world",
+  },
+  prop: "something"
+}
+
+const schema = composite(
+  {
+    something: "else",
+    hello: capture({ key: "first" }),
+    prop: capture({ key: "second", selector: "alt" })
+  },
+  [
+    { name: "default", modifiers: { object: x => x.node } },
+    { name: "alt" },
+  ]
+)
+
+```
+
 ### Advanced
 Property Modifier. Use this if your input tree isn't a simple object.
 ```
