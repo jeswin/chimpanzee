@@ -3,7 +3,7 @@ import should from "should";
 import fs from "fs";
 import path from "path";
 import sourceMapSupport from "source-map-support";
-import { Match, Skip, Fault } from "../results";
+import { Match, Skip, Fault, Empty } from "../results";
 import { match } from "../chimpanzee";
 
 sourceMapSupport.install();
@@ -17,6 +17,8 @@ describe("chimpanzee", () => {
       if (resultType === "return") {
         result.should.be.an.instanceOf(Match);
         result.value.should.deepEqual(expected.result);
+      }  else if (resultType === "empty") {
+        result.should.be.an.instanceOf(Empty);
       } else if (resultType === "skip") {
         result.should.be.an.instanceOf(Skip);
         result.message.should.deepEqual(expected.result);
@@ -29,6 +31,7 @@ describe("chimpanzee", () => {
 
   const tests = [
     ["any", "any", "return"],
+    ["any-native-types", "any-native-types", "empty"],
     ["any-negative", "any-negative", "skip"],
     ["array", "array", "return"],
     ["array-repeating", "array-repeating", "return"],
