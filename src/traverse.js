@@ -333,5 +333,5 @@ export function traverse(schema, params = {}, inner = false) {
         };
   }
 
-  return new Schema(fn, params, meta);
+  return new Schema(fn, params);
 }

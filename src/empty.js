@@ -8,5 +8,5 @@ export function empty() {
     return obj === undefined ? new Empty(meta) : new Skip("Not empty.", meta);
   }
 
-  return new Schema(fn, undefined, meta);
+  return new Schema(fn, undefined);
 }

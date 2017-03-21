@@ -23,5 +23,5 @@ export function optional(schema, params = {}) {
     );
   }
 
-  return new Schema(fn, params, meta);
+  return new Schema(fn, params);
 }

@@ -27,5 +27,5 @@ export function any(schemas, params) {
       : new Empty(meta);
   }
 
-  return new Schema(fn, params, meta);
+  return new Schema(fn, params);
 }

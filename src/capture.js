@@ -62,5 +62,5 @@ export function take(predicate, schema, params, options = {}) {
         );
   }
 
-  return new Schema(fn, params, meta);
+  return new Schema(fn, params);
 }

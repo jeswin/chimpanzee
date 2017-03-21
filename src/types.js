@@ -40,5 +40,5 @@ function checkType(type, params) {
     );
   }
 
-  return new Schema(fn, params, meta);
+  return new Schema(fn, params);
 }

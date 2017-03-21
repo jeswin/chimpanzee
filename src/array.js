@@ -25,13 +25,16 @@ export function repeatingItem(_schema, opts = {}) {
   return new ArrayItem(needle => {
     return new Schema((obj, context, key) =>
       (function run(items, results, needle) {
-        const completed = (result, needle) =>
-          results.length >= min && (!max || results.length <= max)
-            ? {
-                result: new Match(results.concat(result ? [result.value] : []), meta),
-                needle
-              }
-            : { result: new Skip("Incorrect number of matches.", meta) };
+        const completed = (result, needle) => results.length >= min &&
+          (!max || results.length <= max)
+          ? {
+              result: new Match(
+                results.concat(result ? [result.value] : []),
+                meta
+              ),
+              needle
+            }
+          : { result: new Skip("Incorrect number of matches.", meta) };
 
         return waitForSchema(
           schema(needle),
@@ -44,7 +47,7 @@ export function repeatingItem(_schema, opts = {}) {
                   ? run(items, results.concat([result.value]), needle)
                   : completed(result, needle)
         );
-      })(obj, [], needle), undefined, meta);
+      })(obj, [], needle));
   });
 }
 
@@ -57,7 +60,7 @@ export function repeatingItem(_schema, opts = {}) {
   We don't care about the needle.
 */
 export function unorderedItem(_schema) {
-  const meta = { type: "unorderedItem", schema: _schema }
+  const meta = { type: "unorderedItem", schema: _schema };
 
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
@@ -66,14 +69,16 @@ export function unorderedItem(_schema) {
         schema(i),
         items,
         context,
-        ({ result }) =>
-          result instanceof Match
-            ? { result, needle }
-            : items.length > i
-                ? run(items, i + 1)
-                : { result: new Skip(`Unordered item was not found.`, meta), needle }
+        ({ result }) => result instanceof Match
+          ? { result, needle }
+          : items.length > i
+              ? run(items, i + 1)
+              : {
+                  result: new Skip(`Unordered item was not found.`, meta),
+                  needle
+                }
       );
-    })(obj, 0), undefined, meta);
+    })(obj, 0));
   });
 }
 
@@ -96,7 +101,7 @@ export function optionalItem(_schema) {
           result instanceof Match
             ? { result, needle: needle + 1 }
             : { result: new Empty(meta), needle }
-      ), undefined, meta);
+      ));
   });
 }
 
@@ -115,7 +120,7 @@ function regularItem(schema) {
           result instanceof Match
             ? { result, needle: needle + 1 }
             : { result, needle }
-      ), undefined, meta);
+      ));
 }
 
 function toNeedledSchema(schema) {
@@ -126,7 +131,7 @@ function toNeedledSchema(schema) {
   You'd call this like
 */
 export function array(schemas, params) {
-  const meta = { type: "array", schemas, params }
+  const meta = { type: "array", schemas, params };
 
   params = typeof params === "string" ? { key: params } : params;
   const fn = function(obj, context, key) {
@@ -153,5 +158,5 @@ export function array(schemas, params) {
         })(schemas, [], 0)
       : new Fault(`Expected array but got ${typeof obj}.`, meta);
   };
-  return new Schema(fn, params, meta);
+  return new Schema(fn, params);
 }

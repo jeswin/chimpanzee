@@ -4,7 +4,7 @@ import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
 export function exists(predicate, schema) {
-  const meta ={ type: "exists" };
+  const meta = { type: "exists" };
 
   predicate = predicate || (x => typeof x !== "undefined");
 
@@ -16,5 +16,5 @@ export function exists(predicate, schema) {
       : new Skip("Does not exist.", meta);
   }
 
-  return new Schema(fn, undefined, meta);
+  return new Schema(fn, undefined);
 }

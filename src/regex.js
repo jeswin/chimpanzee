@@ -24,5 +24,5 @@ export function regex(regex, params) {
     );
   }
 
-  return new Schema(fn, params, meta);
+  return new Schema(fn, params);
 }
