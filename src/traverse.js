@@ -330,5 +330,5 @@ export function traverse(schema, params = {}, inner = false) {
         };
   }
 
-  return new Schema(fn, params, { schema });
+  return new Schema(fn, params, { type: "traverse", schema });
 }

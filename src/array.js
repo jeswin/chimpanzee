@@ -42,7 +42,7 @@ export function repeatingItem(_schema, opts = {}) {
                   ? run(items, results.concat([result.value]), needle)
                   : completed(result, needle)
         );
-      })(obj, [], needle), undefined, "repeatingItem");
+      })(obj, [], needle), undefined, { type: "repeatingItem", schema: _schema });
   });
 }
 
@@ -69,7 +69,7 @@ export function unorderedItem(_schema) {
                 ? run(items, i + 1)
                 : { result: new Skip(`Unordered item was not found.`), needle }
       );
-    })(obj, 0), undefined, "unorderedItem");
+    })(obj, 0), undefined, { type: "unorderedItem", schema: _schema });
   });
 }
 
@@ -90,7 +90,7 @@ export function optionalItem(_schema) {
           result instanceof Match
             ? { result, needle: needle + 1 }
             : { result: new Empty(), needle }
-      ), undefined, "optionalItem");
+      ), undefined, { type: "optionalItem", schema: _schema });
   });
 }
 
@@ -108,7 +108,7 @@ function regularItem(schema) {
           result instanceof Match
             ? { result, needle: needle + 1 }
             : { result, needle }
-      ), undefined, "regularItem");
+      ), undefined, { type: "regularItem", schema });
 }
 
 function toNeedledSchema(schema) {
@@ -145,5 +145,5 @@ export function array(schemas, params) {
         })(schemas, [], 0)
       : new Fault(`Expected array but got ${typeof obj}.`);
   };
-  return new Schema(fn, params, params, { schemas });
+  return new Schema(fn, params, params, { type: "array", schemas });
 }

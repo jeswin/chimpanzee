@@ -21,5 +21,5 @@ export function optional(schema, params = {}) {
     );
   }
 
-  return new Schema(fn, params, { schema });
+  return new Schema(fn, params, { type: "optional", schema });
 }

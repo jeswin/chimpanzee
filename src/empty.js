@@ -6,5 +6,5 @@ export function empty() {
     return obj === undefined ? new Empty() : new Skip("Not empty.");
   }
 
-  return new Schema(fn, undefined, "empty");
+  return new Schema(fn, undefined, { type: "empty" });
 }
