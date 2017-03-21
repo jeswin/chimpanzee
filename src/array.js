@@ -30,16 +30,24 @@ export function repeatingItem(_schema, opts = {}) {
           ? {
               result: new Match(
                 results.concat(result ? [result.value] : []),
+                { obj, context, key },
                 meta
               ),
               needle
             }
-          : { result: new Skip("Incorrect number of matches.", meta) };
+          : {
+              result: new Skip(
+                "Incorrect number of matches.",
+                { obj, context, key },
+                meta
+              )
+            };
 
         return waitForSchema(
           schema(needle),
           items,
           context,
+          key,
           ({ result, needle }) =>
             result instanceof Skip || result instanceof Fault
               ? completed(undefined, needle)
@@ -69,12 +77,17 @@ export function unorderedItem(_schema) {
         schema(i),
         items,
         context,
+        key,
         ({ result }) => result instanceof Match
           ? { result, needle }
           : items.length > i
               ? run(items, i + 1)
               : {
-                  result: new Skip(`Unordered item was not found.`, meta),
+                  result: new Skip(
+                    `Unordered item was not found.`,
+                    { obj, context, key },
+                    meta
+                  ),
                   needle
                 }
       );
@@ -97,10 +110,11 @@ export function optionalItem(_schema) {
         schema(needle),
         obj,
         context,
+        key,
         ({ result }) =>
           result instanceof Match
             ? { result, needle: needle + 1 }
-            : { result: new Empty(meta), needle }
+            : { result: new Empty({ obj, context, key }, meta), needle }
       ));
   });
 }
@@ -116,6 +130,7 @@ function regularItem(schema) {
         schema,
         obj[needle],
         context,
+        key,
         result =>
           result instanceof Match
             ? { result, needle: needle + 1 }
@@ -142,6 +157,7 @@ export function array(schemas, params) {
             schema(needle),
             obj,
             { parent: context },
+            key,
             ({ result, needle }) =>
               result instanceof Skip || result instanceof Fault
                 ? result
@@ -153,10 +169,18 @@ export function array(schemas, params) {
                         ),
                         needle
                       )
-                    : new Match(results.concat(result.value), meta)
+                    : new Match(
+                        results.concat(result.value),
+                        { obj, context, key },
+                        meta
+                      )
           );
         })(schemas, [], 0)
-      : new Fault(`Expected array but got ${typeof obj}.`, meta);
+      : new Fault(
+          `Expected array but got ${typeof obj}.`,
+          { obj, context, key },
+          meta
+        );
   };
   return new Schema(fn, params);
 }

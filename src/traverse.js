@@ -39,14 +39,19 @@ export function traverse(schema, params = {}, inner = false) {
                 : builder.predicates.map(p => ({
                     fn: p.predicate,
                     invalid: () =>
-                      new Skip(p.message || `Predicate returned false.`, meta)
+                      new Skip(
+                        p.message || `Predicate returned false.`,
+                        { obj, context, key },
+                        meta
+                      )
                   }));
 
               const assertions = !builder.asserts
                 ? []
                 : builder.asserts.map(a => ({
                     fn: a.predicate,
-                    invalid: () => new Fault(a.error, meta)
+                    invalid: () =>
+                      new Fault(a.error, { obj, context, key }, meta)
                   }));
 
               return Seq.of(predicates.concat(assertions))
@@ -62,7 +67,9 @@ export function traverse(schema, params = {}, inner = false) {
                     resultType => result instanceof resultType
                   )
                     ? result
-                    : new Match(result, meta))(builder.get(obj, context, key));
+                    : new Match(result, { obj, context, key }, meta))(
+                  builder.get(obj, context, key)
+                );
             })()
           : fn;
       };
@@ -74,8 +81,16 @@ export function traverse(schema, params = {}, inner = false) {
         ? params.modifiers.value(obj)
         : obj;
       return schema !== comparand
-        ? [{ task: new Skip(`Expected ${schema} but got ${comparand}.`, meta) }]
-        : [{ task: new Empty(meta) }];
+        ? [
+            {
+              task: new Skip(
+                `Expected ${schema} but got ${comparand}.`,
+                { obj, context, key },
+                meta
+              )
+            }
+          ]
+        : [{ task: new Empty({ obj, context, key }, meta) }];
     }
 
     function getObjectTasks() {
@@ -140,7 +155,15 @@ export function traverse(schema, params = {}, inner = false) {
               [],
               (acc, x) => x.task instanceof Skip || x.task instanceof Fault
             )
-        : [{ task: new Skip(`Cannot traverse undefined.`, meta) }];
+        : [
+            {
+              task: new Skip(
+                `Cannot traverse undefined.`,
+                { obj, context, key },
+                meta
+              )
+            }
+          ];
     }
 
     function getArrayTasks() {
@@ -148,6 +171,7 @@ export function traverse(schema, params = {}, inner = false) {
         ? schema.length !== obj.length
             ? new Skip(
                 `Expected array of length ${schema.length} but got ${obj.length}.`,
+                { obj, context, key },
                 meta
               )
             : Seq.of(schema)
@@ -166,7 +190,13 @@ export function traverse(schema, params = {}, inner = false) {
                   params: schema.params
                 }))
                 .toArray()
-        : [new Skip(`Schema is an array but property is a non-array.`, meta)];
+        : [
+            new Skip(
+              `Schema is an array but property is a non-array.`,
+              { obj, context, key },
+              meta
+            )
+          ];
     }
 
     function getSchemaTasks() {
@@ -314,14 +344,14 @@ export function traverse(schema, params = {}, inner = false) {
                 : () => run([], unfinished)
             : (schemaType !== "object" || !inner) &&
                 typeof state !== "undefined"
-                ? new Match(state, meta)
-                : new Empty(meta);
+                ? new Match(state, { obj, context, key }, meta)
+                : new Empty({ obj, context, key }, meta);
     }
 
     const mustRun = !params.predicate || params.predicate(obj);
 
     return !mustRun
-      ? new Skip(`Predicate returned false.`, meta)
+      ? new Skip(`Predicate returned false.`, { obj, context, key }, meta)
       : () => {
           const tasks = Seq.of(params.builders)
             .map(builder => getTask(builder))

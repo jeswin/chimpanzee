@@ -9,6 +9,6 @@ export function waitFor(gen, then = x => x) {
   })(gen);
 }
 
-export function waitForSchema(schema, obj, context, then) {
-  return waitFor(traverse(schema).fn(obj, context), then);
+export function waitForSchema(schema, obj, context, key, then) {
+  return waitFor(traverse(schema).fn(obj, context, key), then);
 }

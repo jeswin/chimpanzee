@@ -41,6 +41,7 @@ export function take(predicate, schema, params, options = {}) {
               schema,
               obj,
               context,
+              key,
               result => result instanceof Match
                 ? new Match(
                     {
@@ -49,15 +50,25 @@ export function take(predicate, schema, params, options = {}) {
                         ? options.modifier(result.value)
                         : result.value)
                     },
+                    { obj, context, key },
                     meta
                   )
-                : new Skip("Capture failed in inner schema.", meta)
+                : new Skip(
+                    "Capture failed in inner schema.",
+                    { obj, context, key },
+                    meta
+                  )
             )
-          : new Match(options.modifier ? options.modifier(obj) : obj, meta)
+          : new Match(
+              options.modifier ? options.modifier(obj) : obj,
+              { obj, context, key },
+              meta
+            )
       : new Skip(
           options.skipMessage
             ? options.skipMessage(obj)
             : "Predicate returned false.",
+          { obj, context, key },
           meta
         );
   }

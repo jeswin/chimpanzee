@@ -27,7 +27,12 @@ function getSchema(schema, paramSelector) {
 }
 
 export function composite(schema, _paramsList, ownParams) {
-  const meta = { type: "composite", schema, paramsList: _paramsList, ownParams };
+  const meta = {
+    type: "composite",
+    schema,
+    paramsList: _paramsList,
+    ownParams
+  };
 
   const normalizedParams = _paramsList.map(
     params => typeof params === "string" ? { key: params } : params
@@ -48,13 +53,14 @@ export function composite(schema, _paramsList, ownParams) {
             schemas[0],
             obj,
             context,
+            key,
             result =>
               result instanceof Match
                 ? schemas.length > 1 ? run(schemas.slice(1)) : result
                 : result
           );
         })(schemas)
-      : new Empty(meta);
+      : new Empty({ obj, context, key }, meta);
   }
 
   return traverse(fn, ownParams);

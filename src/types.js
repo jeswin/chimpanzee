@@ -28,14 +28,19 @@ function checkType(type, params) {
 
   params = typeof params === "string" ? { key: params } : params;
 
-  function fn(obj, context) {
+  function fn(obj, context, key) {
     return waitForSchema(
       captureIf(obj => typeof obj === type, params),
       obj,
       context,
+      key,
       result =>
         result instanceof Skip
-          ? new Skip(`Expected ${type} but got ${typeof obj}.`, meta)
+          ? new Skip(
+              `Expected ${type} but got ${typeof obj}.`,
+              { obj, context, key },
+              meta
+            )
           : result
     );
   }

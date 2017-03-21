@@ -8,12 +8,12 @@ export function exists(predicate, schema) {
 
   predicate = predicate || (x => typeof x !== "undefined");
 
-  function fn(obj, context) {
+  function fn(obj, context, key) {
     return predicate(obj)
       ? schema
-          ? waitForSchema(schema, obj, context, inner => inner)
-          : new Empty(meta)
-      : new Skip("Does not exist.", meta);
+          ? waitForSchema(schema, obj, context, key, inner => inner)
+          : new Empty({ obj, context, key }, meta)
+      : new Skip("Does not exist.", { obj, context, key }, meta);
   }
 
   return new Schema(fn, undefined);

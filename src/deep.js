@@ -8,17 +8,18 @@ export function deep(schema, params) {
 
   params = typeof params === "string" ? { key: params } : params;
 
-  function fn(obj, context) {
+  function fn(obj, context, key) {
     function traverseObject(keys) {
       return keys.length
         ? waitForSchema(
             deep(schema),
             obj[keys[0]],
             context,
+            key,
             result =>
               result instanceof Match ? result : traverseObject(keys.slice(1))
           )
-        : new Skip("Not found in deep.", meta);
+        : new Skip("Not found in deep.", { obj, context, key }, meta);
     }
 
     function traverseArray(items) {
@@ -27,16 +28,18 @@ export function deep(schema, params) {
             deep(schema, options),
             items[0],
             context,
+            key,
             result =>
               result instanceof Match ? result : traverseArray(items.slice(1))
           )
-        : new Skip("Not found in deep.", meta);
+        : new Skip("Not found in deep.", { obj, context, key }, meta);
     }
 
     return waitForSchema(
       schema,
       obj,
       context,
+      key,
       result =>
         result instanceof Match
           ? result
@@ -44,7 +47,7 @@ export function deep(schema, params) {
               ? traverseObject(Object.keys(obj))
               : Array.isArray(obj)
                   ? traverseArray(obj)
-                  : new Skip("Not found in deep.", meta)
+                  : new Skip("Not found in deep.", { obj, context, key }, meta)
     );
   }
 

@@ -8,7 +8,7 @@ export function any(schemas, params) {
 
   params = typeof params === "string" ? { key: params } : params;
 
-  function fn(obj, context) {
+  function fn(obj, context, key) {
     return schemas.length
       ? (function run(schemas) {
           const newContext = { ...context };
@@ -16,15 +16,20 @@ export function any(schemas, params) {
             schemas[0],
             obj,
             newContext,
+            key,
             result =>
               result instanceof Match
                 ? result
                 : schemas.length > 1
                     ? () => run(schemas.slice(1))
-                    : new Skip("None of the items matched.", meta)
+                    : new Skip(
+                        "None of the items matched.",
+                        { obj, context, key },
+                        meta
+                      )
           );
         })(schemas)
-      : new Empty(meta);
+      : new Empty({ obj, context, key }, meta);
   }
 
   return new Schema(fn, params);
