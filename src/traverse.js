@@ -166,7 +166,7 @@ export function traverse(schema, params = {}, inner = false) {
                   params: schema.params
                 }))
                 .toArray()
-        : [Skip(`Schema is an array but property is a non-array.`)];
+        : [new Skip(`Schema is an array but property is a non-array.`, meta)];
     }
 
     function getSchemaTasks() {
