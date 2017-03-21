@@ -4,6 +4,8 @@ import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
 export function regex(regex, params) {
+  const meta = { type: "regex", regex, params };
+
   params = typeof params === "string" ? { key: params } : params;
 
   function fn(obj, context) {
@@ -18,9 +20,9 @@ export function regex(regex, params) {
       obj,
       context,
       result =>
-        result instanceof Skip ? new Skip(`Did not match regex.`) : result
+        result instanceof Skip ? new Skip(`Did not match regex.`, meta) : result
     );
   }
 
-  return new Schema(fn, params, { type: "regex", regex });
+  return new Schema(fn, params, meta);
 }

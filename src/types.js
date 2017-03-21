@@ -24,6 +24,8 @@ export function func(params) {
 }
 
 function checkType(type, params) {
+  const meta = { type, params };
+
   params = typeof params === "string" ? { key: params } : params;
 
   function fn(obj, context) {
@@ -33,10 +35,10 @@ function checkType(type, params) {
       context,
       result =>
         result instanceof Skip
-          ? new Skip(`Expected ${type} but got ${typeof obj}.`)
+          ? new Skip(`Expected ${type} but got ${typeof obj}.`, meta)
           : result
     );
   }
 
-  return new Schema(fn, params, { type });
+  return new Schema(fn, params, meta);
 }

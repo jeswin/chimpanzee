@@ -15,6 +15,8 @@ function getSchemaType(schema) {
 }
 
 export function traverse(schema, params = {}, inner = false) {
+  const meta = { type: "traverse", schema, params, inner };
+
   params = typeof params === "string" ? { key: params } : params;
   params.builders = params.builders || [{ get: (obj, { state }) => state }];
   params.modifiers = params.modifiers || {};
@@ -37,14 +39,14 @@ export function traverse(schema, params = {}, inner = false) {
                 : builder.predicates.map(p => ({
                     fn: p.predicate,
                     invalid: () =>
-                      new Skip(p.message || `Predicate returned false.`)
+                      new Skip(p.message || `Predicate returned false.`, meta)
                   }));
 
               const assertions = !builder.asserts
                 ? []
                 : builder.asserts.map(a => ({
                     fn: a.predicate,
-                    invalid: () => new Fault(a.error)
+                    invalid: () => new Fault(a.error, meta)
                   }));
 
               return Seq.of(predicates.concat(assertions))
@@ -60,7 +62,7 @@ export function traverse(schema, params = {}, inner = false) {
                     resultType => result instanceof resultType
                   )
                     ? result
-                    : new Match(result))(builder.get(obj, context, key));
+                    : new Match(result, meta))(builder.get(obj, context, key));
             })()
           : fn;
       };
@@ -72,8 +74,8 @@ export function traverse(schema, params = {}, inner = false) {
         ? params.modifiers.value(obj)
         : obj;
       return schema !== comparand
-        ? [{ task: new Skip(`Expected ${schema} but got ${comparand}.`) }]
-        : [{ task: new Empty() }];
+        ? [{ task: new Skip(`Expected ${schema} but got ${comparand}.`, meta) }]
+        : [{ task: new Empty(meta) }];
     }
 
     function getObjectTasks() {
@@ -138,14 +140,15 @@ export function traverse(schema, params = {}, inner = false) {
               [],
               (acc, x) => x.task instanceof Skip || x.task instanceof Fault
             )
-        : [{ task: new Skip(`Cannot traverse undefined.`) }];
+        : [{ task: new Skip(`Cannot traverse undefined.`, meta) }];
     }
 
     function getArrayTasks() {
       return Array.isArray(obj)
         ? schema.length !== obj.length
             ? new Skip(
-                `Expected array of length ${schema.length} but got ${obj.length}.`
+                `Expected array of length ${schema.length} but got ${obj.length}.`,
+                meta
               )
             : Seq.of(schema)
                 .map((rhs, i) => ({
@@ -311,14 +314,14 @@ export function traverse(schema, params = {}, inner = false) {
                 : () => run([], unfinished)
             : (schemaType !== "object" || !inner) &&
                 typeof state !== "undefined"
-                ? new Match(state)
-                : new Empty();
+                ? new Match(state, meta)
+                : new Empty(meta);
     }
 
     const mustRun = !params.predicate || params.predicate(obj);
 
     return !mustRun
-      ? new Skip(`Predicate returned false.`)
+      ? new Skip(`Predicate returned false.`, meta)
       : () => {
           const tasks = Seq.of(params.builders)
             .map(builder => getTask(builder))
@@ -330,5 +333,5 @@ export function traverse(schema, params = {}, inner = false) {
         };
   }
 
-  return new Schema(fn, params, { type: "traverse", schema });
+  return new Schema(fn, params, meta);
 }

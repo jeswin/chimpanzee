@@ -4,6 +4,8 @@ import { Seq } from "lazily";
 import { waitForSchema } from "./utils";
 
 export function any(schemas, params) {
+  const meta = { type: "any", schemas, params };
+
   params = typeof params === "string" ? { key: params } : params;
 
   function fn(obj, context) {
@@ -19,11 +21,11 @@ export function any(schemas, params) {
                 ? result
                 : schemas.length > 1
                     ? () => run(schemas.slice(1))
-                    : new Skip("None of the items matched.")
+                    : new Skip("None of the items matched.", meta)
           );
         })(schemas)
-      : new Empty();
+      : new Empty(meta);
   }
 
-  return new Schema(fn, params, { type: "any", schemas });
+  return new Schema(fn, params, meta);
 }

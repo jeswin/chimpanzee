@@ -17,6 +17,8 @@ class ArrayItem {
   returns [4, 4], with needle moved to 5.
 */
 export function repeatingItem(_schema, opts = {}) {
+  const meta = { type: "repeatingItem", schema: _schema };
+
   const min = opts.min || 0;
   const max = opts.max;
   const schema = toNeedledSchema(_schema);
@@ -26,10 +28,10 @@ export function repeatingItem(_schema, opts = {}) {
         const completed = (result, needle) =>
           results.length >= min && (!max || results.length <= max)
             ? {
-                result: new Match(results.concat(result ? [result.value] : [])),
+                result: new Match(results.concat(result ? [result.value] : []), meta),
                 needle
               }
-            : { result: new Skip("Incorrect number of matches.") };
+            : { result: new Skip("Incorrect number of matches.", meta) };
 
         return waitForSchema(
           schema(needle),
@@ -42,7 +44,7 @@ export function repeatingItem(_schema, opts = {}) {
                   ? run(items, results.concat([result.value]), needle)
                   : completed(result, needle)
         );
-      })(obj, [], needle), undefined, { type: "repeatingItem", schema: _schema });
+      })(obj, [], needle), undefined, meta);
   });
 }
 
@@ -55,6 +57,8 @@ export function repeatingItem(_schema, opts = {}) {
   We don't care about the needle.
 */
 export function unorderedItem(_schema) {
+  const meta = { type: "unorderedItem", schema: _schema }
+
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
     return new Schema((obj, context, key) => (function run(items, i) {
@@ -67,9 +71,9 @@ export function unorderedItem(_schema) {
             ? { result, needle }
             : items.length > i
                 ? run(items, i + 1)
-                : { result: new Skip(`Unordered item was not found.`), needle }
+                : { result: new Skip(`Unordered item was not found.`, meta), needle }
       );
-    })(obj, 0), undefined, { type: "unorderedItem", schema: _schema });
+    })(obj, 0), undefined, meta);
   });
 }
 
@@ -79,6 +83,8 @@ export function unorderedItem(_schema) {
   The needle is incrementd by 1 if found, otherwise it remains the same.
 */
 export function optionalItem(_schema) {
+  const meta = { type: "optionalItem", schema: _schema };
+
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
     return new Schema((obj, context, key) =>
@@ -89,8 +95,8 @@ export function optionalItem(_schema) {
         ({ result }) =>
           result instanceof Match
             ? { result, needle: needle + 1 }
-            : { result: new Empty(), needle }
-      ), undefined, { type: "optionalItem", schema: _schema });
+            : { result: new Empty(meta), needle }
+      ), undefined, meta);
   });
 }
 
@@ -98,6 +104,7 @@ export function optionalItem(_schema) {
   Not array types, viz optional, unordered or repeating.
 */
 function regularItem(schema) {
+  const meta = { type: "regularItem", schema };
   return needle =>
     new Schema((obj, context, key) =>
       waitForSchema(
@@ -108,7 +115,7 @@ function regularItem(schema) {
           result instanceof Match
             ? { result, needle: needle + 1 }
             : { result, needle }
-      ), undefined, { type: "regularItem", schema });
+      ), undefined, meta);
 }
 
 function toNeedledSchema(schema) {
@@ -119,8 +126,9 @@ function toNeedledSchema(schema) {
   You'd call this like
 */
 export function array(schemas, params) {
-  params = typeof params === "string" ? { key: params } : params;
+  const meta = { type: "array", schemas, params }
 
+  params = typeof params === "string" ? { key: params } : params;
   const fn = function(obj, context, key) {
     return Array.isArray(obj)
       ? (function run(list, results, needle) {
@@ -140,10 +148,10 @@ export function array(schemas, params) {
                         ),
                         needle
                       )
-                    : new Match(results.concat(result.value))
+                    : new Match(results.concat(result.value), meta)
           );
         })(schemas, [], 0)
-      : new Fault(`Expected array but got ${typeof obj}.`);
+      : new Fault(`Expected array but got ${typeof obj}.`, meta);
   };
-  return new Schema(fn, params, params, { type: "array", schemas });
+  return new Schema(fn, params, meta);
 }

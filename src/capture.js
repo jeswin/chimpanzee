@@ -30,6 +30,8 @@ export function literal(what, params) {
 }
 
 export function take(predicate, schema, params, options = {}) {
+  const meta = { type: "take", schema, params, predicate, options };
+
   params = typeof params === "string" ? { key: params } : params;
 
   function fn(obj, context, key) {
@@ -39,23 +41,26 @@ export function take(predicate, schema, params, options = {}) {
               schema,
               obj,
               context,
-              result =>
-                result instanceof Match
-                  ? new Match({
+              result => result instanceof Match
+                ? new Match(
+                    {
                       ...obj,
                       ...(options.modifier
                         ? options.modifier(result.value)
                         : result.value)
-                    })
-                  : new Skip("Capture failed in inner schema.")
+                    },
+                    meta
+                  )
+                : new Skip("Capture failed in inner schema.", meta)
             )
-          : new Match(options.modifier ? options.modifier(obj) : obj)
+          : new Match(options.modifier ? options.modifier(obj) : obj, meta)
       : new Skip(
           options.skipMessage
             ? options.skipMessage(obj)
-            : "Predicate returned false."
+            : "Predicate returned false.",
+          meta
         );
   }
 
-  return new Schema(fn, params, { type: "take", schema, predicate, options });
+  return new Schema(fn, params, meta);
 }

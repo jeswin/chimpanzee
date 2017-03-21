@@ -1,6 +1,6 @@
 export default class Match {
-  constructor(value, params) {
+  constructor(value, meta) {
     this.value = value;
-    this.params = params;
+    this.meta = meta;
   }
 }

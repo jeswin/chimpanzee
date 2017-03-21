@@ -4,29 +4,31 @@ import Schema from "./schema";
 import { Seq } from "lazily";
 import { waitForSchema } from "./utils";
 
-function getSchema(schema, paramName) {
-  const schemaName = schema.params && schema.params.selector
+function getSchema(schema, paramSelector) {
+  const schemaSelector = schema.params && schema.params.selector
     ? schema.params.selector
     : "default";
 
   return Array.isArray(schema)
     ? schema
-        .map(item => getSchema(item, paramName))
+        .map(item => getSchema(item, paramSelector))
         .filter(x => x !== undefined)
     : schema instanceof Schema
-        ? schemaName === paramName ? schema : undefined
+        ? schemaSelector === paramSelector ? schema : undefined
         : typeof schema === "object"
             ? Seq.of(Object.keys(schema)).reduce(
                 (acc, key) => {
-                  const result = getSchema(schema[key], paramName);
+                  const result = getSchema(schema[key], paramSelector);
                   return result !== undefined ? { ...acc, [key]: result } : acc;
                 },
                 {}
               )
-            : paramName === "default" ? schema : undefined;
+            : paramSelector === "default" ? schema : undefined;
 }
 
 export function composite(schema, _paramsList, ownParams) {
+  const meta = { type: "composite", schema, paramsList: _paramsList, ownParams };
+
   const normalizedParams = _paramsList.map(
     params => typeof params === "string" ? { key: params } : params
   );
@@ -43,7 +45,7 @@ export function composite(schema, _paramsList, ownParams) {
     return schemas.length
       ? (function run(schemas) {
           return waitForSchema(
-            schemas[0],
+            traverse(schemas[0], ownParams),
             obj,
             context,
             result =>
@@ -52,8 +54,8 @@ export function composite(schema, _paramsList, ownParams) {
                 : result
           );
         })(schemas)
-      : new Empty();
+      : new Empty(meta);
   }
 
-  return traverse(fn, ownParams);
+  return new Schema(fn, undefined, meta);
 }

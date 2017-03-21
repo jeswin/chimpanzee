@@ -3,6 +3,8 @@ import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
 export function optional(schema, params = {}) {
+  const meta = { type: "optional", schema, params };
+
   params = typeof params === "string" ? { key: params } : params;
 
   function fn(obj, context) {
@@ -14,12 +16,12 @@ export function optional(schema, params = {}) {
         result instanceof Match
           ? result
           : result instanceof Error
-              ? params.swallowErrors ? new Empty() : result
+              ? params.swallowErrors ? new Empty(meta) : result
               : result instanceof Skip
-                  ? new Empty()
-                  : new Fault(`Unknown result ${result.type}.`)
+                  ? new Empty(meta)
+                  : new Fault(`Unknown result ${result.type}.`, meta)
     );
   }
 
-  return new Schema(fn, params, { type: "optional", schema });
+  return new Schema(fn, params, meta);
 }

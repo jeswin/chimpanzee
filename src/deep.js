@@ -4,6 +4,8 @@ import Schema from "./schema";
 import { waitForSchema } from "./utils";
 
 export function deep(schema, params) {
+  const meta = { type: "deep", schema, params };
+
   params = typeof params === "string" ? { key: params } : params;
 
   function fn(obj, context) {
@@ -16,7 +18,7 @@ export function deep(schema, params) {
             result =>
               result instanceof Match ? result : traverseObject(keys.slice(1))
           )
-        : new Skip("Not found in deep.");
+        : new Skip("Not found in deep.", meta);
     }
 
     function traverseArray(items) {
@@ -28,7 +30,7 @@ export function deep(schema, params) {
             result =>
               result instanceof Match ? result : traverseArray(items.slice(1))
           )
-        : new Skip("Not found in deep.");
+        : new Skip("Not found in deep.", meta);
     }
 
     return waitForSchema(
@@ -42,9 +44,9 @@ export function deep(schema, params) {
               ? traverseObject(Object.keys(obj))
               : Array.isArray(obj)
                   ? traverseArray(obj)
-                  : new Skip("Not found in deep.")
+                  : new Skip("Not found in deep.", meta)
     );
   }
 
-  return new Schema(fn, params, { type: "deep", schema });
+  return new Schema(fn, params, meta);
 }
