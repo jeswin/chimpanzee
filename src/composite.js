@@ -45,7 +45,7 @@ export function composite(schema, _paramsList, ownParams) {
     return schemas.length
       ? (function run(schemas) {
           return waitForSchema(
-            traverse(schemas[0], ownParams),
+            schemas[0],
             obj,
             context,
             result =>
@@ -57,5 +57,5 @@ export function composite(schema, _paramsList, ownParams) {
       : new Empty(meta);
   }
 
-  return new Schema(fn, undefined, meta);
+  return traverse(fn, ownParams);
 }
