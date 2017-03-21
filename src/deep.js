@@ -46,5 +46,5 @@ export function deep(schema, params) {
     );
   }
 
-  return new Schema(fn, params);
+  return new Schema(fn, params, { schema });
 }

@@ -42,7 +42,7 @@ export function repeatingItem(_schema, opts = {}) {
                   ? run(items, results.concat([result.value]), needle)
                   : completed(result, needle)
         );
-      })(obj, [], needle));
+      })(obj, [], needle), undefined, "repeatingItem");
   });
 }
 
@@ -69,7 +69,7 @@ export function unorderedItem(_schema) {
                 ? run(items, i + 1)
                 : { result: new Skip(`Unordered item was not found.`), needle }
       );
-    })(obj, 0));
+    })(obj, 0), undefined, "unorderedItem");
   });
 }
 
@@ -90,7 +90,7 @@ export function optionalItem(_schema) {
           result instanceof Match
             ? { result, needle: needle + 1 }
             : { result: new Empty(), needle }
-      ));
+      ), undefined, "optionalItem");
   });
 }
 
@@ -108,7 +108,7 @@ function regularItem(schema) {
           result instanceof Match
             ? { result, needle: needle + 1 }
             : { result, needle }
-      ));
+      ), undefined, "regularItem");
 }
 
 function toNeedledSchema(schema) {
@@ -118,13 +118,13 @@ function toNeedledSchema(schema) {
 /*
   You'd call this like
 */
-export function array(list, params) {
+export function array(schemas, params) {
   params = typeof params === "string" ? { key: params } : params;
 
   const fn = function(obj, context, key) {
     return Array.isArray(obj)
-      ? (function run(schemas, results, needle) {
-          const schema = toNeedledSchema(schemas[0]);
+      ? (function run(list, results, needle) {
+          const schema = toNeedledSchema(list[0]);
           return waitForSchema(
             schema(needle),
             obj,
@@ -132,9 +132,9 @@ export function array(list, params) {
             ({ result, needle }) =>
               result instanceof Skip || result instanceof Fault
                 ? result
-                : schemas.length > 1
+                : list.length > 1
                     ? run(
-                        schemas.slice(1),
+                        list.slice(1),
                         results.concat(
                           result instanceof Empty ? [] : [result.value]
                         ),
@@ -142,8 +142,8 @@ export function array(list, params) {
                       )
                     : new Match(results.concat(result.value))
           );
-        })(list, [], 0)
+        })(schemas, [], 0)
       : new Fault(`Expected array but got ${typeof obj}.`);
   };
-  return new Schema(fn, params);
+  return new Schema(fn, params, params, { schemas });
 }

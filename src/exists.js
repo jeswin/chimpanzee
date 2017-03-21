@@ -14,5 +14,5 @@ export function exists(predicate, schema) {
       : new Skip("Does not exist.");
   }
 
-  return new Schema(fn);
+  return new Schema(fn, undefined, "exists" );
 }

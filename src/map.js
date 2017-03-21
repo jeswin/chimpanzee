@@ -16,5 +16,5 @@ export function map(schema, mapper, params) {
     );
   }
 
-  return new Schema(fn, params);
+  return new Schema(fn, params, { schema });
 }
