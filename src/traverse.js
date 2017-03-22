@@ -62,14 +62,14 @@ export function traverse(schema, params = {}, inner = false) {
                       : predicate.invalid()
                 )
                 .first(x => x) ||
-                (result =>
-                  [Match, Skip, Fault].some(
+                (() => {
+                  const result = builder.get(obj, context, key);
+                  return [Match, Skip, Fault].some(
                     resultType => result instanceof resultType
                   )
                     ? result
-                    : new Match(result, { obj, context, key }, meta))(
-                  builder.get(obj, context, key)
-                );
+                    : new Match(result, { obj, context, key }, meta);
+                })();
             })()
           : fn;
       };
