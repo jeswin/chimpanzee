@@ -10,7 +10,7 @@ export function any(schemas, params) {
 
   function fn(obj, context, key) {
     return schemas.length
-      ? (function run(schemas) {
+      ? (function run(schemas, nonMatching = []) {
           const newContext = { ...context };
           return waitForSchema(
             schemas[0],
@@ -21,10 +21,10 @@ export function any(schemas, params) {
               result instanceof Match
                 ? result
                 : schemas.length > 1
-                    ? () => run(schemas.slice(1))
+                    ? () => run(schemas.slice(1), nonMatching.concat(result))
                     : new Skip(
                         "None of the items matched.",
-                        { obj, context, key },
+                        { obj, context, key, nonMatching },
                         meta
                       )
           );
