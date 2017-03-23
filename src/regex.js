@@ -8,7 +8,7 @@ export function regex(regex, params) {
 
   params = typeof params === "string" ? { key: params } : params;
 
-  function fn(obj, context, key) {
+  function fn(obj, context, key, parents, parentKeys) {
     return waitForSchema(
       captureIf(
         obj =>
@@ -20,9 +20,11 @@ export function regex(regex, params) {
       obj,
       context,
       key,
+      parents,
+      parentKeys,
       result =>
         result instanceof Skip
-          ? new Skip(`Did not match regex.`, { obj, context, key }, meta)
+          ? new Skip(`Did not match regex.`, { obj, context, key, parents, parentKeys }, meta)
           : result
     );
   }

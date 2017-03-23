@@ -34,7 +34,7 @@ export function take(predicate, schema, params, options = {}) {
 
   params = typeof params === "string" ? { key: params } : params;
 
-  function fn(obj, context, key) {
+  function fn(obj, context, key, parents, parentKeys) {
     return predicate(obj)
       ? typeof schema !== "undefined"
           ? waitForSchema(
@@ -42,6 +42,8 @@ export function take(predicate, schema, params, options = {}) {
               obj,
               context,
               key,
+              parents,
+              parentKeys,
               result => result instanceof Match
                 ? new Match(
                     {
@@ -50,25 +52,25 @@ export function take(predicate, schema, params, options = {}) {
                         ? options.modifier(result.value)
                         : result.value)
                     },
-                    { obj, context, key },
+                    { obj, context, key, parents, parentKeys },
                     meta
                   )
                 : new Skip(
                     "Capture failed in inner schema.",
-                    { obj, context, key },
+                    { obj, context, key, parents, parentKeys },
                     meta
                   )
             )
           : new Match(
               options.modifier ? options.modifier(obj) : obj,
-              { obj, context, key },
+              { obj, context, key, parents, parentKeys },
               meta
             )
       : new Skip(
           options.skipMessage
             ? options.skipMessage(obj)
             : "Predicate returned false.",
-          { obj, context, key },
+          { obj, context, key, parents, parentKeys },
           meta
         );
   }

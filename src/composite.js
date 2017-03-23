@@ -46,7 +46,7 @@ export function composite(schema, _paramsList, ownParams) {
   const schemas = paramsList.map(params =>
     traverse(getSchema(schema, (params && params.name) || "default"), params));
 
-  function fn(obj, context, key) {
+  function fn(obj, context, key, parents, parentKeys) {
     return schemas.length
       ? (function run(schemas) {
           return waitForSchema(
@@ -54,13 +54,15 @@ export function composite(schema, _paramsList, ownParams) {
             obj,
             context,
             key,
+            parents,
+            parentKeys,
             result =>
               result instanceof Match
                 ? schemas.length > 1 ? run(schemas.slice(1)) : result
                 : result
           );
         })(schemas)
-      : new Empty({ obj, context, key }, meta);
+      : new Empty({ obj, context, key, parents, parentKeys }, meta);
   }
 
   return traverse(fn, ownParams);

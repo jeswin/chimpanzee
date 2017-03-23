@@ -23,7 +23,7 @@ export function traverse(schema, params = {}, inner = false) {
 
   const schemaType = getSchemaType(schema);
 
-  function fn(originalObj, context = {}, key) {
+  function fn(originalObj, context = {}, key, parents, parentKeys) {
     const obj = params.modifiers.object
       ? params.modifiers.object(originalObj)
       : originalObj;
@@ -31,7 +31,7 @@ export function traverse(schema, params = {}, inner = false) {
     function getTask(builder) {
       const task = function fn() {
         const readyToRun = !builder.precondition ||
-          builder.precondition(obj, context, key);
+          builder.precondition(obj, context, key, parents, parentKeys);
         return readyToRun
           ? (() => {
               const predicates = !builder.predicates
@@ -41,7 +41,7 @@ export function traverse(schema, params = {}, inner = false) {
                     invalid: () =>
                       new Skip(
                         p.message || `Predicate returned false.`,
-                        { obj, context, key },
+                        { obj, context, key, parents, parentKeys },
                         meta
                       )
                   }));
@@ -51,24 +51,24 @@ export function traverse(schema, params = {}, inner = false) {
                 : builder.asserts.map(a => ({
                     fn: a.predicate,
                     invalid: () =>
-                      new Fault(a.error, { obj, context, key }, meta)
+                      new Fault(a.error, { obj, context, key, parents, parentKeys }, meta)
                   }));
 
               return Seq.of(predicates.concat(assertions))
                 .map(
                   predicate =>
-                    predicate.fn(obj, context, key)
+                    predicate.fn(obj, context, key, parents, parentKeys)
                       ? undefined
                       : predicate.invalid()
                 )
                 .first(x => x) ||
                 (() => {
-                  const result = builder.get(obj, context, key);
+                  const result = builder.get(obj, context, key, parents, parentKeys);
                   return [Match, Skip, Fault].some(
                     resultType => result instanceof resultType
                   )
                     ? result
-                    : new Match(result, { obj, context, key }, meta);
+                    : new Match(result, { obj, context, key, parents, parentKeys }, meta);
                 })();
             })()
           : fn;
@@ -85,19 +85,19 @@ export function traverse(schema, params = {}, inner = false) {
             {
               task: new Skip(
                 `Expected ${schema} but got ${comparand}.`,
-                { obj, context, key },
+                { obj, context, key, parents, parentKeys },
                 meta
               )
             }
           ]
-        : [{ task: new Empty({ obj, context, key }, meta) }];
+        : [{ task: new Empty({ obj, context, key, parents, parentKeys }, meta) }];
     }
 
     function getObjectTasks() {
       return typeof obj !== "undefined"
         ? Seq.of(Object.keys(schema))
-            .map(key => {
-              const childSchema = schema[key];
+            .map(childKey => {
+              const childSchema = schema[childKey];
               const childUnmodified = (childSchema.params &&
                 childSchema.params.unmodified) || {
                 object: false,
@@ -106,20 +106,20 @@ export function traverse(schema, params = {}, inner = false) {
 
               const childItem = childUnmodified.object
                 ? childUnmodified.property
-                    ? originalObj[key]
+                    ? originalObj[childKey]
                     : params.modifiers.propertyOnUnmodified
                         ? params.modifiers.propertyOnUnmodified(
                             originalObj,
-                            key
+                            childKey
                           )
                         : params.modifiers.property
-                            ? params.modifiers.property(originalObj, key)
-                            : originalObj[key]
+                            ? params.modifiers.property(originalObj, childKey)
+                            : originalObj[childKey]
                 : childUnmodified.property
-                    ? obj[key]
+                    ? obj[childKey]
                     : params.modifiers.property
-                        ? params.modifiers.property(obj, key)
-                        : obj[key];
+                        ? params.modifiers.property(obj, childKey)
+                        : obj[childKey];
 
               return {
                 task: traverse(
@@ -137,14 +137,16 @@ export function traverse(schema, params = {}, inner = false) {
                   getSchemaType(childSchema) === "object"
                     ? context
                     : { parent: context },
-                  key
+                  childKey,
+                  parents.concat(originalObj),
+                  parentKeys.concat(key)
                 ),
                 params: childSchema.params
                   ? {
                       ...childSchema.params,
-                      key: childSchema.params.key || key
+                      key: childSchema.params.key || childKey
                     }
-                  : { key }
+                  : { key: childKey }
               };
             })
             .reduce(
@@ -159,7 +161,7 @@ export function traverse(schema, params = {}, inner = false) {
             {
               task: new Skip(
                 `Cannot traverse undefined.`,
-                { obj, context, key },
+                { obj, context, key, parents, parentKeys },
                 meta
               )
             }
@@ -171,7 +173,7 @@ export function traverse(schema, params = {}, inner = false) {
         ? schema.length !== obj.length
             ? new Skip(
                 `Expected array of length ${schema.length} but got ${obj.length}.`,
-                { obj, context, key },
+                { obj, context, key, parents, parentKeys },
                 meta
               )
             : Seq.of(schema)
@@ -186,25 +188,31 @@ export function traverse(schema, params = {}, inner = false) {
                       }
                     },
                     false
-                  ).fn(obj[i], { parent: context }),
+                  ).fn(
+                    obj[i],
+                    { parent: context },
+                    `${key}.${i}`,
+                    parents.concat(originalObj),
+                    parentKeys.concat(`${key}.${i}`)
+                  ),
                   params: schema.params
                 }))
                 .toArray()
         : [
             new Skip(
               `Schema is an array but property is a non-array.`,
-              { obj, context, key },
+              { obj, context, key, parents, parentKeys },
               meta
             )
           ];
     }
 
     function getSchemaTasks() {
-      return [{ task: schema.fn(obj, context, key) }];
+      return [{ task: schema.fn(obj, context, key, parents, parentKeys) }];
     }
 
     function getFunctionTasks() {
-      return [{ task: schema(obj, context, key) }];
+      return [{ task: schema(obj, context, key, parents, parentKeys) }];
     }
 
     /*
@@ -344,14 +352,14 @@ export function traverse(schema, params = {}, inner = false) {
                 : () => run([], unfinished)
             : (schemaType !== "object" || !inner) &&
                 typeof state !== "undefined"
-                ? new Match(state, { obj, context, key }, meta)
-                : new Empty({ obj, context, key }, meta);
+                ? new Match(state, { obj, context, key, parents, parentKeys }, meta)
+                : new Empty({ obj, context, key, parents, parentKeys }, meta);
     }
 
     const mustRun = !params.predicate || params.predicate(obj);
 
     return !mustRun
-      ? new Skip(`Predicate returned false.`, { obj, context, key }, meta)
+      ? new Skip(`Predicate returned false.`, { obj, context, key, parents, parentKeys }, meta)
       : () => {
           const tasks = Seq.of(params.builders)
             .map(builder => getTask(builder))

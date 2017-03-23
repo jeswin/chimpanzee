@@ -28,6 +28,6 @@ function _match(traverseResult) {
   return typeof result === "function" ? _match(result()) : result;
 }
 
-export function match(schema, args) {
-  return _match(schema.fn(args, {}));
+export function match(schema, input) {
+  return _match(schema.fn(input, {}, undefined, [], []));
 }

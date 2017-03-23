@@ -8,15 +8,17 @@ export function map(schema, mapper, params) {
 
   params = typeof params === "string" ? { key: params } : params;
 
-  function fn(obj, context, key) {
+  function fn(obj, context, key, parents, parentKeys) {
     return waitForSchema(
       schema,
       obj,
       context,
       key,
+      parents,
+      parentKeys,
       result =>
         result instanceof Match
-          ? new Match(mapper(result.value), { obj, context, key }, meta)
+          ? new Match(mapper(result.value), { obj, context, key, parents, parentKeys }, meta)
           : result
     );
   }

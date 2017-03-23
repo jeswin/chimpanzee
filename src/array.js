@@ -23,14 +23,14 @@ export function repeatingItem(_schema, opts = {}) {
   const max = opts.max;
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
-    return new Schema((obj, context, key) =>
+    return new Schema((obj, context, key, parents, parentKeys) =>
       (function run(items, results, needle) {
         const completed = (result, needle) => results.length >= min &&
           (!max || results.length <= max)
           ? {
               result: new Match(
                 results.concat(result ? [result.value] : []),
-                { obj, context, key },
+                { obj, context, key, parents, parentKeys },
                 meta
               ),
               needle
@@ -38,7 +38,7 @@ export function repeatingItem(_schema, opts = {}) {
           : {
               result: new Skip(
                 "Incorrect number of matches.",
-                { obj, context, key },
+                { obj, context, key, parents, parentKeys },
                 meta
               )
             };
@@ -48,6 +48,8 @@ export function repeatingItem(_schema, opts = {}) {
           items,
           context,
           key,
+          parents,
+          parentKeys,
           ({ result, needle }) =>
             result instanceof Skip || result instanceof Fault
               ? completed(undefined, needle)
@@ -72,26 +74,29 @@ export function unorderedItem(_schema) {
 
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
-    return new Schema((obj, context, key) => (function run(items, i) {
-      return waitForSchema(
-        schema(i),
-        items,
-        context,
-        key,
-        ({ result }) => result instanceof Match
-          ? { result, needle }
-          : items.length > i
-              ? run(items, i + 1)
-              : {
-                  result: new Skip(
-                    `Unordered item was not found.`,
-                    { obj, context, key },
-                    meta
-                  ),
-                  needle
-                }
-      );
-    })(obj, 0));
+    return new Schema((obj, context, key, parents, parentKeys) =>
+      (function run(items, i) {
+        return waitForSchema(
+          schema(i),
+          items,
+          context,
+          key,
+          parents,
+          parentKeys,
+          ({ result }) => result instanceof Match
+            ? { result, needle }
+            : items.length > i
+                ? run(items, i + 1)
+                : {
+                    result: new Skip(
+                      `Unordered item was not found.`,
+                      { obj, context, key, parents, parentKeys },
+                      meta
+                    ),
+                    needle
+                  }
+        );
+      })(obj, 0));
   });
 }
 
@@ -105,16 +110,24 @@ export function optionalItem(_schema) {
 
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
-    return new Schema((obj, context, key) =>
+    return new Schema((obj, context, key, parents, parentKeys) =>
       waitForSchema(
         schema(needle),
         obj,
         context,
         key,
+        parents,
+        parentKeys,
         ({ result }) =>
           result instanceof Match
             ? { result, needle: needle + 1 }
-            : { result: new Empty({ obj, context, key }, meta), needle }
+            : {
+                result: new Empty(
+                  { obj, context, key, parents, parentKeys },
+                  meta
+                ),
+                needle
+              }
       ));
   });
 }
@@ -125,12 +138,14 @@ export function optionalItem(_schema) {
 function regularItem(schema) {
   const meta = { type: "regularItem", schema };
   return needle =>
-    new Schema((obj, context, key) =>
+    new Schema((obj, context, key, parents, parentKeys) =>
       waitForSchema(
         schema,
         obj[needle],
         context,
         key,
+        parents,
+        parentKeys,
         result =>
           result instanceof Match
             ? { result, needle: needle + 1 }
@@ -149,7 +164,7 @@ export function array(schemas, params) {
   const meta = { type: "array", schemas, params };
 
   params = typeof params === "string" ? { key: params } : params;
-  const fn = function(obj, context, key) {
+  const fn = function(obj, context, key, parents, parentKeys) {
     return Array.isArray(obj)
       ? (function run(list, results, needle) {
           const schema = toNeedledSchema(list[0]);
@@ -158,6 +173,8 @@ export function array(schemas, params) {
             obj,
             { parent: context },
             key,
+            parents,
+            parentKeys,
             ({ result, needle }) =>
               result instanceof Skip || result instanceof Fault
                 ? result
@@ -171,14 +188,14 @@ export function array(schemas, params) {
                       )
                     : new Match(
                         results.concat(result.value),
-                        { obj, context, key },
+                        { obj, context, key, parents, parentKeys },
                         meta
                       )
           );
         })(schemas, [], 0)
       : new Fault(
           `Expected array but got ${typeof obj}.`,
-          { obj, context, key },
+          { obj, context, key, parents, parentKeys },
           meta
         );
   };
