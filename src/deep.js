@@ -16,12 +16,16 @@ export function deep(schema, params) {
             obj[keys[0]],
             context,
             key,
-            parents,
-            parentKeys,
+            parents.concat(obj),
+            parentKeys.concat(keys[0]),
             result =>
               result instanceof Match ? result : traverseObject(keys.slice(1))
           )
-        : new Skip("Not found in deep.", { obj, context, key, parents, parentKeys }, meta);
+        : new Skip(
+            "Not found in deep.",
+            { obj, context, key, parents, parentKeys },
+            meta
+          );
     }
 
     function traverseArray(items) {
@@ -36,7 +40,11 @@ export function deep(schema, params) {
             result =>
               result instanceof Match ? result : traverseArray(items.slice(1))
           )
-        : new Skip("Not found in deep.", { obj, context, key, parents, parentKeys }, meta);
+        : new Skip(
+            "Not found in deep.",
+            { obj, context, key, parents, parentKeys },
+            meta
+          );
     }
 
     return waitForSchema(
@@ -53,7 +61,11 @@ export function deep(schema, params) {
               ? traverseObject(Object.keys(obj))
               : Array.isArray(obj)
                   ? traverseArray(obj)
-                  : new Skip("Not found in deep.", { obj, context, key, parents, parentKeys }, meta)
+                  : new Skip(
+                      "Not found in deep.",
+                      { obj, context, key, parents, parentKeys },
+                      meta
+                    )
     );
   }
 

@@ -5,26 +5,43 @@ import path from "path";
 import sourceMapSupport from "source-map-support";
 import { Match, Skip, Fault, Empty } from "../results";
 import { match } from "../chimpanzee";
+import util from "util";
 
 sourceMapSupport.install();
 
 describe("chimpanzee", () => {
   function run([description, dir, resultType]) {
     it(`${description}`, () => {
+      global.__chimpanzeeTestContext = [];
       const fixture = require(`./fixtures/${dir}/fixture`);
-      const result = match(fixture.schema, fixture.input);
+      const actual = match(fixture.schema, fixture.input);
       const expected = require(`./fixtures/${dir}/expected`);
       if (resultType === "match") {
-        result.should.be.an.instanceOf(Match);
-        result.value.should.deepEqual(expected.result);
+        actual.should.be.an.instanceOf(Match);
+        actual.value.should.deepEqual(expected.result);
       }  else if (resultType === "empty") {
-        result.should.be.an.instanceOf(Empty);
+        actual.should.be.an.instanceOf(Empty);
       } else if (resultType === "skip") {
-        result.should.be.an.instanceOf(Skip);
-        result.message.should.deepEqual(expected.result);
+        actual.should.be.an.instanceOf(Skip);
+        actual.message.should.deepEqual(expected.result);
       } else if (resultType === "fault") {
-        result.should.be.an.instanceOf(Fault);
-        result.message.should.deepEqual(expected.result);
+        actual.should.be.an.instanceOf(Fault);
+        actual.message.should.deepEqual(expected.result);
+      }
+
+      if (expected.allResults) {
+        for (const [actualIndex, expectedResult] of expected.allResults) {
+          const actualResult = global.__chimpanzeeTestContext[actualIndex];
+          if (expectedResult.message) {
+            actualResult.message.should.equal(expectedResult.message)
+          }
+          if (expectedResult.env && expectedResult.env.parentKeys) {
+            actualResult.env.parentKeys.should.deepEqual(expectedResult.env.parentKeys);
+          }
+          if (expectedResult.meta && expectedResult.meta.type) {
+            actualResult.meta.type.should.equal(expectedResult.meta.type);
+          }
+        }
       }
     });
   }

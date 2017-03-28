@@ -44,22 +44,23 @@ export function take(predicate, schema, params, options = {}) {
               key,
               parents,
               parentKeys,
-              result => result instanceof Match
-                ? new Match(
-                    {
-                      ...obj,
-                      ...(options.modifier
-                        ? options.modifier(result.value)
-                        : result.value)
-                    },
-                    { obj, context, key, parents, parentKeys },
-                    meta
-                  )
-                : new Skip(
-                    "Capture failed in inner schema.",
-                    { obj, context, key, parents, parentKeys },
-                    meta
-                  )
+              result =>
+                result instanceof Match
+                  ? new Match(
+                      {
+                        ...obj,
+                        ...(options.modifier
+                          ? options.modifier(result.value)
+                          : result.value)
+                      },
+                      { obj, context, key, parents, parentKeys },
+                      meta
+                    )
+                  : new Skip(
+                      "Capture failed in inner schema.",
+                      { obj, context, key, parents, parentKeys },
+                      meta
+                    )
             )
           : new Match(
               options.modifier ? options.modifier(obj) : obj,
@@ -69,7 +70,7 @@ export function take(predicate, schema, params, options = {}) {
       : new Skip(
           options.skipMessage
             ? options.skipMessage(obj)
-            : "Predicate returned false.",
+            : `Predicate returned false. Predicate was ${predicate.toString()}`,
           { obj, context, key, parents, parentKeys },
           meta
         );

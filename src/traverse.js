@@ -193,7 +193,7 @@ export function traverse(schema, params = {}, inner = false) {
                     { parent: context },
                     `${key}.${i}`,
                     parents.concat(originalObj),
-                    parentKeys.concat(`${key}.${i}`)
+                    parentKeys.concat(key)
                   ),
                   params: schema.params
                 }))

@@ -25,23 +25,23 @@ export function repeatingItem(_schema, opts = {}) {
   return new ArrayItem(needle => {
     return new Schema((obj, context, key, parents, parentKeys) =>
       (function run(items, results, needle) {
-        const completed = (result, needle) => results.length >= min &&
-          (!max || results.length <= max)
-          ? {
-              result: new Match(
-                results.concat(result ? [result.value] : []),
-                { obj, context, key, parents, parentKeys },
-                meta
-              ),
-              needle
-            }
-          : {
-              result: new Skip(
-                "Incorrect number of matches.",
-                { obj, context, key, parents, parentKeys },
-                meta
-              )
-            };
+        const completed = (result, needle) =>
+          results.length >= min && (!max || results.length <= max)
+            ? {
+                result: new Match(
+                  results.concat(result ? [result.value] : []),
+                  { obj, context, key, parents, parentKeys },
+                  meta
+                ),
+                needle
+              }
+            : {
+                result: new Skip(
+                  "Incorrect number of matches.",
+                  { obj, context, key, parents, parentKeys },
+                  meta
+                )
+              };
 
         return waitForSchema(
           schema(needle),
@@ -83,18 +83,19 @@ export function unorderedItem(_schema) {
           key,
           parents,
           parentKeys,
-          ({ result }) => result instanceof Match
-            ? { result, needle }
-            : items.length > i
-                ? run(items, i + 1)
-                : {
-                    result: new Skip(
-                      `Unordered item was not found.`,
-                      { obj, context, key, parents, parentKeys },
-                      meta
-                    ),
-                    needle
-                  }
+          ({ result }) =>
+            result instanceof Match
+              ? { result, needle }
+              : items.length > i
+                  ? run(items, i + 1)
+                  : {
+                      result: new Skip(
+                        `Unordered item was not found.`,
+                        { obj, context, key, parents, parentKeys },
+                        meta
+                      ),
+                      needle
+                    }
         );
       })(obj, 0));
   });
@@ -143,9 +144,9 @@ function regularItem(schema) {
         schema,
         obj[needle],
         context,
-        key,
-        parents,
-        parentKeys,
+        `${key}.${needle}`,
+        parents.concat(obj),
+        parentKeys.concat(key),
         result =>
           result instanceof Match
             ? { result, needle: needle + 1 }
@@ -177,7 +178,7 @@ export function array(schemas, params) {
             parentKeys,
             ({ result, needle }) =>
               result instanceof Skip || result instanceof Fault
-                ? result
+                ? result.updateEnv({ needle })
                 : list.length > 1
                     ? run(
                         list.slice(1),

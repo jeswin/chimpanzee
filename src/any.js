@@ -23,12 +23,12 @@ export function any(schemas, params) {
               result instanceof Match
                 ? result
                 : schemas.length > 1
-                  ? () => run(schemas.slice(1), nonMatching.concat(result))
-                  : new Skip(
-                      "None of the items matched.",
-                      { obj, context, key, parents, parentKeys, nonMatching },
-                      meta
-                    )
+                    ? () => run(schemas.slice(1), nonMatching.concat(result))
+                    : new Skip(
+                        "None of the items matched.",
+                        { obj, context, key, parents, parentKeys, nonMatching },
+                        meta
+                      )
           );
         })(schemas)
       : new Empty({ obj, context, key, parents, parentKeys }, meta);

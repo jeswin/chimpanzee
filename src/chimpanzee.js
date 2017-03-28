@@ -29,5 +29,5 @@ function _match(traverseResult) {
 }
 
 export function match(schema, input) {
-  return _match(schema.fn(input, {}, undefined, [], []));
+  return _match(schema.fn(input, {}, "__INIT__", [], []));
 }
