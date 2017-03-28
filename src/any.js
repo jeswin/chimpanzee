@@ -20,13 +20,13 @@ export function any(schemas, params) {
             parents,
             parentKeys,
             result =>
-              result instanceof Match
+                result instanceof Match
                 ? result
                 : schemas.length > 1
                     ? () => run(schemas.slice(1), nonMatching.concat(result))
                     : new Skip(
                         "None of the items matched.",
-                        { obj, context, key, parents, parentKeys, nonMatching },
+                        { obj, context, key, parents, parentKeys, nonMatching: nonMatching.concat(result) },
                         meta
                       )
           );
