@@ -7,7 +7,11 @@ export function empty() {
   function fn(obj, context, key, parents, parentKeys) {
     return obj === undefined
       ? new Empty({ obj, context, key, parents, parentKeys }, meta)
-      : new Skip("Not empty.", { obj, context, key, parents, parentKeys }, meta);
+      : new Skip(
+          "Not empty.",
+          { obj, context, key, parents, parentKeys },
+          meta
+        );
   }
 
   return new Schema(fn, undefined);

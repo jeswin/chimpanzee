@@ -18,7 +18,11 @@ export function map(schema, mapper, params) {
       parentKeys,
       result =>
         result instanceof Match
-          ? new Match(mapper(result.value), { obj, context, key, parents, parentKeys }, meta)
+          ? new Match(
+              mapper(result.value),
+              { obj, context, key, parents, parentKeys },
+              meta
+            )
           : result
     );
   }

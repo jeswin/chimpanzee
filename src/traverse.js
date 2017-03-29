@@ -51,7 +51,11 @@ export function traverse(schema, params = {}, inner = false) {
                 : builder.asserts.map(a => ({
                     fn: a.predicate,
                     invalid: () =>
-                      new Fault(a.error, { obj, context, key, parents, parentKeys }, meta)
+                      new Fault(
+                        a.error,
+                        { obj, context, key, parents, parentKeys },
+                        meta
+                      )
                   }));
 
               return Seq.of(predicates.concat(assertions))
@@ -63,12 +67,22 @@ export function traverse(schema, params = {}, inner = false) {
                 )
                 .first(x => x) ||
                 (() => {
-                  const result = builder.get(obj, context, key, parents, parentKeys);
+                  const result = builder.get(
+                    obj,
+                    context,
+                    key,
+                    parents,
+                    parentKeys
+                  );
                   return [Match, Skip, Fault].some(
                     resultType => result instanceof resultType
                   )
                     ? result
-                    : new Match(result, { obj, context, key, parents, parentKeys }, meta);
+                    : new Match(
+                        result,
+                        { obj, context, key, parents, parentKeys },
+                        meta
+                      );
                 })();
             })()
           : fn;
@@ -90,7 +104,11 @@ export function traverse(schema, params = {}, inner = false) {
               )
             }
           ]
-        : [{ task: new Empty({ obj, context, key, parents, parentKeys }, meta) }];
+        : [
+            {
+              task: new Empty({ obj, context, key, parents, parentKeys }, meta)
+            }
+          ];
     }
 
     function getObjectTasks() {
@@ -226,7 +244,7 @@ export function traverse(schema, params = {}, inner = false) {
         ? !(result instanceof Empty)
             ? Object.assign(context, { state: result.value })
             : context
-        : { invalidResult: result };
+        : { nonMatch: result };
     }
 
     /*
@@ -250,7 +268,7 @@ export function traverse(schema, params = {}, inner = false) {
                         }
                   )
                 : acc
-            : { invalidResult: result };
+            : { nonMatch: result };
         },
         context,
         (acc, { result }) => !(result instanceof Match)
@@ -269,7 +287,7 @@ export function traverse(schema, params = {}, inner = false) {
                     state: (acc.state || []).concat([result.value])
                   })
                 : acc
-            : { invalidResult: result };
+            : { nonMatch: result };
         },
         context,
         (acc, { result }) => !(result instanceof Match)
@@ -278,7 +296,7 @@ export function traverse(schema, params = {}, inner = false) {
 
     function mergeNativeTypeChildTasks(finished, isRunningChildTasks) {
       const result = finished[0].result;
-      return result instanceof Match ? context : { invalidResult: result };
+      return result instanceof Match ? context : { nonMatch: result };
     }
 
     function mergeTasks(finished) {
@@ -288,7 +306,7 @@ export function traverse(schema, params = {}, inner = false) {
             ? !(result instanceof Empty)
                 ? Object.assign(acc, { state: result.value })
                 : acc
-            : { invalidResult: result };
+            : { nonMatch: result };
         },
         context,
         (acc, { result }) => !(result instanceof Match)
@@ -326,40 +344,49 @@ export function traverse(schema, params = {}, inner = false) {
 
       const runnables = isRunningChildTasks ? childTasks : tasks;
       const { finished, unfinished } = Seq.of(runnables).reduce(
-        (acc, { task, params }) => typeof task === "function"
-          ? {
-              finished: acc.finished,
-              unfinished: acc.unfinished.concat({ task: task(), params })
-            }
-          : {
-              finished: acc.finished.concat({ result: task, params }),
-              unfinished: acc.unfinished
-            },
+        (acc, { task, params }) =>
+          typeof task === "function"
+            ? {
+                finished: acc.finished,
+                unfinished: acc.unfinished.concat({ task: task(), params })
+              }
+            : {
+                finished: acc.finished.concat({ result: task, params }),
+                unfinished: acc.unfinished
+              },
         { finished: [], unfinished: [] }
       );
 
-      const { state, invalidResult } = finished.length
+      const { state, nonMatch } = finished.length
         ? isRunningChildTasks
             ? methods[schemaType].mergeChildTasks(finished)
             : mergeTasks(finished)
         : {};
 
-      return invalidResult
-        ? invalidResult
+      return nonMatch
+        ? nonMatch
         : childTasks.length || unfinished.length
             ? isRunningChildTasks
                 ? () => run(unfinished, tasks)
                 : () => run([], unfinished)
             : (schemaType !== "object" || !inner) &&
                 typeof state !== "undefined"
-                ? new Match(state, { obj, context, key, parents, parentKeys }, meta)
+                ? new Match(
+                    state,
+                    { obj, context, key, parents, parentKeys },
+                    meta
+                  )
                 : new Empty({ obj, context, key, parents, parentKeys }, meta);
     }
 
     const mustRun = !params.predicate || params.predicate(obj);
 
     return !mustRun
-      ? new Skip(`Predicate returned false.`, { obj, context, key, parents, parentKeys }, meta)
+      ? new Skip(
+          `Predicate returned false.`,
+          { obj, context, key, parents, parentKeys },
+          meta
+        )
       : () => {
           const tasks = Seq.of(params.builders)
             .map(builder => getTask(builder))
