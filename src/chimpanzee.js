@@ -29,5 +29,6 @@ function _match(traverseResult) {
 }
 
 export function match(schema, input) {
-  return _match(schema.fn(input, {}, "__INIT__", [], []));
+  const fn = typeof schema === "function" ? schema : schema.fn;
+  return _match(fn(input, {}, "__INIT__", [], []));
 }
