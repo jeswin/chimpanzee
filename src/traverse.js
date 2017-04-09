@@ -1,6 +1,7 @@
+import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
-import { Seq } from "lazily";
+import runner from "./runner";
 
 function getSchemaType(schema) {
   return ["string", "number", "boolean", "symbol"].includes(typeof schema)
@@ -21,74 +22,10 @@ export function traverse(schema, params = {}, inner = false) {
   params.builders = params.builders || [{ get: (obj, { state }) => state }];
   params.modifiers = params.modifiers || {};
 
-  const schemaType = getSchemaType(schema);
-
   function fn(originalObj, context = {}, key, parents, parentKeys) {
     const obj = params.modifiers.object
       ? params.modifiers.object(originalObj)
       : originalObj;
-
-    function getTask(builder) {
-      const task = function fn() {
-        const readyToRun = !builder.precondition ||
-          builder.precondition(obj, context, key, parents, parentKeys);
-        return readyToRun
-          ? (() => {
-              const predicates = !builder.predicates
-                ? []
-                : builder.predicates.map(p => ({
-                    fn: p.predicate,
-                    invalid: () =>
-                      new Skip(
-                        p.message || `Predicate returned false.`,
-                        { obj, context, key, parents, parentKeys },
-                        meta
-                      )
-                  }));
-
-              const assertions = !builder.asserts
-                ? []
-                : builder.asserts.map(a => ({
-                    fn: a.predicate,
-                    invalid: () =>
-                      new Fault(
-                        a.error,
-                        { obj, context, key, parents, parentKeys },
-                        meta
-                      )
-                  }));
-
-              return Seq.of(predicates.concat(assertions))
-                .map(
-                  predicate =>
-                    predicate.fn(obj, context, key, parents, parentKeys)
-                      ? undefined
-                      : predicate.invalid()
-                )
-                .first(x => x) ||
-                (() => {
-                  const result = builder.get(
-                    obj,
-                    context,
-                    key,
-                    parents,
-                    parentKeys
-                  );
-                  return [Match, Skip, Fault].some(
-                    resultType => result instanceof resultType
-                  )
-                    ? result
-                    : new Match(
-                        result,
-                        { obj, context, key, parents, parentKeys },
-                        meta
-                      );
-                })();
-            })()
-          : fn;
-      };
-      return { task };
-    }
 
     function getNativeTypeTasks() {
       const comparand = params.modifiers.value
@@ -238,7 +175,7 @@ export function traverse(schema, params = {}, inner = false) {
       So, we can consider the first item in finished as the only item.
       There can be multiple tasks though.
     */
-    function mergeChildTasks(finished) {
+    function mergeExternalChildTasks(finished) {
       const result = finished[0].result;
       return result instanceof Match
         ? !(result instanceof Empty)
@@ -299,103 +236,43 @@ export function traverse(schema, params = {}, inner = false) {
       return result instanceof Match ? context : { nonMatch: result };
     }
 
-    function mergeTasks(finished) {
-      return Seq.of(finished).reduce(
-        (acc, { result, params }) => {
-          return result instanceof Match
-            ? !(result instanceof Empty)
-                ? Object.assign(acc, { state: result.value })
-                : acc
-            : { nonMatch: result };
-        },
-        context,
-        (acc, { result }) => !(result instanceof Match)
-      );
-    }
-
+    // prettier-ignore
     const methods = {
-      function: {
-        mergeChildTasks: mergeChildTasks,
+      "function": {
+        mergeChildTasks: mergeExternalChildTasks,
         getChildTasks: getFunctionTasks
       },
-      schema: {
-        mergeChildTasks: mergeChildTasks,
+      "schema": {
+        mergeChildTasks: mergeExternalChildTasks,
         getChildTasks: getSchemaTasks
       },
-      object: {
+      "object": {
         mergeChildTasks: mergeObjectChildTasks,
         getChildTasks: getObjectTasks
       },
-      array: {
+      "array": {
         mergeChildTasks: mergeArrayChildTasks,
         getChildTasks: getArrayTasks
       },
-      native: {
+      "native": {
         mergeChildTasks: mergeNativeTypeChildTasks,
         getChildTasks: getNativeTypeTasks
       }
     };
 
-    /*
-      tasks must run only after childTasks are complete.
-    */
-    function run(childTasks, tasks) {
-      const isRunningChildTasks = childTasks.length;
+    const schemaType = getSchemaType(schema);
+    const childTasks = methods[schemaType].getChildTasks();
+    const mergeChildTasks = results =>
+      methods[schemaType].mergeChildTasks(results);
+    const isTraversingDependent = schemaType === "object" && inner;
 
-      const runnables = isRunningChildTasks ? childTasks : tasks;
-      const { finished, unfinished } = Seq.of(runnables).reduce(
-        (acc, { task, params }) =>
-          typeof task === "function"
-            ? {
-                finished: acc.finished,
-                unfinished: acc.unfinished.concat({ task: task(), params })
-              }
-            : {
-                finished: acc.finished.concat({ result: task, params }),
-                unfinished: acc.unfinished
-              },
-        { finished: [], unfinished: [] }
-      );
-
-      const { state, nonMatch } = finished.length
-        ? isRunningChildTasks
-            ? methods[schemaType].mergeChildTasks(finished)
-            : mergeTasks(finished)
-        : {};
-
-      return nonMatch
-        ? nonMatch
-        : childTasks.length || unfinished.length
-            ? isRunningChildTasks
-                ? () => run(unfinished, tasks)
-                : () => run([], unfinished)
-            : (schemaType !== "object" || !inner) &&
-                typeof state !== "undefined"
-                ? new Match(
-                    state,
-                    { obj, context, key, parents, parentKeys },
-                    meta
-                  )
-                : new Empty({ obj, context, key, parents, parentKeys }, meta);
-    }
-
-    const mustRun = !params.predicate || params.predicate(obj);
-
-    return !mustRun
-      ? new Skip(
-          `Predicate returned false.`,
-          { obj, context, key, parents, parentKeys },
-          meta
-        )
-      : () => {
-          const tasks = Seq.of(params.builders)
-            .map(builder => getTask(builder))
-            .toArray();
-
-          const childTasks = methods[schemaType].getChildTasks();
-
-          return run(childTasks, tasks);
-        };
+    return runner(
+      params,
+      isTraversingDependent,
+      childTasks,
+      mergeChildTasks,
+      meta
+    )(obj, context, key, parents, parentKeys);
   }
 
   return new Schema(fn, params);
