@@ -1,7 +1,7 @@
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
-import { waitForSchema } from "./utils";
+import { runToResult } from "./utils";
 
 export function number(params) {
   return checkType("number", params);
@@ -23,29 +23,22 @@ export function func(params) {
   return checkType("function", params);
 }
 
-function checkType(type, params) {
+function checkType(type, params = {}) {
   const meta = { type, params };
 
-  params = typeof params === "string" ? { key: params } : params;
-
-  function fn(obj, context, key, parents, parentKeys) {
-    return waitForSchema(
-      captureIf(obj => typeof obj === type, params),
-      obj,
-      context,
-      key,
-      parents,
-      parentKeys,
-      result =>
-        result instanceof Skip
-          ? new Skip(
-              `Expected ${type} but got ${typeof obj}.`,
-              { obj, context, key, parents, parentKeys },
-              meta
-            )
-          : result
-    );
-  }
+  const fn = runToResult(params, params =>
+    (obj, context, key, parents, parentKeys) => ({
+      runner: result =>
+        () =>
+          result instanceof Skip
+            ? new Skip(
+                `Expected ${type} but got ${typeof obj}.`,
+                { obj, context, key, parents, parentKeys },
+                meta
+              )
+            : result,
+      init: next => next(captureIf(obj => typeof obj === type, params))
+    }));
 
   return new Schema(fn, params);
 }
