@@ -1,12 +1,11 @@
 import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
-import { waitForSchema } from "./utils";
+import { getDefaultParams, waitForSchema } from "./utils";
 
 export function deep(schema, params) {
   const meta = { type: "deep", schema, params };
-
-  params = typeof params === "string" ? { key: params } : params;
+  params = getDefaultParams(params);
 
   function fn(obj, context, key, parents, parentKeys) {
     function traverseObject(keys) {

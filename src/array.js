@@ -1,7 +1,7 @@
 import { traverse } from "./traverse";
-import { waitForSchema } from "./utils";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
+import { getDefaultParams, waitForSchema } from "./utils";
 
 class ArrayItem {
   constructor(fn) {
@@ -163,8 +163,8 @@ function toNeedledSchema(schema) {
 */
 export function array(schemas, params) {
   const meta = { type: "array", schemas, params };
+  params = getDefaultParams(params);
 
-  params = typeof params === "string" ? { key: params } : params;
   const fn = function(obj, context, key, parents, parentKeys) {
     return Array.isArray(obj)
       ? (function run(list, results, needle) {

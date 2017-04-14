@@ -2,7 +2,7 @@ import { Match, Empty, Skip, Fault } from "./results";
 import { traverse } from "./traverse";
 import Schema from "./schema";
 import { Seq } from "lazily";
-import { waitForSchema } from "./utils";
+import { getDefaultParams, waitForSchema } from "./utils";
 
 function getSchema(schema, paramSelector) {
   const schemaSelector = schema.params && schema.params.selector
@@ -33,6 +33,8 @@ export function composite(schema, _paramsList, ownParams) {
     paramsList: _paramsList,
     ownParams
   };
+
+  ownParams = getDefaultParams(ownParams);
 
   const normalizedParams = _paramsList.map(
     params => typeof params === "string" ? { key: params } : params

@@ -17,6 +17,12 @@ export function runManyToResult(params, fn, single = false) {
         return typeof task === "function" ? loop(task()) : task;
       }
       const effectiveContext = options.newContext ? { ...context } : context;
+      const schemaFn = typeof schema === "function"
+        ? schema
+        : schema instanceof Schema
+          ? schema.fn
+          : traverse(schema, params).fn;
+
       const result = loop(
         schema.fn(obj, effectiveContext, key, parents, parentKeys)
       );
@@ -25,9 +31,7 @@ export function runManyToResult(params, fn, single = false) {
         : fn(options.runner(result));
     }
 
-    params = getDefaultParams();
-    const handler = fn(params);
-    const options = handler(obj, context, key, parents, parentKeys);
+    const options = fn(obj, context, key, parents, parentKeys);
     return options.init(next);
   };
 }

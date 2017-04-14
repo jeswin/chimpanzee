@@ -1,6 +1,7 @@
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { waitForSchema } from "./utils";
+import { getDefaultParams, runToResult } from "./utils";
 
 export function capture(params) {
   return captureIf(obj => typeof obj !== "undefined", params);
@@ -31,8 +32,47 @@ export function literal(what, params) {
 
 export function take(predicate, schema, params, options = {}) {
   const meta = { type: "take", schema, params, predicate, options };
+  params = getDefaultParams(params);
 
-  params = typeof params === "string" ? { key: params } : params;
+  // const fn = runToResult(
+  //   (obj, context, key, parents, parentKeys) =>
+  //     predicate(obj)
+  //       ? typeof schema !== "undefined"
+  //           ? {
+  //               runner: result =>
+  //                 () =>
+  //                   result instanceof Skip
+  //                     ? new Skip(
+  //                         `Did not match regex.`,
+  //                         { obj, context, key, parents, parentKeys },
+  //                         meta
+  //                       )
+  //                     : result,
+  //               init: next =>
+  //                 next(
+  //                   captureIf(
+  //                     obj =>
+  //                       typeof regex === "string"
+  //                         ? typeof obj === "string" &&
+  //                             new RegExp(regex).test(obj)
+  //                         : typeof obj === "string" && regex.test(obj),
+  //                     params
+  //                   )
+  //                 )
+  //             }
+  //           : new Match(
+  //               options.modifier ? options.modifier(obj) : obj,
+  //               { obj, context, key, parents, parentKeys },
+  //               meta
+  //             )
+  //       : new Skip(
+  //           options.skipMessage
+  //             ? options.skipMessage(obj)
+  //             : `Predicate returned false. Predicate was ${predicate.toString()}`,
+  //           { obj, context, key, parents, parentKeys },
+  //           meta
+  //         )
+  // );
 
   function fn(obj, context, key, parents, parentKeys) {
     return predicate(obj)

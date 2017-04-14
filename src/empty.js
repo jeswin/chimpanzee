@@ -3,7 +3,7 @@ import Schema from "./schema";
 
 export function empty() {
   const meta = { type: "empty" };
-
+  
   function fn(obj, context, key, parents, parentKeys) {
     return obj === undefined
       ? new Empty({ obj, context, key, parents, parentKeys }, meta)
