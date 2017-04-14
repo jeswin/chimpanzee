@@ -9,7 +9,7 @@ export function getDefaultParams(params = {}) {
   return params;
 }
 
-export function runManyToResult(params, fn, single = false) {
+export function runManyToResult(params, options, single = false) {
   return function(obj, context, key, parents, parentKeys) {
     function next(schema, fn) {
       fn = fn || (fn => fn());
@@ -19,19 +19,18 @@ export function runManyToResult(params, fn, single = false) {
       const effectiveContext = options.newContext ? { ...context } : context;
       const schemaFn = typeof schema === "function"
         ? schema
-        : schema instanceof Schema
-          ? schema.fn
-          : traverse(schema, params).fn;
+        : schema instanceof Schema ? schema.fn : traverse(schema, params).fn;
 
       const result = loop(
         schema.fn(obj, effectiveContext, key, parents, parentKeys)
       );
       return !single
-        ? fn(options.runner(next)(result))
-        : fn(options.runner(result));
+        ? fn(
+            options.runner(next)(obj, context, key, parents, parentKeys)(result)
+          )
+        : fn(options.runner(obj, context, key, parents, parentKeys)(result));
     }
 
-    const options = fn(obj, context, key, parents, parentKeys);
     return options.init(next);
   };
 }

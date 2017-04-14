@@ -8,35 +8,36 @@ export function any(schemas, params = {}) {
   const meta = { type: "any", schemas, params };
   params = getDefaultParams(params);
 
-  const fn = runManyToResult(params, (obj, context, key, parents, parentKeys) => ({
+  const fn = runManyToResult(params, {
     runner: next =>
-      result =>
-        (currentSchema, schemas, nonMatching) =>
-          result instanceof Match
-            ? result
-            : schemas.length
-                ? next(traverse(schemas[0]), fn =>
-                    fn(
-                      schemas[0],
-                      schemas.slice(1),
-                      nonMatching.concat(currentSchema)
-                    ))
-                : new Skip(
-                    "None of the items matched.",
-                    {
-                      obj,
-                      context,
-                      key,
-                      parents,
-                      parentKeys,
-                      nonMatching: nonMatching.concat(result)
-                    },
-                    meta
-                  ),
+      (obj, context, key, parents, parentKeys) =>
+        result =>
+          (currentSchema, schemas, nonMatching) =>
+            result instanceof Match
+              ? result
+              : schemas.length
+                  ? next(traverse(schemas[0]), fn =>
+                      fn(
+                        schemas[0],
+                        schemas.slice(1),
+                        nonMatching.concat(currentSchema)
+                      ))
+                  : new Skip(
+                      "None of the items matched.",
+                      {
+                        obj,
+                        context,
+                        key,
+                        parents,
+                        parentKeys,
+                        nonMatching: nonMatching.concat(result)
+                      },
+                      meta
+                    ),
     newContext: true,
     init: next =>
       next(traverse(schemas[0]), fn => fn(schemas[0], schemas.slice(1), []))
-  }));
+  });
 
   return new Schema(fn, params);
 }

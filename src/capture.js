@@ -35,6 +35,7 @@ export function take(predicate, schema, params, options = {}) {
   params = getDefaultParams(params);
 
   // const fn = runToResult(
+  //   params,
   //   (obj, context, key, parents, parentKeys) =>
   //     predicate(obj)
   //       ? typeof schema !== "undefined"

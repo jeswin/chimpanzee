@@ -8,16 +8,17 @@ export function regex(regex, params = {}) {
   const meta = { type: "regex", regex, params };
   params = getDefaultParams(params);
 
-  const fn = runToResult(params, (obj, context, key, parents, parentKeys) => ({
-    runner: result =>
-      () =>
-        result instanceof Skip
-          ? new Skip(
-              `Did not match regex.`,
-              { obj, context, key, parents, parentKeys },
-              meta
-            )
-          : result,
+  const fn = runToResult(params, {
+    runner: (obj, context, key, parents, parentKeys) =>
+      result =>
+        () =>
+          result instanceof Skip
+            ? new Skip(
+                `Did not match regex.`,
+                { obj, context, key, parents, parentKeys },
+                meta
+              )
+            : result,
     init: next =>
       next(
         captureIf(
@@ -28,7 +29,7 @@ export function regex(regex, params = {}) {
           params
         )
       )
-  }));
+  });
 
   return new Schema(fn, params);
 }
