@@ -1,7 +1,7 @@
 import { traverse } from "./traverse";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
-import { getDefaultParams, waitForSchema } from "./utils";
+import { getDefaultParams, runToResult } from "./utils";
 
 export function exists(predicate, schema) {
   const meta = { type: "exists" };
@@ -11,15 +11,12 @@ export function exists(predicate, schema) {
   function fn(obj, context, key, parents, parentKeys) {
     return predicate(obj)
       ? schema
-          ? waitForSchema(
-              schema,
-              obj,
-              context,
-              key,
-              parents,
-              parentKeys,
-              inner => inner
-            )
+          ? runToResult({
+              result: next =>
+                (obj, context, key, parents, parentKeys) =>
+                  result => () => result,
+              schema
+            })
           : new Empty({ obj, context, key, parents, parentKeys }, meta)
       : new Skip(
           "Does not exist.",

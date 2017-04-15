@@ -37,7 +37,7 @@ export function take(predicate, schema, params, options = {}) {
   function fn(obj, context, key, parents, parentKeys) {
     return predicate(obj)
       ? typeof schema !== "undefined"
-          ? runToResult(params, {
+          ? runToResult({
               result: next =>
                 (obj, context, key, parents, parentKeys) =>
                   result =>
@@ -73,48 +73,6 @@ export function take(predicate, schema, params, options = {}) {
           meta
         );
   }
-
-  // function fn(obj, context, key, parents, parentKeys) {
-  //   return predicate(obj)
-  //     ? typeof schema !== "undefined"
-  //         ? waitForSchema(
-  //             schema,
-  //             obj,
-  //             context,
-  //             key,
-  //             parents,
-  //             parentKeys,
-  //             result =>
-  //               result instanceof Match
-  //                 ? new Match(
-  //                     {
-  //                       ...obj,
-  //                       ...(options.modifier
-  //                         ? options.modifier(result.value)
-  //                         : result.value)
-  //                     },
-  //                     { obj, context, key, parents, parentKeys },
-  //                     meta
-  //                   )
-  //                 : new Skip(
-  //                     "Capture failed in inner schema.",
-  //                     { obj, context, key, parents, parentKeys },
-  //                     meta
-  //                   )
-  //           )
-  //         : new Match(
-  //             options.modifier ? options.modifier(obj) : obj,
-  //             { obj, context, key, parents, parentKeys },
-  //             meta
-  //           )
-  //     : new Skip(
-  //         options.skipMessage
-  //           ? options.skipMessage(obj)
-  //           : `Predicate returned false. Predicate was ${predicate.toString()}`,
-  //         { obj, context, key, parents, parentKeys },
-  //         meta
-  //       );
-  // }
 
   return new Schema(fn, params);
 }

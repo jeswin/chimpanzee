@@ -27,7 +27,7 @@ function checkType(type, params) {
   const meta = { type, params };
   params = getDefaultParams(params);
 
-  const fn = runToResult(params, {
+  const fn = runToResult({
     result: next =>
       (obj, context, key, parents, parentKeys) =>
         result =>

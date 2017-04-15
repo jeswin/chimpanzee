@@ -8,7 +8,7 @@ export function any(schemas, params = {}) {
   const meta = { type: "any", schemas, params };
   params = getDefaultParams(params);
 
-  const fn = runToResult(params, {
+  const fn = runToResult({
     result: next =>
       (obj, context, key, parents, parentKeys) =>
         result =>

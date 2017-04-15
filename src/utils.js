@@ -9,7 +9,7 @@ export function getDefaultParams(params = {}) {
   return params;
 }
 
-export function runToResult(params, options) {
+export function runToResult(options) {
   return function(obj, context, key, parents, parentKeys) {
     function next(schema, fn) {
       fn = fn || (fn => fn());
@@ -32,7 +32,7 @@ export function runToResult(params, options) {
               ? schema
               : schema instanceof Schema
                   ? schema.fn
-                  : traverse(schema, params).fn;
+                  : traverse(schema).fn;
             return schemaFn(obj, effectiveContext, key, parents, parentKeys);
           })();
 
