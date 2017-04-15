@@ -28,17 +28,18 @@ function checkType(type, params) {
   params = getDefaultParams(params);
 
   const fn = runToResult(params, {
-    runner: (obj, context, key, parents, parentKeys) =>
-      result =>
-        () =>
-          result instanceof Skip
-            ? new Skip(
-                `Expected ${type} but got ${typeof obj}.`,
-                { obj, context, key, parents, parentKeys },
-                meta
-              )
-            : result,
-    init: next => next(captureIf(obj => typeof obj === type, params))
+    result: next =>
+      (obj, context, key, parents, parentKeys) =>
+        result =>
+          () =>
+            result instanceof Skip
+              ? new Skip(
+                  `Expected ${type} but got ${typeof obj}.`,
+                  { obj, context, key, parents, parentKeys },
+                  meta
+                )
+              : result,
+    schema: captureIf(obj => typeof obj === type)
   });
 
   return new Schema(fn, params);

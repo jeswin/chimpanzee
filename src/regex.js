@@ -9,26 +9,24 @@ export function regex(regex, params = {}) {
   params = getDefaultParams(params);
 
   const fn = runToResult(params, {
-    runner: (obj, context, key, parents, parentKeys) =>
-      result =>
-        () =>
-          result instanceof Skip
-            ? new Skip(
-                `Did not match regex.`,
-                { obj, context, key, parents, parentKeys },
-                meta
-              )
-            : result,
-    init: next =>
-      next(
-        captureIf(
-          obj =>
-            typeof regex === "string"
-              ? typeof obj === "string" && new RegExp(regex).test(obj)
-              : typeof obj === "string" && regex.test(obj),
-          params
-        )
-      )
+    result: next =>
+      (obj, context, key, parents, parentKeys) =>
+        result =>
+          () =>
+            result instanceof Skip
+              ? new Skip(
+                  `Did not match regex.`,
+                  { obj, context, key, parents, parentKeys },
+                  meta
+                )
+              : result,
+    schema: captureIf(
+      obj =>
+        typeof regex === "string"
+          ? typeof obj === "string" && new RegExp(regex).test(obj)
+          : typeof obj === "string" && regex.test(obj),
+      params
+    )
   });
 
   return new Schema(fn, params);

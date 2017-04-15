@@ -2,14 +2,14 @@ import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { Seq } from "lazily";
 import { traverse } from "./traverse";
-import { getDefaultParams, runManyToResult } from "./utils";
+import { getDefaultParams, runToResult } from "./utils";
 
 export function any(schemas, params = {}) {
   const meta = { type: "any", schemas, params };
   params = getDefaultParams(params);
 
-  const fn = runManyToResult(params, {
-    runner: next =>
+  const fn = runToResult(params, {
+    result: next =>
       (obj, context, key, parents, parentKeys) =>
         result =>
           (currentSchema, schemas, nonMatching) =>
@@ -35,7 +35,7 @@ export function any(schemas, params = {}) {
                       meta
                     ),
     newContext: true,
-    init: next =>
+    run: next =>
       next(traverse(schemas[0]), fn => fn(schemas[0], schemas.slice(1), []))
   });
 

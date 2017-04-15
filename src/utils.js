@@ -9,34 +9,37 @@ export function getDefaultParams(params = {}) {
   return params;
 }
 
-export function runManyToResult(params, options, single = false) {
+export function runToResult(params, options) {
   return function(obj, context, key, parents, parentKeys) {
     function next(schema, fn) {
       fn = fn || (fn => fn());
-      function loop(task) {
-        return typeof task === "function" ? loop(task()) : task;
+
+      function run(task) {
+        return typeof task === "function"
+          ? () => run(task())
+          : fn(
+              options.result(next)(obj, context, key, parents, parentKeys)(task)
+            );
       }
-      const effectiveContext = options.newContext ? { ...context } : context;
-      const schemaFn = typeof schema === "function"
+
+      const task = [Match, Skip, Fault].some(cls => schema instanceof cls)
         ? schema
-        : schema instanceof Schema ? schema.fn : traverse(schema, params).fn;
+        : (() => {
+            const effectiveContext = options.newContext
+              ? { ...context }
+              : context;
+            const schemaFn = typeof schema === "function"
+              ? schema
+              : schema instanceof Schema
+                  ? schema.fn
+                  : traverse(schema, params).fn;
+            return schemaFn(obj, effectiveContext, key, parents, parentKeys);
+          })();
 
-      const result = loop(
-        schema.fn(obj, effectiveContext, key, parents, parentKeys)
-      );
-      return !single
-        ? fn(
-            options.runner(next)(obj, context, key, parents, parentKeys)(result)
-          )
-        : fn(options.runner(obj, context, key, parents, parentKeys)(result));
+      return run(task);
     }
-
-    return options.init(next);
+    return options.run ? options.run(next) : next(options.schema);
   };
-}
-
-export function runToResult(params, fn) {
-  return runManyToResult(params, fn, true);
 }
 
 export function waitFor(gen, then = x => x) {
