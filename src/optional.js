@@ -1,13 +1,13 @@
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
-import { getDefaultParams, runToXXX } from "./utils";
+import { getDefaultParams, waitForSchema } from "./utils";
 
 export function optional(schema, params = {}) {
   const meta = { type: "optional", schema, params };
   params = getDefaultParams(params);
 
   function fn(obj, context, key, parents, parentKeys) {
-    return runToXXX(
+    return waitForSchema(
       schema,
       result =>
         result instanceof Match

@@ -1,15 +1,14 @@
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
-import { waitForSchema } from "./utils";
-import { getDefaultParams, runToXXX } from "./utils";
+import { getDefaultParams, waitForSchema } from "./utils";
 
 export function regex(regex, params = {}) {
   const meta = { type: "regex", regex, params };
   params = getDefaultParams(params);
 
   function fn(obj, context, key, parents, parentKeys) {
-    return runToXXX(
+    return waitForSchema(
       captureIf(
         obj =>
           typeof regex === "string"

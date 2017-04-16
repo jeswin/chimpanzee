@@ -1,7 +1,7 @@
 import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
-import { getDefaultParams, runToXXX } from "./utils";
+import { getDefaultParams, waitForSchema } from "./utils";
 
 export function deep(schema, params) {
   const meta = { type: "deep", schema, params };
@@ -10,7 +10,7 @@ export function deep(schema, params) {
   function fn(obj, context, key, parents, parentKeys) {
     function traverseObject(keys) {
       return keys.length
-        ? runToXXX(deep(schema), result =>
+        ? waitForSchema(deep(schema), result =>
             () =>
               result instanceof Match ? result : traverseObject(keys.slice(1)))(
             obj[keys[0]],
@@ -28,7 +28,7 @@ export function deep(schema, params) {
 
     function traverseArray(items) {
       return items.length
-        ? runToXXX(deep(schema, options), result =>
+        ? waitForSchema(deep(schema, options), result =>
             () =>
               result instanceof Match ? result : traverseArray(items.slice(1)))(
             items[0],
@@ -44,7 +44,7 @@ export function deep(schema, params) {
           );
     }
 
-    return runToXXX(
+    return waitForSchema(
       schema,
       result =>
         result instanceof Match

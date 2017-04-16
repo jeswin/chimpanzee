@@ -2,7 +2,7 @@ import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { Seq } from "lazily";
 import { traverse } from "./traverse";
-import { getDefaultParams, runToXXX } from "./utils";
+import { getDefaultParams, waitForSchema } from "./utils";
 
 export function any(schemas, params = {}) {
   const meta = { type: "any", schemas, params };
@@ -11,7 +11,7 @@ export function any(schemas, params = {}) {
   function fn(obj, context, key, parents, parentKeys) {
     const effectiveContext = { ...context };
     return (function run(schemas, nonMatching) {
-      return runToXXX(
+      return waitForSchema(
         schemas[0],
         result =>
           result instanceof Match

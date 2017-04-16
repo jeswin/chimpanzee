@@ -1,7 +1,6 @@
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
-import { waitForSchema } from "./utils";
-import { getDefaultParams, runToXXX } from "./utils";
+import { getDefaultParams, waitForSchema } from "./utils";
 
 export function capture(params) {
   return captureIf(obj => typeof obj !== "undefined", params);
@@ -37,7 +36,7 @@ export function take(predicate, schema, params, options = {}) {
   function fn(obj, context, key, parents, parentKeys) {
     return predicate(obj)
       ? typeof schema !== "undefined"
-          ? runToXXX(
+          ? waitForSchema(
               schema,
               result =>
                 result instanceof Match

@@ -1,7 +1,7 @@
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
-import { getDefaultParams, runToXXX } from "./utils";
+import { getDefaultParams, waitForSchema } from "./utils";
 
 export function number(params) {
   return checkType("number", params);
@@ -28,7 +28,7 @@ function checkType(type, params) {
   params = getDefaultParams(params);
 
   function fn(obj, context, key, parents, parentKeys) {
-    return runToXXX(
+    return waitForSchema(
       captureIf(obj => typeof obj === type),
       result =>
         result instanceof Skip
