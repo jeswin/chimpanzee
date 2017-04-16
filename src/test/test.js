@@ -49,7 +49,7 @@ describe("chimpanzee", () => {
   const tests = [
     ["any", "any", "match"],
     ["any-native-types", "any-native-types", "empty"],
-    ["any-negative", "any-negative", "skip"],
+   ["any-negative", "any-negative", "skip"],
     ["array", "array", "match"],
     ["array-repeating", "array-repeating", "match"],
     ["array-unordered", "array-unordered", "match"],

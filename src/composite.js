@@ -2,7 +2,7 @@ import { Match, Empty, Skip, Fault } from "./results";
 import { traverse } from "./traverse";
 import Schema from "./schema";
 import { Seq } from "lazily";
-import { getDefaultParams, runToResult } from "./utils";
+import { getDefaultParams, runToXXX } from "./utils";
 
 function getSchema(schema, paramSelector) {
   const schemaSelector = schema.params && schema.params.selector
@@ -51,16 +51,11 @@ export function composite(schema, _paramsList, ownParams) {
   function fn(obj, context, key, parents, parentKeys) {
     return schemas.length
       ? (function run(schemas) {
-          return runToResult({
-            result: next =>
-              (obj, context, key, parents, parentKeys) =>
-                result =>
-                  () =>
-                    result instanceof Match
-                      ? schemas.length > 1 ? run(schemas.slice(1)) : result
-                      : result,
-            schema: schemas[0]
-          })(obj, context, key, parents, parentKeys);
+          return runToXXX(schemas[0], result =>
+            () =>
+              result instanceof Match
+                ? schemas.length > 1 ? run(schemas.slice(1)) : result
+                : result)(obj, context, key, parents, parentKeys);
         })(schemas)
       : new Empty({ obj, context, key, parents, parentKeys }, meta);
   }

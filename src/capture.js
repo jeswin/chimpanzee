@@ -1,7 +1,7 @@
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { waitForSchema } from "./utils";
-import { getDefaultParams, runToResult } from "./utils";
+import { getDefaultParams, runToXXX } from "./utils";
 
 export function capture(params) {
   return captureIf(obj => typeof obj !== "undefined", params);
@@ -37,29 +37,26 @@ export function take(predicate, schema, params, options = {}) {
   function fn(obj, context, key, parents, parentKeys) {
     return predicate(obj)
       ? typeof schema !== "undefined"
-          ? runToResult({
-              result: next =>
-                (obj, context, key, parents, parentKeys) =>
-                  result =>
-                    () =>
-                      result instanceof Match
-                        ? new Match(
-                            {
-                              ...obj,
-                              ...(options.modifier
-                                ? options.modifier(result.value)
-                                : result.value)
-                            },
-                            { obj, context, key, parents, parentKeys },
-                            meta
-                          )
-                        : new Skip(
-                            "Capture failed in inner schema.",
-                            { obj, context, key, parents, parentKeys },
-                            meta
-                          ),
-              schema
-            })(obj, context, key, parents, parentKeys)
+          ? runToXXX(
+              schema,
+              result =>
+                result instanceof Match
+                  ? new Match(
+                      {
+                        ...obj,
+                        ...(options.modifier
+                          ? options.modifier(result.value)
+                          : result.value)
+                      },
+                      { obj, context, key, parents, parentKeys },
+                      meta
+                    )
+                  : new Skip(
+                      "Capture failed in inner schema.",
+                      { obj, context, key, parents, parentKeys },
+                      meta
+                    )
+            )(obj, context, key, parents, parentKeys)
           : new Match(
               options.modifier ? options.modifier(obj) : obj,
               { obj, context, key, parents, parentKeys },

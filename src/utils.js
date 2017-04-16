@@ -9,36 +9,24 @@ export function getDefaultParams(params = {}) {
   return params;
 }
 
-export function runToResult(options) {
+export function runToXXX(schema, then, options = {}) {
+  then = then || (result => result);
+;
   return function(obj, context, key, parents, parentKeys) {
-    function next(schema, fn) {
-      fn = fn || (fn => fn());
-
-      function run(task) {
+    function next(schema) {
+      function loop(task) {
         return typeof task === "function"
-          ? () => run(task())
-          : fn(
-              options.result(next)(obj, context, key, parents, parentKeys)(task)
-            );
+          ? () => loop(task())
+          : then(task);
       }
 
-      const task = [Match, Skip, Fault].some(cls => schema instanceof cls)
+      const effectiveContext = options.newContext ? { ...context } : context;
+      const schemaFn = typeof schema === "function"
         ? schema
-        : (() => {
-            const effectiveContext = options.newContext
-              ? { ...context }
-              : context;
-            const schemaFn = typeof schema === "function"
-              ? schema
-              : schema instanceof Schema
-                  ? schema.fn
-                  : traverse(schema).fn;
-            return schemaFn(obj, effectiveContext, key, parents, parentKeys);
-          })();
-
-      return run(task);
+        : schema instanceof Schema ? schema.fn : traverse(schema).fn;
+      return loop(schemaFn(obj, effectiveContext, key, parents, parentKeys));
     }
-    return options.run ? options.run(next) : next(options.schema);
+    return next(schema);
   };
 }
 

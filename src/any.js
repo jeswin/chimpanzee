@@ -2,42 +2,37 @@ import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import { Seq } from "lazily";
 import { traverse } from "./traverse";
-import { getDefaultParams, runToResult } from "./utils";
+import { getDefaultParams, runToXXX } from "./utils";
 
 export function any(schemas, params = {}) {
   const meta = { type: "any", schemas, params };
   params = getDefaultParams(params);
 
-  const fn = runToResult({
-    result: next =>
-      (obj, context, key, parents, parentKeys) =>
+  function fn(obj, context, key, parents, parentKeys) {
+    const effectiveContext = { ...context };
+    return (function run(schemas, nonMatching) {
+      return runToXXX(
+        schemas[0],
         result =>
-          (currentSchema, schemas, nonMatching) =>
-            result instanceof Match
-              ? result
-              : schemas.length
-                  ? next(traverse(schemas[0]), fn =>
-                      fn(
-                        schemas[0],
-                        schemas.slice(1),
-                        nonMatching.concat(currentSchema)
-                      ))
-                  : new Skip(
-                      "None of the items matched.",
-                      {
-                        obj,
-                        context,
-                        key,
-                        parents,
-                        parentKeys,
-                        nonMatching: nonMatching.concat(result)
-                      },
-                      meta
-                    ),
-    newContext: true,
-    run: next =>
-      next(traverse(schemas[0]), fn => fn(schemas[0], schemas.slice(1), []))
-  });
+          result instanceof Match
+            ? result
+            : schemas.length > 1
+                ? run(schemas.slice(1), nonMatching.concat(schemas[0]))
+                : new Skip(
+                    "None of the items matched.",
+                    {
+                      obj,
+                      effectiveContext,
+                      key,
+                      parents,
+                      parentKeys,
+                      nonMatching: nonMatching.concat(schemas[0])
+                    },
+                    meta
+                  )
+      )(obj, effectiveContext, key, parents, parentKeys);
+    })(schemas, []);
+  }
 
   return new Schema(fn, params);
 }
