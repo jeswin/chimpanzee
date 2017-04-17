@@ -51,11 +51,13 @@ export function composite(schema, _paramsList, ownParams) {
   function fn(obj, context, key, parents, parentKeys) {
     return schemas.length
       ? (function run(schemas) {
-          return waitForSchema(schemas[0], result =>
-            () =>
+          return waitForSchema(
+            schemas[0],
+            result =>
               result instanceof Match
                 ? schemas.length > 1 ? run(schemas.slice(1)) : result
-                : result)(obj, context, key, parents, parentKeys);
+                : result
+          )(obj, context, key, parents, parentKeys);
         })(schemas)
       : new Empty({ obj, context, key, parents, parentKeys }, meta);
   }

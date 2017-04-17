@@ -10,9 +10,11 @@ export function deep(schema, params) {
   function fn(obj, context, key, parents, parentKeys) {
     function traverseObject(keys) {
       return keys.length
-        ? waitForSchema(deep(schema), result =>
-            () =>
-              result instanceof Match ? result : traverseObject(keys.slice(1)))(
+        ? waitForSchema(
+            deep(schema),
+            result =>
+              result instanceof Match ? result : traverseObject(keys.slice(1))
+          )(
             obj[keys[0]],
             context,
             key,
@@ -28,15 +30,11 @@ export function deep(schema, params) {
 
     function traverseArray(items) {
       return items.length
-        ? waitForSchema(deep(schema, options), result =>
-            () =>
-              result instanceof Match ? result : traverseArray(items.slice(1)))(
-            items[0],
-            context,
-            key,
-            parents,
-            parentKeys
-          )
+        ? waitForSchema(
+            deep(schema, options),
+            result =>
+              result instanceof Match ? result : traverseArray(items.slice(1))
+          )(items[0], context, key, parents, parentKeys)
         : new Skip(
             "Not found in deep.",
             { obj, context, key, parents, parentKeys },
