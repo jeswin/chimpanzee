@@ -23,6 +23,8 @@ export { Match, Empty, Skip, Fault } from "./results";
 
 export { default as Schema } from "./schema";
 
+export { waitForSchema as waitForSchema } from "./utils";
+
 function _match(traverseResult) {
   const result = traverseResult;
   return typeof result === "function" ? _match(result()) : result;

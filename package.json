@@ -1,6 +1,6 @@
 {
   "name": "chimpanzee",
-  "version": "0.0.32",
+  "version": "0.0.33",
   "author": "Jeswin<jeswinpk@agilehead.com>",
   "scripts": {
     "test": "mocha dist/test/test.js"
