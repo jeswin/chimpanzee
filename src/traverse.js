@@ -262,6 +262,10 @@ export function traverse(schema, params = {}, inner = false) {
 
     const schemaType = getSchemaType(schema);
     const childTasks = methods[schemaType].getChildTasks();
+
+    const immediateChildTasks = childTasks.filter(t => !t.params || !t.params.defer)
+    const deferredChildTasks = childTasks.filter(t => t.params && t.params.defer)
+
     const mergeChildTasks = results =>
       methods[schemaType].mergeChildTasks(results);
     const isTraversingDependent = schemaType === "object" && inner;
@@ -269,7 +273,7 @@ export function traverse(schema, params = {}, inner = false) {
     return runner(
       params,
       isTraversingDependent,
-      childTasks,
+      [immediateChildTasks, deferredChildTasks],
       mergeChildTasks,
       meta
     )(obj, context, key, parents, parentKeys);

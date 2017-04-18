@@ -4,20 +4,11 @@ import { Match, Empty, Skip, Fault } from "./results";
 export default function(
   params,
   isTraversingDependent,
-  childTasks,
+  [immediateChildTasks = [], deferredChildTasks = []],
   mergeChildTasks,
   meta
 ) {
   return function(obj, context, key, parents, parentKeys) {
-
-    function defaultMergeChildTasks(finished) {
-      const result = finished[0].result;
-      return result instanceof Match
-        ? !(result instanceof Empty)
-            ? Object.assign(context, { state: result.value })
-            : context
-        : { nonMatch: result };
-    }
 
     function mergeTasks(finished) {
       return Seq.of(finished).reduce(
@@ -145,9 +136,7 @@ export default function(
             .map(builder => getTask(builder))
             .toArray();
 
-          const allTasks = childTasks && childTasks.length
-            ? [[childTasks, mergeChildTasks || defaultMergeChildTasks], [tasks, mergeTasks]]
-            : [[tasks, mergeTasks]];
+          const allTasks = [[immediateChildTasks, mergeChildTasks], [deferredChildTasks, mergeChildTasks], [tasks, mergeTasks]]
 
           return run(allTasks);
         };

@@ -19,7 +19,7 @@ describe("chimpanzee", () => {
       if (resultType === "match") {
         actual.should.be.an.instanceOf(Match);
         actual.value.should.deepEqual(expected.result);
-      }  else if (resultType === "empty") {
+      } else if (resultType === "empty") {
         actual.should.be.an.instanceOf(Empty);
       } else if (resultType === "skip") {
         actual.should.be.an.instanceOf(Skip);
@@ -33,10 +33,12 @@ describe("chimpanzee", () => {
         for (const [actualIndex, expectedResult] of expected.allResults) {
           const actualResult = global.__chimpanzeeTestContext[actualIndex];
           if (expectedResult.message) {
-            actualResult.message.should.equal(expectedResult.message)
+            actualResult.message.should.equal(expectedResult.message);
           }
           if (expectedResult.env && expectedResult.env.parentKeys) {
-            actualResult.env.parentKeys.should.deepEqual(expectedResult.env.parentKeys);
+            actualResult.env.parentKeys.should.deepEqual(
+              expectedResult.env.parentKeys
+            );
           }
           if (expectedResult.meta && expectedResult.meta.type) {
             actualResult.meta.type.should.equal(expectedResult.meta.type);
@@ -49,7 +51,7 @@ describe("chimpanzee", () => {
   const tests = [
     ["any", "any", "match"],
     ["any-native-types", "any-native-types", "empty"],
-   ["any-negative", "any-negative", "skip"],
+    ["any-negative", "any-negative", "skip"],
     ["array", "array", "match"],
     ["array-repeating", "array-repeating", "match"],
     ["array-unordered", "array-unordered", "match"],
@@ -72,6 +74,8 @@ describe("chimpanzee", () => {
     ["composite-own-params", "composite-own-params", "match"],
     ["composite-skip", "composite-skip", "skip"],
     ["deep", "deep", "match"],
+    ["defer", "defer", "match"],
+    ["defer-none", "defer-none", "match"],
     ["empty", "empty", "match"],
     ["empty-negative", "empty-negative", "skip"],
     ["exists", "exists", "match"],
