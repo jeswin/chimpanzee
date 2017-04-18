@@ -36,14 +36,13 @@ export function composite(schema, _paramsList, ownParams) {
 
   ownParams = getDefaultParams(ownParams);
 
-  const normalizedParams = _paramsList.map(
-    params => typeof params === "string" ? { key: params } : params
-  );
+  const normalizedParams = _paramsList.map(getDefaultParams);
+
   const paramsList = normalizedParams.some(
     params => params.name === "default" || typeof params.name === "undefined"
   )
     ? normalizedParams
-    : [{}].concat(normalizedParams);
+    : [getDefaultParams({})].concat(normalizedParams);
 
   const schemas = paramsList.map(params =>
     traverse(getSchema(schema, (params && params.name) || "default"), params));
