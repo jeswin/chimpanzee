@@ -9,20 +9,18 @@ export function traverse(schema, params, inner = false) {
   const meta = { type: "traverse", schema, params, inner };
   params = getDefaultParams(params);
 
+  const schemaType = getSchemaType(schema);
+
   function fn(originalObj, context = {}, key, parents, parentKeys) {
     const obj = params.modifiers.object
       ? params.modifiers.object(originalObj)
       : originalObj;
 
-    const schemaType = getSchemaType(schema);
-
-    const childReconciler = getReconciler(schemaType)(schema, params, inner)(
-      originalObj,
-      context,
-      key,
-      parents,
-      parentKeys
-    )(obj, meta);
+    const childReconciler = getReconciler(schemaType)(
+      schema,
+      params,
+      inner
+    )(originalObj, context, key, parents, parentKeys)(obj, meta);
 
     const childTasks = childReconciler.getChildTasks();
 

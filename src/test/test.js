@@ -83,6 +83,7 @@ describe("chimpanzee", () => {
     ["func", "func", "match"],
     ["func-negative", "func-negative", "skip"],
     ["function-schema", "function-schema", "match"],
+    ["key", "key", "match"],
     ["literal", "literal", "match"],
     ["literal-negative", "literal-negative", "skip"],
     ["map", "map", "match"],
