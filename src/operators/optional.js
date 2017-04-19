@@ -1,6 +1,6 @@
-import { Match, Empty, Skip, Fault } from "./results";
-import Schema from "./schema";
-import { getDefaultParams, waitForSchema } from "./utils";
+import { Match, Empty, Skip, Fault } from "../results";
+import Schema from "../schema";
+import { getDefaultParams, waitForSchema } from "../utils";
 
 export function optional(schema, params = {}) {
   const meta = { type: "optional", schema, params };

@@ -1,7 +1,7 @@
 import { captureIf } from "./capture";
-import { Match, Empty, Skip, Fault } from "./results";
-import Schema from "./schema";
-import { getDefaultParams, waitForSchema } from "./utils";
+import { Match, Empty, Skip, Fault } from "../results";
+import Schema from "../schema";
+import { getDefaultParams, waitForSchema } from "../utils";
 
 export function number(params) {
   return checkType("number", params);

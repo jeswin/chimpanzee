@@ -1,6 +1,6 @@
-import { Match, Empty, Skip, Fault } from "./results";
-import Schema from "./schema";
-import { getDefaultParams, waitForSchema } from "./utils";
+import { Match, Empty, Skip, Fault } from "../results";
+import Schema from "../schema";
+import { getDefaultParams, waitForSchema } from "../utils";
 
 export function capture(params) {
   return captureIf(obj => typeof obj !== "undefined", params);

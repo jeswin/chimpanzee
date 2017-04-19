@@ -1,7 +1,7 @@
-import { traverse } from "./traverse";
-import { Match, Empty, Skip, Fault } from "./results";
-import Schema from "./schema";
-import { getDefaultParams, waitForSchema } from "./utils";
+import { traverse } from "../traverse";
+import { Match, Empty, Skip, Fault } from "../results";
+import Schema from "../schema";
+import { getDefaultParams, waitForSchema } from "../utils";
 
 export function map(schema, mapper, params) {
   const meta = { type: "map", schema, mapper, params };

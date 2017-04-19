@@ -1,8 +1,8 @@
-import { Match, Empty, Skip, Fault } from "./results";
-import Schema from "./schema";
+import { Match, Empty, Skip, Fault } from "../results";
+import Schema from "../schema";
 import { Seq } from "lazily";
-import { traverse } from "./traverse";
-import { getDefaultParams, waitForSchema } from "./utils";
+import { traverse } from "../traverse";
+import { getDefaultParams, waitForSchema } from "../utils";
 
 export function any(schemas, params = {}) {
   const meta = { type: "any", schemas, params };

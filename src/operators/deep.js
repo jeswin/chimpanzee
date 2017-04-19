@@ -1,7 +1,7 @@
 import { Seq } from "lazily";
-import { Match, Empty, Skip, Fault } from "./results";
-import Schema from "./schema";
-import { getDefaultParams, waitForSchema } from "./utils";
+import { Match, Empty, Skip, Fault } from "../results";
+import Schema from "../schema";
+import { getDefaultParams, waitForSchema } from "../utils";
 
 export function deep(schema, params) {
   const meta = { type: "deep", schema, params };

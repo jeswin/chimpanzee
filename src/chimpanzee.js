@@ -1,5 +1,5 @@
 export { traverse } from "./traverse";
-export { composite } from "./composite";
+export { composite } from "./operators/composite";
 export {
   capture,
   captureIf,
@@ -7,17 +7,17 @@ export {
   literal,
   modify,
   take
-} from "./capture";
-export { any } from "./any";
-export { map } from "./map";
-export { optional } from "./optional";
-export { deep } from "./deep";
-export { empty } from "./empty";
-export { exists } from "./exists";
-export { number, bool, string, object, func } from "./types";
-export { regex } from "./regex";
+} from "./operators/capture";
+export { any } from "./operators/any";
+export { map } from "./operators/map";
+export { optional } from "./operators/optional";
+export { deep } from "./operators/deep";
+export { empty } from "./operators/empty";
+export { exists } from "./operators/exists";
+export { number, bool, string, object, func } from "./operators/types";
+export { regex } from "./operators/regex";
 
-export { repeatingItem, unorderedItem, optionalItem, array } from "./array";
+export { repeatingItem, unorderedItem, optionalItem, array } from "./operators/array";
 
 export { Match, Empty, Skip, Fault } from "./results";
 

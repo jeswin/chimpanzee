@@ -1,5 +1,5 @@
 import { Seq } from "lazily";
-import { Match, Empty, Skip, Fault } from "./results";
+import { Match, Empty, Skip, Fault } from "../results";
 
 export default function(
   params,
