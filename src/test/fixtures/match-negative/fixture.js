@@ -10,7 +10,7 @@ export const input = {
       }
     }
   }
-}
+};
 
 export const schema = traverse({
   level2a: {
@@ -18,4 +18,4 @@ export const schema = traverse({
       prop3: capture()
     }
   }
-})
+});

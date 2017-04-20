@@ -4,10 +4,10 @@ export const input = {
   node: {
     something: "else",
     jeff: "buckley",
-    hello: "world",
+    hello: "world"
   },
   prop: "something"
-}
+};
 
 export const schema = composite(
   {
@@ -15,11 +15,10 @@ export const schema = composite(
     hello: capture({ key: "first" }),
     prop: capture({ key: "second", selector: "alt" })
   },
-  [
-    { name: "default", modifiers: { object: x => x.node } },
-    { name: "alt" },
-  ],
+  [{ name: "default", modifiers: { object: x => x.node } }, { name: "alt" }],
   {
-    builders: [ { get: (obj, context) => ({ ...context.state, third: "yaaay" }) }]
+    builders: [
+      { get: (obj, context) => ({ ...context.state, third: "yaaay" }) }
+    ]
   }
-)
+);

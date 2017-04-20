@@ -10,7 +10,7 @@ export function optional(schema, params = {}) {
     return waitForSchema(
       schema,
       result =>
-        result instanceof Match
+        (result instanceof Match
           ? result
           : result instanceof Error
               ? params.swallowErrors
@@ -22,7 +22,7 @@ export function optional(schema, params = {}) {
                       `Unknown result ${result.type}.`,
                       { obj, context, key, parents, parentKeys },
                       meta
-                    )
+                    ))
     )(obj, context, key, parents, parentKeys);
   }
 

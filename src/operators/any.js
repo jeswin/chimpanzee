@@ -14,7 +14,7 @@ export function any(schemas, params = {}) {
       return waitForSchema(
         schemas[0],
         result =>
-          result instanceof Match
+          (result instanceof Match
             ? result
             : schemas.length > 1
                 ? run(schemas.slice(1), nonMatching.concat(schemas[0]))
@@ -29,7 +29,7 @@ export function any(schemas, params = {}) {
                       nonMatching: nonMatching.concat(schemas[0])
                     },
                     meta
-                  )
+                  ))
       )(obj, effectiveContext, key, parents, parentKeys);
     })(schemas, []);
   }

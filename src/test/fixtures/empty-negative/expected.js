@@ -1,1 +1,1 @@
-export const result = "Not empty."
+export const result = "Not empty.";

@@ -18,5 +18,5 @@ export const allResults = [
         type: "take"
       }
     }
-  ],
+  ]
 ];

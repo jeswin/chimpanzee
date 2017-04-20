@@ -1,1 +1,1 @@
-export const result = "Did not match regex."
+export const result = "Did not match regex.";

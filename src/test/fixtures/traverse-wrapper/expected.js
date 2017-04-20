@@ -1,3 +1,3 @@
 export const result = {
-  prop2: "hello world",
-}
+  prop2: "hello world"
+};

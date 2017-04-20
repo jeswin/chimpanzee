@@ -12,20 +12,23 @@ export const input = {
     }
   },
   prop: "something"
-}
+};
 
 export const schema = composite(
   {
     something: "else",
     hello: capture({ key: "first" }),
     prop: capture({ key: "second", selector: "alt" }),
-    heal: traverse({
-      what: capture()
-    }, { selector: "heal", replace: true, modifiers: { object: x => x.node } })
+    heal: traverse(
+      {
+        what: capture()
+      },
+      { selector: "heal", replace: true, modifiers: { object: x => x.node } }
+    )
   },
   [
     { name: "default", modifiers: { object: x => x.node } },
     { name: "alt" },
     { name: "heal", modifiers: { object: x => x.node } }
   ]
-)
+);

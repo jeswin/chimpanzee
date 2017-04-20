@@ -65,9 +65,9 @@ export default function(schema, params, inner) {
               })
               .reduce(
                 (acc, x) =>
-                  !(x.task instanceof Skip || x.task instanceof Fault)
+                  (!(x.task instanceof Skip || x.task instanceof Fault)
                     ? acc.concat(x)
-                    : [x.task],
+                    : [x.task]),
                 [],
                 (acc, x) => x.task instanceof Skip || x.task instanceof Fault
               )

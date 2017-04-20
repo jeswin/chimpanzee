@@ -26,7 +26,7 @@ export function repeatingItem(_schema, opts = {}) {
     return new Schema((obj, context, key, parents, parentKeys) =>
       (function run(items, results, needle) {
         const completed = (result, needle) =>
-          results.length >= min && (!max || results.length <= max)
+          (results.length >= min && (!max || results.length <= max)
             ? {
                 result: new Match(
                   results.concat(result ? [result.value] : []),
@@ -41,18 +41,19 @@ export function repeatingItem(_schema, opts = {}) {
                   { obj, context, key, parents, parentKeys },
                   meta
                 )
-              };
+              });
 
         return waitForSchema(
           schema(needle),
           ({ result, needle }) =>
-            result instanceof Skip || result instanceof Fault
+            (result instanceof Skip || result instanceof Fault
               ? completed(undefined, needle)
               : items.length > needle
                   ? run(items, results.concat([result.value]), needle)
-                  : completed(result, needle)
+                  : completed(result, needle))
         )(items, context, key, parents, parentKeys);
-      })(obj, [], needle));
+      })(obj, [], needle)
+    );
   });
 }
 
@@ -74,7 +75,7 @@ export function unorderedItem(_schema) {
         return waitForSchema(
           schema(i),
           ({ result }) =>
-            result instanceof Match
+            (result instanceof Match
               ? { result, needle }
               : items.length > i
                   ? run(items, i + 1)
@@ -85,9 +86,10 @@ export function unorderedItem(_schema) {
                         meta
                       ),
                       needle
-                    }
+                    })
         )(items, context, key, parents, parentKeys);
-      })(obj, 0));
+      })(obj, 0)
+    );
   });
 }
 
@@ -105,7 +107,7 @@ export function optionalItem(_schema) {
       waitForSchema(
         schema(needle),
         ({ result }) =>
-          result instanceof Match
+          (result instanceof Match
             ? { result, needle: needle + 1 }
             : {
                 result: new Empty(
@@ -113,8 +115,9 @@ export function optionalItem(_schema) {
                   meta
                 ),
                 needle
-              }
-      )(obj, context, key, parents, parentKeys));
+              })
+      )(obj, context, key, parents, parentKeys)
+    );
   });
 }
 
@@ -128,16 +131,17 @@ function regularItem(schema) {
       waitForSchema(
         schema,
         result =>
-          result instanceof Match
+          (result instanceof Match
             ? { result, needle: needle + 1 }
-            : { result, needle }
+            : { result, needle })
       )(
         obj[needle],
         context,
         `${key}.${needle}`,
         parents.concat(obj),
         parentKeys.concat(key)
-      ));
+      )
+    );
 }
 
 function toNeedledSchema(schema) {
@@ -158,7 +162,7 @@ export function array(schemas, params) {
           return waitForSchema(
             schema(needle),
             ({ result, needle }) =>
-              result instanceof Skip || result instanceof Fault
+              (result instanceof Skip || result instanceof Fault
                 ? result.updateEnv({ needle })
                 : list.length > 1
                     ? run(
@@ -172,7 +176,7 @@ export function array(schemas, params) {
                         results.concat(result.value),
                         { obj, context, key, parents, parentKeys },
                         meta
-                      )
+                      ))
           )(obj, { parent: context }, key, parents, parentKeys);
         })(schemas, [], 0)
       : new Fault(

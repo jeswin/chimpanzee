@@ -16,11 +16,13 @@ export function traverse(schema, params, inner = false) {
       ? params.modifiers.object(originalObj)
       : originalObj;
 
-    const childReconciler = getReconciler(schemaType)(
-      schema,
-      params,
-      inner
-    )(originalObj, context, key, parents, parentKeys)(obj, meta);
+    const childReconciler = getReconciler(schemaType)(schema, params, inner)(
+      originalObj,
+      context,
+      key,
+      parents,
+      parentKeys
+    )(obj, meta);
 
     const childTasks = childReconciler.getChildTasks();
 

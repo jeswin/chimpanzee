@@ -11,13 +11,13 @@ export function map(schema, mapper, params) {
     return waitForSchema(
       schema,
       result =>
-        result instanceof Match
+        (result instanceof Match
           ? new Match(
               mapper(result.value),
               { obj, context, key, parents, parentKeys },
               meta
             )
-          : result
+          : result)
     )(obj, context, key, parents, parentKeys);
   }
 

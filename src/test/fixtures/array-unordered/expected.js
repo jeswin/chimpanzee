@@ -1,6 +1,3 @@
 export const result = {
-  level1: [
-    "one",
-    true
-  ]
-}
+  level1: ["one", true]
+};

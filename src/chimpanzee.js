@@ -17,13 +17,18 @@ export { exists } from "./operators/exists";
 export { number, bool, string, object, func } from "./operators/types";
 export { regex } from "./operators/regex";
 
-export { repeatingItem, unorderedItem, optionalItem, array } from "./operators/array";
+export {
+  repeatingItem,
+  unorderedItem,
+  optionalItem,
+  array
+} from "./operators/array";
 
 export { Match, Empty, Skip, Fault } from "./results";
 
 export { default as Schema } from "./schema";
 
-export { waitForSchema as waitForSchema } from "./utils";
+export { waitForSchema } from "./utils";
 
 function _match(traverseResult) {
   const result = traverseResult;

@@ -11,6 +11,6 @@ export default class Empty extends Match {
   }
 
   updateEnv(args) {
-    return new Empty({ ...this.env, ...args }, this.meta)
+    return new Empty({ ...this.env, ...args }, this.meta);
   }
 }

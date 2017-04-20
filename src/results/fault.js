@@ -11,6 +11,6 @@ export default class Fault {
   }
 
   updateEnv(args) {
-    return new Fault(this.message, { ...this.env, ...args }, this.meta)
+    return new Fault(this.message, { ...this.env, ...args }, this.meta);
   }
 }

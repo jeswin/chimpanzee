@@ -1,3 +1,3 @@
 export const result = {
-  proppapig: "hello",
-}
+  proppapig: "hello"
+};

@@ -9,7 +9,6 @@ export default function(
   meta
 ) {
   return function(obj, context, key, parents, parentKeys) {
-
     function mergeTasks(finished) {
       return Seq.of(finished).reduce(
         (acc, { result, params }) => {
@@ -26,7 +25,8 @@ export default function(
 
     function getTask(builder) {
       const task = function fn() {
-        const readyToRun = !builder.precondition ||
+        const readyToRun =
+          !builder.precondition ||
           builder.precondition(obj, context, key, parents, parentKeys);
         return readyToRun
           ? (() => {
@@ -54,14 +54,15 @@ export default function(
                       )
                   }));
 
-              return Seq.of(predicates.concat(assertions))
-                .map(
-                  predicate =>
-                    predicate.fn(obj, context, key, parents, parentKeys)
-                      ? undefined
-                      : predicate.invalid()
-                )
-                .first(x => x) ||
+              return (
+                Seq.of(predicates.concat(assertions))
+                  .map(
+                    predicate =>
+                      (predicate.fn(obj, context, key, parents, parentKeys)
+                        ? undefined
+                        : predicate.invalid())
+                  )
+                  .first(x => x) ||
                 (() => {
                   const result = builder.get(
                     obj,
@@ -79,7 +80,8 @@ export default function(
                         { obj, context, key, parents, parentKeys },
                         meta
                       );
-                })();
+                })()
+              );
             })()
           : fn;
       };
@@ -91,7 +93,7 @@ export default function(
 
       const { finished, unfinished } = Seq.of(tasks).reduce(
         (acc, { task, params }) =>
-          typeof task === "function"
+          (typeof task === "function"
             ? {
                 finished: acc.finished,
                 unfinished: acc.unfinished.concat({ task: task(), params })
@@ -99,7 +101,7 @@ export default function(
             : {
                 finished: acc.finished.concat({ result: task, params }),
                 unfinished: acc.unfinished
-              },
+              }),
         { finished: [], unfinished: [] }
       );
 
@@ -136,7 +138,11 @@ export default function(
             .map(builder => getTask(builder))
             .toArray();
 
-          const allTasks = [[immediateChildTasks, mergeChildTasks], [deferredChildTasks, mergeChildTasks], [tasks, mergeTasks]]
+          const allTasks = [
+            [immediateChildTasks, mergeChildTasks],
+            [deferredChildTasks, mergeChildTasks],
+            [tasks, mergeTasks]
+          ];
 
           return run(allTasks);
         };

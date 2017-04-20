@@ -11,18 +11,18 @@ export function regex(regex, params = {}) {
     return waitForSchema(
       captureIf(
         obj =>
-          typeof regex === "string"
+          (typeof regex === "string"
             ? typeof obj === "string" && new RegExp(regex).test(obj)
-            : typeof obj === "string" && regex.test(obj)
+            : typeof obj === "string" && regex.test(obj))
       ),
       result =>
-        result instanceof Skip
+        (result instanceof Skip
           ? new Skip(
               `Did not match regex.`,
               { obj, context, key, parents, parentKeys },
               meta
             )
-          : result
+          : result)
     )(obj, context, key, parents, parentKeys);
   }
 

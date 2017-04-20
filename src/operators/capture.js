@@ -39,7 +39,7 @@ export function take(predicate, schema, params, options = {}) {
           ? waitForSchema(
               schema,
               result =>
-                result instanceof Match
+                (result instanceof Match
                   ? new Match(
                       {
                         ...obj,
@@ -54,7 +54,7 @@ export function take(predicate, schema, params, options = {}) {
                       "Capture failed in inner schema.",
                       { obj, context, key, parents, parentKeys },
                       meta
-                    )
+                    ))
             )(obj, context, key, parents, parentKeys)
           : new Match(
               options.modifier ? options.modifier(obj) : obj,

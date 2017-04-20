@@ -1,1 +1,1 @@
-export const result = "Does not exist."
+export const result = "Does not exist.";

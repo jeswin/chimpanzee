@@ -11,6 +11,6 @@ export default class Match {
   }
 
   updateEnv(args) {
-    return new Match(this.value, { ...this.env, ...args }, this.meta)
+    return new Match(this.value, { ...this.env, ...args }, this.meta);
   }
 }

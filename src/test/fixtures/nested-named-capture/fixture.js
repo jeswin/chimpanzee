@@ -8,7 +8,7 @@ export const input = {
       prop2: "world"
     }
   }
-}
+};
 
 export const schema = traverse({
   level1: {
@@ -17,4 +17,4 @@ export const schema = traverse({
       prop2: capture("myProp2")
     }
   }
-})
+});

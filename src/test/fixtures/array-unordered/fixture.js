@@ -1,16 +1,16 @@
-import { traverse, capture, unorderedItem, array, bool, string } from "../../../chimpanzee";
+import {
+  traverse,
+  capture,
+  unorderedItem,
+  array,
+  bool,
+  string
+} from "../../../chimpanzee";
 
 export const input = {
-  level1: [
-    "one",
-    "two",
-    true
-  ]
-}
+  level1: ["one", "two", true]
+};
 
 export const schema = traverse({
-  level1: array([
-    unorderedItem(string()),
-    unorderedItem(bool())
-  ])
+  level1: array([unorderedItem(string()), unorderedItem(bool())])
 });

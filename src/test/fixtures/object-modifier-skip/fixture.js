@@ -5,11 +5,11 @@ export const input = {
   node: {
     prop1: "hello"
   }
-}
+};
 
 export const schema = traverse(
   {
-    prop1: captureIf(x => true, { unmodified: { object: true } }),
+    prop1: captureIf(x => true, { unmodified: { object: true } })
   },
   { modifiers: { object: obj => obj.node } }
-)
+);

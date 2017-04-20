@@ -11,6 +11,6 @@ export default class Skip {
   }
 
   updateEnv(args) {
-    return new Skip(this.message, { ...this.env, ...args }, this.meta)
+    return new Skip(this.message, { ...this.env, ...args }, this.meta);
   }
 }

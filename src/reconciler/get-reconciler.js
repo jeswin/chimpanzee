@@ -13,14 +13,18 @@ const index = {
 };
 
 export default function(schemaType) {
-  return (schema, params, inner) =>
-    (originalObj, context, key, parents, parentKeys) =>
-      (obj, meta) =>
-        index[schemaType](schema, params, inner)(
-          originalObj,
-          context,
-          key,
-          parents,
-          parentKeys
-        )(obj, meta);
+  return (schema, params, inner) => (
+    originalObj,
+    context,
+    key,
+    parents,
+    parentKeys
+  ) => (obj, meta) =>
+    index[schemaType](schema, params, inner)(
+      originalObj,
+      context,
+      key,
+      parents,
+      parentKeys
+    )(obj, meta);
 }

@@ -31,13 +31,13 @@ function checkType(type, params) {
     return waitForSchema(
       captureIf(obj => typeof obj === type),
       result =>
-        result instanceof Skip
+        (result instanceof Skip
           ? new Skip(
               `Expected ${type} but got ${typeof obj}.`,
               { obj, context, key, parents, parentKeys },
               meta
             )
-          : result
+          : result)
     )(obj, context, key, parents, parentKeys);
   }
 

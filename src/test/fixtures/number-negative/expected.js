@@ -1,1 +1,1 @@
-export const result = "Expected number but got string."
+export const result = "Expected number but got string.";
