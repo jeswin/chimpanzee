@@ -13,7 +13,7 @@ export function deep(schema, params) {
         ? waitForSchema(
             deep(schema),
             result =>
-              (result instanceof Match ? result : traverseObject(keys.slice(1)))
+              (!(result instanceof Skip) ? result : traverseObject(keys.slice(1)))
           )(
             obj[keys[0]],
             context,
@@ -33,7 +33,7 @@ export function deep(schema, params) {
         ? waitForSchema(
             deep(schema, options),
             result =>
-              (result instanceof Match ? result : traverseArray(items.slice(1)))
+              (!(result instanceof Skip) ? result : traverseArray(items.slice(1)))
           )(items[0], context, key, parents, parentKeys)
         : new Skip(
             "Not found in deep.",
@@ -45,7 +45,7 @@ export function deep(schema, params) {
     return waitForSchema(
       schema,
       result =>
-        (result instanceof Match
+        (!(result instanceof Skip)
           ? result
           : typeof obj === "object"
               ? traverseObject(Object.keys(obj))

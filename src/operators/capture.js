@@ -50,11 +50,13 @@ export function take(predicate, schema, params, options = {}) {
                       { obj, context, key, parents, parentKeys },
                       meta
                     )
-                  : new Skip(
-                      "Capture failed in inner schema.",
-                      { obj, context, key, parents, parentKeys },
-                      meta
-                    ))
+                  : result instanceof Skip
+                      ? new Skip(
+                          "Capture failed in inner schema.",
+                          { obj, context, key, parents, parentKeys },
+                          meta
+                        )
+                      : result) //Fault
             )(obj, context, key, parents, parentKeys)
           : new Match(
               options.modifier ? options.modifier(obj) : obj,

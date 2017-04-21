@@ -10,19 +10,9 @@ export function optional(schema, params = {}) {
     return waitForSchema(
       schema,
       result =>
-        (result instanceof Match
+        (!(result instanceof Skip)
           ? result
-          : result instanceof Error
-              ? params.swallowErrors
-                  ? new Empty({ obj, context, key, parents, parentKeys }, meta)
-                  : result
-              : result instanceof Skip
-                  ? new Empty({ obj, context, key, parents, parentKeys }, meta)
-                  : new Fault(
-                      `Unknown result ${result.type}.`,
-                      { obj, context, key, parents, parentKeys },
-                      meta
-                    ))
+          : new Empty({ obj, context, key, parents, parentKeys }, meta))
     )(obj, context, key, parents, parentKeys);
   }
 

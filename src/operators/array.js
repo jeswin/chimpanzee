@@ -46,11 +46,13 @@ export function repeatingItem(_schema, opts = {}) {
         return waitForSchema(
           schema(needle),
           ({ result, needle }) =>
-            (result instanceof Skip || result instanceof Fault
-              ? completed(undefined, needle)
-              : items.length > needle
+            (result instanceof Match
+              ? items.length > needle
                   ? run(items, results.concat([result.value]), needle)
-                  : completed(result, needle))
+                  : completed(result, needle)
+              : result instanceof Skip
+                  ? completed(undefined, needle)
+                  : { result, needle })
         )(items, context, key, parents, parentKeys);
       })(obj, [], needle)
     );
@@ -75,7 +77,7 @@ export function unorderedItem(_schema) {
         return waitForSchema(
           schema(i),
           ({ result }) =>
-            (result instanceof Match
+            (result instanceof Match || result instanceof Fault
               ? { result, needle }
               : items.length > i
                   ? run(items, i + 1)
@@ -109,13 +111,15 @@ export function optionalItem(_schema) {
         ({ result }) =>
           (result instanceof Match
             ? { result, needle: needle + 1 }
-            : {
-                result: new Empty(
-                  { obj, context, key, parents, parentKeys },
-                  meta
-                ),
-                needle
-              })
+            : result instanceof Skip
+                ? {
+                    result: new Empty(
+                      { obj, context, key, parents, parentKeys },
+                      meta
+                    ),
+                    needle
+                  }
+                : { result, needle })
       )(obj, context, key, parents, parentKeys)
     );
   });
