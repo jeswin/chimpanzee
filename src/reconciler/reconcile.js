@@ -1,15 +1,32 @@
 /* @flow */
 import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "../results";
+import Schema from "../schema";
+
+import type {
+  ContextType,
+  SchemaType,
+  RawSchemaParamsType,
+  SchemaParamsType,
+  ResultGeneratorType,
+  EnvType,
+  MetaType
+} from "../types";
 
 export default function(
-  params,
-  isTraversingDependent,
+  params: SchemaParamsType,
+  isTraversingDependent: boolean,
   [immediateChildTasks = [], deferredChildTasks = []],
   mergeChildTasks,
-  meta
+  meta: MetaType
 ) {
-  return function(obj, context, key, parents, parentKeys) {
+  return function(
+    obj: any,
+    context: ContextType,
+    key: string,
+    parents: Array<any>,
+    parentKeys: Array<string>
+  ) {
     function mergeTasks(finished) {
       return Seq.of(finished).reduce(
         (acc, { result, params }) => {

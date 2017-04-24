@@ -13,14 +13,20 @@ export type FuncSchemaType = (
   parentKeys: Array<string>
 ) => ResultGenerator;
 
-export type NativeSchemaType = string | boolean | number;
+export type NativeTypeSchemaType = string | boolean | number;
 export type ArraySchemaType = Array<SchemaType>;
-export type SchemaType = object | NativeSchemaType | SchemaFuncType | Schema;
+export type SchemaType = Object | NativeTypeSchemaType | FuncSchemaType | Schema | ArraySchemaType;
 
 export type RawSchemaParamsType = {};
 export type SchemaParamsType = {};
 
 export type ResultTransformType = (result: ResultType) => ResultGeneratorType;
+
+export SchemaInvocationFnType = (obj: Object,
+context: ContextType,
+key: string,
+parents: Array<Object>,
+parentKeys: Array<string>) => ResultGeneratorType
 
 export type EnvType = {
   obj: Object,

@@ -1,13 +1,33 @@
 /* @flow */
 import { Seq } from "lazily";
 import { traverse } from "../traverse";
-import { Match, Empty, Skip, Fault } from "../results";
+import { Result, Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
+
+import type {
+  ContextType,
+  SchemaType,
+  RawSchemaParamsType,
+  SchemaParamsType,
+  ResultGeneratorType,
+  EnvType,
+  MetaType
+} from "../types";
 import { getSchemaType } from "../utils";
 
-export default function(schema, params, inner) {
-  return function(originalObj, context, key, parents, parentKeys) {
-    return function(obj, meta) {
+export default function(
+  schema: Object,
+  params: SchemaParamsType,
+  inner: boolean
+) {
+  return function(
+    originalObj: any,
+    context: ContextType,
+    key: string,
+    parents: Array<any>,
+    parentKeys: Array<string>
+  ) {
+    return function(obj: any, meta: MetaType) {
       function getChildTasks() {
         return typeof obj !== "undefined"
           ? Seq.of(Object.keys(schema))
@@ -87,7 +107,7 @@ export default function(schema, params, inner) {
       Child tasks of objects will always return an object.
       Which will need to be spread.
     */
-      function mergeChildTasks(finished) {
+      function mergeChildTasks(finished: { result: Result, params: SchemaParamsType }) {
         return Seq.of(finished).reduce(
           (acc, { result, params }) => {
             return result instanceof Match

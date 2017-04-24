@@ -1,4 +1,14 @@
 /* @flow */
+import type {
+  ContextType,
+  SchemaType,
+  RawSchemaParamsType,
+  SchemaParamsType,
+  ResultGeneratorType,
+  EnvType,
+  MetaType
+} from "./types";
+
 export { traverse } from "./traverse";
 export { composite } from "./operators/composite";
 export {
@@ -31,12 +41,12 @@ export { default as Schema } from "./schema";
 
 export { waitForSchema } from "./utils";
 
-function _match(traverseResult) {
+function _match(traverseResult: ResultGeneratorType) {
   const result = traverseResult;
   return typeof result === "function" ? _match(result()) : result;
 }
 
-export function match(schema, input) {
+export function match(schema: SchemaType, input: any) {
   const fn = typeof schema === "function" ? schema : schema.fn;
   return _match(fn(input, {}, "__INIT__", [], []));
 }

@@ -6,9 +6,20 @@ import reconcile from "./reconciler/reconcile";
 import { getDefaultParams } from "./utils";
 import { getSchemaType } from "./utils";
 
-export function traverse(schema, params, inner = false) {
-  const meta = { type: "traverse", schema, params, inner };
-  params = getDefaultParams(params);
+import type {
+  ContextType,
+  SchemaType,
+  SchemaInvocationFnType,
+  RawSchemaParamsType,
+  SchemaParamsType,
+  ResultGeneratorType,
+  EnvType,
+  MetaType
+} from "./types";
+
+export function traverse(schema: SchemaType, rawParams: RawSchemaParamsType, inner: boolean = false) {
+  const meta = { type: "traverse", schema, params: rawParams, inner };
+  const params = getDefaultParams(rawParams);
 
   const schemaType = getSchemaType(schema);
 

@@ -8,7 +8,7 @@ import type {
   ResultGeneratorType,
   PredicateType,
   ContextType,
-  NativeSchemaType,
+  NativeTypeSchemaType,
   SchemaType
 } from "../types";
 
@@ -31,7 +31,7 @@ export type TakeOptions = {
 }
 
 export function modify(
-  comparand: NativeSchemaType | PredicateType,
+  comparand: NativeTypeSchemaType | PredicateType,
   modifier: ModifierType,
   params: RawSchemaParamsType
 ): ResultGeneratorType {
@@ -51,7 +51,7 @@ export function captureAndTraverse(
 }
 
 export function literal(
-  what: NativeSchemaType,
+  what: NativeTypeSchemaType,
   params: RawSchemaParamsType
 ): ResultGeneratorType {
   return take(x => x === what, undefined, params, {

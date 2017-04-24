@@ -2,6 +2,7 @@
 import { traverse } from "./traverse";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
+
 import type {
   RawSchemaParamsType,
   SchemaType,

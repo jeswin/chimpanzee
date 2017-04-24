@@ -1,12 +1,22 @@
 /* @flow */
 import { Seq } from "lazily";
 import { traverse } from "../traverse";
-import { Match, Empty, Skip, Fault } from "../results";
+import { Result, Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 
-export default function(schema, params, inner) {
-  return function(originalObj, context, key, parents, parentKeys) {
-    return function(obj, meta) {
+import type {
+  ContextType,
+  ArraySchemaType,
+  RawSchemaParamsType,
+  SchemaParamsType,
+  ResultGeneratorType,
+  EnvType,
+  MetaType
+} from "../types";
+
+export default function(schema: ArraySchemaType, params: SchemaParamsType, inner: boolean) {
+  return function(originalObj: any, context: ContextType, key: string, parents: Array<any>, parentKeys: Array<string>) {
+    return function(obj: any, meta: MetaType) {
       function getChildTasks() {
         return Array.isArray(obj)
           ? schema.length !== obj.length
@@ -49,7 +59,7 @@ export default function(schema, params, inner) {
       /*
       Array child tasks will always return an array.
     */
-      function mergeChildTasks(finished) {
+      function mergeChildTasks(finished: { result: Result, params: SchemaParamsType }) {
         return Seq.of(finished).reduce(
           (acc, { result, params }) => {
             return result instanceof Match
