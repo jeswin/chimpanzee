@@ -4,7 +4,17 @@ import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { getDefaultParams, waitForSchema } from "../utils";
 
-export function exists(predicate, schema) {
+import type {
+  ContextType,
+  SchemaType,
+  RawSchemaParamsType,
+  SchemaParamsType,
+  ResultGeneratorType
+} from "../types";
+
+type PredicateType = (obj: any) => boolean;
+
+export function exists(predicate: PredicateType, schema: SchemaType) : SchemaType {
   const meta = { type: "exists" };
 
   predicate = predicate || (x => typeof x !== "undefined");

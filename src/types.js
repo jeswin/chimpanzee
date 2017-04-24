@@ -1,6 +1,5 @@
 //export type ResultGenerator =
 import Schema from "./schema";
-import type { ResultType } from "./results";
 
 export type PredicateType = (obj: any) => boolean;
 

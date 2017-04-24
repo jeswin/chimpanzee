@@ -4,8 +4,18 @@ import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { getDefaultParams, waitForSchema } from "../utils";
 
+import type {
+  ContextType,
+  SchemaType,
+  RawSchemaParamsType,
+  ResultGeneratorType
+} from "../types";
+
+type ArrayItemFnType = (needle: number) => Schema
+
 class ArrayItem {
-  constructor(fn) {
+  fn: ArrayItemFnType;
+  constructor(fn: ArrayItemFnType) {
     this.fn = fn;
   }
 }
@@ -17,11 +27,14 @@ class ArrayItem {
             ^needle
   returns [4, 4], with needle moved to 5.
 */
-export function repeatingItem(_schema, opts = {}) {
+type RepeatingItemOptsType = { min?: number, max?: number }
+
+export function repeatingItem(_schema: SchemaType, opts: RepeatingItemOptsType = {}) {
   const meta = { type: "repeatingItem", schema: _schema };
 
   const min = opts.min || 0;
   const max = opts.max;
+
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
     return new Schema((obj, context, key, parents, parentKeys) =>
@@ -68,7 +81,7 @@ export function repeatingItem(_schema, opts = {}) {
   returns 1, with needle still pointing at 4.
   We don't care about the needle.
 */
-export function unorderedItem(_schema) {
+export function unorderedItem(_schema: SchemaType) {
   const meta = { type: "unorderedItem", schema: _schema };
 
   const schema = toNeedledSchema(_schema);
@@ -101,7 +114,7 @@ export function unorderedItem(_schema) {
   A Skip() is not issued when an item is not found.
   The needle is incrementd by 1 if found, otherwise it remains the same.
 */
-export function optionalItem(_schema) {
+export function optionalItem(_schema: SchemaType) {
   const meta = { type: "optionalItem", schema: _schema };
 
   const schema = toNeedledSchema(_schema);
@@ -156,9 +169,9 @@ function toNeedledSchema(schema) {
 /*
   You'd call this like
 */
-export function array(schemas, params) {
-  const meta = { type: "array", schemas, params };
-  params = getDefaultParams(params);
+export function array(schemas: Array<Schema>, rawParams: RawSchemaParamsType) {
+  const meta = { type: "array", schemas, params: rawParams };
+  const params = getDefaultParams(rawParams);
 
   const fn = function(obj, context, key, parents, parentKeys) {
     return Array.isArray(obj)

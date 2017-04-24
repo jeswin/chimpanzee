@@ -27,7 +27,7 @@ export type ModifierType = (obj: any) => any;
 
 export type TakeOptions = {
   modifier?: ModifierType,
-  skipMessage: (obj: object) => string
+  skipMessage?: (obj: Object) => string
 }
 
 export function modify(
@@ -55,7 +55,7 @@ export function literal(
   params: RawSchemaParamsType
 ): ResultGeneratorType {
   return take(x => x === what, undefined, params, {
-    skipMessage: x => `Expected value to be ${what} but got ${x}.`
+    skipMessage: x => `Expected value to be ${what} but got ${x.toString()}.`
   });
 }
 

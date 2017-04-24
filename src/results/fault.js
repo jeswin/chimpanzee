@@ -1,9 +1,13 @@
 /* @flow */
-export default class Fault {
-  constructor(message: string, env, meta) {
+import Result from "./result";
+import type { EnvType, MetaType } from "../types";
+
+export default class Fault extends Result {
+  message: string;
+
+  constructor(message: string, env: EnvType, meta: MetaType) {
+    super(env, meta);
     this.message = message;
-    this.env = env;
-    this.meta = meta;
 
     //Unit test support
     if (global.__chimpanzeeTestContext) {
@@ -11,7 +15,7 @@ export default class Fault {
     }
   }
 
-  updateEnv(args) {
+  updateEnv(args: Object) {
     return new Fault(this.message, { ...this.env, ...args }, this.meta);
   }
 }

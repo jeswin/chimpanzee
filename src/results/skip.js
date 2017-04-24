@@ -1,9 +1,13 @@
 /* @flow */
-export default class Skip {
-  constructor(message, env, meta) {
+import Result from "./result";
+import type { EnvType, MetaType } from "../types";
+
+export default class Skip extends Result {
+  message: string;
+
+  constructor(message: string, env: EnvType, meta: MetaType) {
+    super(env, meta);
     this.message = message;
-    this.env = env;
-    this.meta = meta;
 
     //Unit test support
     if (global.__chimpanzeeTestContext) {
@@ -11,7 +15,7 @@ export default class Skip {
     }
   }
 
-  updateEnv(args) {
+  updateEnv(args: Object) {
     return new Skip(this.message, { ...this.env, ...args }, this.meta);
   }
 }

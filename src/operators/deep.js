@@ -4,9 +4,17 @@ import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { getDefaultParams, waitForSchema } from "../utils";
 
-export function deep(schema, params) {
-  const meta = { type: "deep", schema, params };
-  params = getDefaultParams(params);
+import type {
+  ContextType,
+  SchemaType,
+  RawSchemaParamsType,
+  SchemaParamsType,
+  ResultGeneratorType
+} from "../types";
+
+export function deep(schema: SchemaType, rawParams: RawSchemaParamsType) {
+  const meta = { type: "deep", schema, params: rawParams };
+  const params = getDefaultParams(rawParams);
 
   function fn(obj, context, key, parents, parentKeys) {
     function traverseObject(keys) {
@@ -32,7 +40,7 @@ export function deep(schema, params) {
     function traverseArray(items) {
       return items.length
         ? waitForSchema(
-            deep(schema, options),
+            deep(schema, params),
             result =>
               (!(result instanceof Skip) ? result : traverseArray(items.slice(1)))
           )(items[0], context, key, parents, parentKeys)

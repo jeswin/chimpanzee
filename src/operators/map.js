@@ -4,9 +4,19 @@ import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { getDefaultParams, waitForSchema } from "../utils";
 
-export function map(schema, mapper, params) {
-  const meta = { type: "map", schema, mapper, params };
-  params = getDefaultParams(params);
+import type {
+  ContextType,
+  SchemaType,
+  RawSchemaParamsType,
+  SchemaParamsType,
+  ResultGeneratorType
+} from "../types";
+
+type MapperType = (a: any) => any
+
+export function map(schema: SchemaType, mapper: MapperType, rawParams: RawSchemaParamsType) {
+  const meta = { type: "map", schema, mapper, params: rawParams };
+  const params = getDefaultParams(rawParams);
 
   function fn(obj, context, key, parents, parentKeys) {
     return waitForSchema(

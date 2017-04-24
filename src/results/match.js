@@ -1,9 +1,13 @@
 /* @flow */
-export default class Match {
-  constructor(value, env, meta) {
+import Result from "./result";
+import type { EnvType, MetaType } from "../types";
+
+export default class Match extends Result {
+  value: any;
+  
+  constructor(value: any, env: EnvType, meta: MetaType) {
+    super(env, meta);
     this.value = value;
-    this.env = env;
-    this.meta = meta;
 
     //Unit test support
     if (global.__chimpanzeeTestContext) {
@@ -11,7 +15,7 @@ export default class Match {
     }
   }
 
-  updateEnv(args) {
+  updateEnv(args: Object) {
     return new Match(this.value, { ...this.env, ...args }, this.meta);
   }
 }

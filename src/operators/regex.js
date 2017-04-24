@@ -4,9 +4,17 @@ import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { getDefaultParams, waitForSchema } from "../utils";
 
-export function regex(regex, params = {}) {
-  const meta = { type: "regex", regex, params };
-  params = getDefaultParams(params);
+import type {
+  ContextType,
+  SchemaType,
+  RawSchemaParamsType,
+  SchemaParamsType,
+  ResultGeneratorType
+} from "../types";
+
+export function regex(regex: string | RegExp, rawParams: RawSchemaParamsType) {
+  const meta = { type: "regex", regex, params: rawParams };
+  const params = getDefaultParams(rawParams);
 
   function fn(obj, context, key, parents, parentKeys) {
     return waitForSchema(

@@ -12,7 +12,7 @@ export default class Empty extends Match {
     }
   }
 
-  updateEnv(args) {
+  updateEnv(args: Object) {
     return new Empty({ ...this.env, ...args }, this.meta);
   }
 }

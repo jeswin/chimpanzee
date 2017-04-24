@@ -3,9 +3,17 @@ import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { getDefaultParams, waitForSchema } from "../utils";
 
-export function optional(schema, params = {}) {
-  const meta = { type: "optional", schema, params };
-  params = getDefaultParams(params);
+import type {
+  ContextType,
+  SchemaType,
+  RawSchemaParamsType,
+  SchemaParamsType,
+  ResultGeneratorType
+} from "../types";
+
+export function optional(schema: SchemaType, rawParams: RawSchemaParamsType) {
+  const meta = { type: "optional", schema, params: rawParams };
+  const params = getDefaultParams(rawParams);
 
   function fn(obj, context, key, parents, parentKeys) {
     return waitForSchema(

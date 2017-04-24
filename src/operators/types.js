@@ -4,29 +4,37 @@ import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { getDefaultParams, waitForSchema } from "../utils";
 
-export function number(params) {
+import type {
+  ContextType,
+  SchemaType,
+  RawSchemaParamsType,
+  SchemaParamsType,
+  ResultGeneratorType
+} from "../types";
+
+export function number(params: RawSchemaParamsType) {
   return checkType("number", params);
 }
 
-export function bool(params) {
+export function bool(params: RawSchemaParamsType) {
   return checkType("boolean", params);
 }
 
-export function string(params) {
+export function string(params: RawSchemaParamsType) {
   return checkType("string", params);
 }
 
-export function object(params) {
+export function object(params: RawSchemaParamsType) {
   return checkType("object", params);
 }
 
-export function func(params) {
+export function func(params: RawSchemaParamsType) {
   return checkType("function", params);
 }
 
-function checkType(type, params) {
-  const meta = { type, params };
-  params = getDefaultParams(params);
+function checkType(type, rawParams: RawSchemaParamsType) {
+  const meta = { type, params: rawParams };
+  const params = getDefaultParams(rawParams);
 
   function fn(obj, context, key, parents, parentKeys) {
     return waitForSchema(
