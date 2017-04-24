@@ -1,8 +1,9 @@
 /* @flow */
 import Match from "./match";
+import type { EnvType, MetaType } from "../types";
 
 export default class Empty extends Match {
-  constructor(env, meta) {
+  constructor(env: EnvType, meta: MetaType) {
     super(undefined, env, meta);
 
     //Unit test support
