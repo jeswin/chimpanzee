@@ -1,5 +1,6 @@
+/* @flow */
 export default class Fault {
-  constructor(message, env, meta) {
+  constructor(message: string, env, meta) {
     this.message = message;
     this.env = env;
     this.meta = meta;

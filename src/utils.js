@@ -1,8 +1,15 @@
+/* @flow */
 import { traverse } from "./traverse";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
+import type {
+  RawSchemaParamsType,
+  SchemaType,
+  SchemaParamsType,
+  ResultTransformerType
+} from "./types";
 
-export function getSchemaType(schema) {
+export function getSchemaType(schema: SchemaType): string {
   return ["string", "number", "boolean", "symbol"].includes(typeof schema)
     ? "native"
     : typeof schema === "function"
@@ -14,14 +21,22 @@ export function getSchemaType(schema) {
                 : typeof schema === "object" ? "object" : typeof schema;
 }
 
-export function getDefaultParams(params = {}) {
+export function getDefaultParams(
+  params: RawSchemaParamsType = {}
+): SchemaParamsType {
   params = typeof params === "string" ? { key: params } : params;
   params.builders = params.builders || [{ get: (obj, { state }) => state }];
   params.modifiers = params.modifiers || {};
   return params;
 }
 
-export function waitForSchema(schema, then, options = {}) {
+export type WaitForSchemaOptionsType = { newContext: boolean };
+
+export function waitForSchema(
+  schema: SchemaType,
+  then: ResultTransformerType,
+  options = {}
+) {
   then = then || (result => result);
   return function(obj, context, key, parents, parentKeys) {
     function next(schema) {

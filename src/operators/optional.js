@@ -1,3 +1,4 @@
+/* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { getDefaultParams, waitForSchema } from "../utils";

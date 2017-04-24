@@ -1,3 +1,4 @@
+/* @flow */
 import { Seq } from "lazily";
 import { traverse } from "../traverse";
 import { Match, Empty, Skip, Fault } from "../results";

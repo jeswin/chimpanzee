@@ -1,3 +1,4 @@
+/* @flow */
 export default class Schema {
   constructor(fn, params, meta) {
     this.fn = fn;

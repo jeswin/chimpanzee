@@ -1,3 +1,4 @@
+/* @flow */
 export { traverse } from "./traverse";
 export { composite } from "./operators/composite";
 export {

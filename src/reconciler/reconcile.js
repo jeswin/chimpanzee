@@ -1,3 +1,4 @@
+/* @flow */
 import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "../results";
 

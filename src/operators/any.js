@@ -1,14 +1,31 @@
+/* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { Seq } from "lazily";
 import { traverse } from "../traverse";
 import { getDefaultParams, waitForSchema } from "../utils";
 
-export function any(schemas, params = {}) {
-  const meta = { type: "any", schemas, params };
-  params = getDefaultParams(params);
+import type {
+  ContextType,
+  SchemaType,
+  RawSchemaParamsType,
+  ResultGeneratorType
+} from "../types";
 
-  function fn(obj, context, key, parents, parentKeys) {
+export function any(
+  schemas: Array<SchemaType>,
+  rawParams: RawSchemaParamsType = {}
+) {
+  const meta = { type: "any", schemas, params: rawParams };
+  const params = getDefaultParams(rawParams);
+
+  function fn(
+    obj: any,
+    context: ContextType,
+    key: string,
+    parents: Array<any>,
+    parentKeys: Array<string>
+  ): ResultGeneratorType {
     const effectiveContext = { ...context };
     return (function run(schemas, nonMatching) {
       return waitForSchema(

@@ -1,3 +1,4 @@
+/* @flow */
 export default class Skip {
   constructor(message, env, meta) {
     this.message = message;

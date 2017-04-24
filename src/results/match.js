@@ -1,3 +1,4 @@
+/* @flow */
 export default class Match {
   constructor(value, env, meta) {
     this.value = value;

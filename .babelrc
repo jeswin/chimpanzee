@@ -1,5 +1,5 @@
 {
   "sourceMaps": true,
-  "presets": ["modern-browsers", "stage-2"],
+  "presets": ["modern-browsers", "stage-2", "flow"],
   "plugins": []
 }

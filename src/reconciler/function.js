@@ -1,3 +1,4 @@
+/* @flow */
 import external from "./external";
 import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";

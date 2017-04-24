@@ -1,3 +1,4 @@
+/* @flow */
 import func from "./function";
 import schema from "./schema";
 import array from "./array";
