@@ -4,6 +4,7 @@ import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 
 import type {
+  ContextType,
   RawSchemaParamsType,
   SchemaType,
   SchemaParamsType,
@@ -23,23 +24,31 @@ export function getSchemaType(schema: SchemaType): string {
 }
 
 export function getDefaultParams(
-  params: RawSchemaParamsType = {}
+  rawParams?: string | RawSchemaParamsType
 ): SchemaParamsType {
-  params = typeof params === "string" ? { key: params } : params;
+  const params: SchemaParamsType = typeof rawParams === "string"
+    ? { key: rawParams }
+    : (rawParams || {});
   params.builders = params.builders || [{ get: (obj, { state }) => state }];
   params.modifiers = params.modifiers || {};
   return params;
 }
 
-export type WaitForSchemaOptionsType = { newContext: boolean };
+export type WaitForSchemaOptionsType = { newContext?: boolean };
 
 export function waitForSchema(
   schema: SchemaType,
   then: ResultTransformerType,
-  options = {}
+  options: WaitForSchemaOptionsType = {}
 ) {
   then = then || (result => result);
-  return function(obj, context, key, parents, parentKeys) {
+  return function(
+    obj: any,
+    context: ContextType,
+    key: string,
+    parents: Array<any>,
+    parentKeys: Array<string>
+  ) {
     function next(schema) {
       function loop(task) {
         return typeof task === "function" ? () => loop(task()) : then(task);

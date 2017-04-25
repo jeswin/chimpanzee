@@ -13,13 +13,18 @@ import type {
   MetaType
 } from "../types";
 
+import type { TaskType } from "../traverse";
+
 export default function(
   params: SchemaParamsType,
   isTraversingDependent: boolean,
-  [immediateChildTasks = [], deferredChildTasks = []],
+  [immediateChildTasks, deferredChildTasks]: [Array<TaskType>, Array<TaskType>],
   mergeChildTasks,
   meta: MetaType
 ) {
+  immediateChildTasks = immediateChildTasks || [];
+  deferredChildTasks = deferredChildTasks || [];
+
   return function(
     obj: any,
     context: ContextType,

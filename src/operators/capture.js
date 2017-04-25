@@ -39,7 +39,7 @@ export function modify(
     typeof comparand === "function" ? comparand : x => x === comparand,
     undefined,
     params,
-    { modifier: typeof modifier === "function" ? modifier : x => modifier(x) }
+    { modifier: typeof modifier === "function" ? modifier : x => modifier }
   );
 }
 
