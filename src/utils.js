@@ -51,7 +51,7 @@ export function waitForSchema(
   ) {
     function next(schema) {
       function loop(task) {
-        return typeof task === "function" ? () => loop(task()) : then(task);
+        return typeof task === "function" ? (state) => loop(task(state)) : then(task);
       }
 
       const effectiveContext = options.newContext ? { ...context } : context;

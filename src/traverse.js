@@ -41,17 +41,15 @@ export function traverse(schema: SchemaType, rawParams: RawSchemaParamsType, inn
     const immediateChildTasks = childTasks.filter(
       t => !t.params || !t.params.defer
     );
+
     const deferredChildTasks = childTasks.filter(
       t => t.params && t.params.defer
     );
 
     const mergeChildTasks = results => childReconciler.mergeChildTasks(results);
 
-    const isTraversingDependent = schemaType === "object" && inner;
-
     return reconcile(
       params,
-      isTraversingDependent,
       [immediateChildTasks, deferredChildTasks],
       mergeChildTasks,
       meta

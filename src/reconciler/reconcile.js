@@ -17,7 +17,6 @@ import type { TaskType } from "../traverse";
 
 export default function(
   params: SchemaParamsType,
-  isTraversingDependent: boolean,
   [immediateChildTasks, deferredChildTasks]: [Array<TaskType>, Array<TaskType>],
   mergeChildTasks,
   meta: MetaType
@@ -36,9 +35,7 @@ export default function(
       return Seq.of(finished).reduce(
         (acc, { result, params }) => {
           return result instanceof Match
-            ? !(result instanceof Empty)
-                ? Object.assign(acc, { state: result.value })
-                : acc
+            ? !(result instanceof Empty) ? { ...acc, state: result.value } : acc
             : { nonMatch: result };
         },
         context,
@@ -47,7 +44,7 @@ export default function(
     }
 
     function getTask(builder) {
-      const task = function fn() {
+      const task = function fn(state) {
         const readyToRun =
           !builder.precondition ||
           builder.precondition(obj, context, key, parents, parentKeys);
@@ -81,15 +78,15 @@ export default function(
                 Seq.of(predicates.concat(assertions))
                   .map(
                     predicate =>
-                      (predicate.fn(obj, context, key, parents, parentKeys)
+                      (predicate.fn(obj, { ...context, state }, key, parents, parentKeys)
                         ? undefined
                         : predicate.invalid())
                   )
-                  .first(x => x) ||
+                  .first(x => typeof x !== "undefined") ||
                 (() => {
                   const result = builder.get(
                     obj,
-                    context,
+                    { ...context, state },
                     key,
                     parents,
                     parentKeys
@@ -111,7 +108,7 @@ export default function(
       return { task };
     }
 
-    function run(tasksList) {
+    function run(tasksList, mainState) {
       const [[tasks, merge], ...rest] = tasksList;
 
       const { finished, unfinished } = Seq.of(tasks).reduce(
@@ -119,7 +116,10 @@ export default function(
           (typeof task === "function"
             ? {
                 finished: acc.finished,
-                unfinished: acc.unfinished.concat({ task: task(), params })
+                unfinished: acc.unfinished.concat({
+                  task: task(mainState),
+                  params
+                })
               }
             : {
                 finished: acc.finished.concat({ result: task, params }),
@@ -128,15 +128,33 @@ export default function(
         { finished: [], unfinished: [] }
       );
 
-      const { state, nonMatch } = finished.length ? merge(finished) : {};
+      console.log("MAINSTATE", mainState);
+
+      const { state, nonMatch } = finished.length
+        ? merge(finished, mainState)
+        : { state: mainState };
+
+      console.log(
+        "\n\nRUN",
+        "....",
+        finished,
+        state,
+        "/",
+        nonMatch,
+        finished.length,
+        unfinished.length,
+        "...",
+        rest.length,
+        "\n\n"
+      );
 
       return nonMatch
         ? nonMatch
         : unfinished.length
-            ? () => run([[unfinished, merge], ...rest])
+            ? () => run([[unfinished, merge], ...rest], state)
             : rest.length
-                ? () => run(rest)
-                : isTraversingDependent || typeof state === "undefined"
+                ? () => run(rest, state)
+                : typeof state === "undefined"
                     ? new Empty(
                         { obj, context, key, parents, parentKeys },
                         meta
@@ -167,7 +185,7 @@ export default function(
             [tasks, mergeTasks]
           ];
 
-          return run(allTasks);
+          return run(allTasks, context.state);
         };
   };
 }

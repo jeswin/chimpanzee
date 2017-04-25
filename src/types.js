@@ -6,8 +6,8 @@ export type PredicateType = (obj: any) => boolean;
 export type ResultGeneratorType = ResultType | (() => ResultGeneratorType);
 
 export type ContextType = {
-  parent: ContextType,
-  state: Object | number | string | boolean
+  parent?: ContextType,
+  state?: Object | number | string | boolean
 };
 
 export type FuncSchemaType = (

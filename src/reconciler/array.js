@@ -14,8 +14,18 @@ import type {
   MetaType
 } from "../types";
 
-export default function(schema: ArraySchemaType, params: SchemaParamsType, inner: boolean) {
-  return function(originalObj: any, context: ContextType, key: string, parents: Array<any>, parentKeys: Array<string>) {
+export default function(
+  schema: ArraySchemaType,
+  params: SchemaParamsType,
+  inner: boolean
+) {
+  return function(
+    originalObj: any,
+    context: ContextType,
+    key: string,
+    parents: Array<any>,
+    parentKeys: Array<string>
+  ) {
     return function(obj: any, meta: MetaType) {
       function getChildTasks() {
         return Array.isArray(obj)
@@ -27,23 +37,24 @@ export default function(schema: ArraySchemaType, params: SchemaParamsType, inner
                 )
               : Seq.of(schema)
                   .map((rhs, i) => ({
-                    task: traverse(
-                      rhs,
-                      {
-                        value: params.value,
-                        modifiers: {
-                          property: params.modifiers.property,
-                          value: params.modifiers.value
-                        }
-                      },
-                      false
-                    ).fn(
-                      obj[i],
-                      { parent: context },
-                      `${key}.${i}`,
-                      parents.concat(originalObj),
-                      parentKeys.concat(key)
-                    ),
+                    task: state =>
+                      traverse(
+                        rhs,
+                        {
+                          value: params.value,
+                          modifiers: {
+                            property: params.modifiers.property,
+                            value: params.modifiers.value
+                          }
+                        },
+                        false
+                      ).fn(
+                        obj[i],
+                        { parent: context, state },
+                        `${key}.${i}`,
+                        parents.concat(originalObj),
+                        parentKeys.concat(key)
+                      ),
                     params: schema.params
                   }))
                   .toArray()
@@ -59,18 +70,20 @@ export default function(schema: ArraySchemaType, params: SchemaParamsType, inner
       /*
       Array child tasks will always return an array.
     */
-      function mergeChildTasks(finished: { result: Result, params: SchemaParamsType }) {
+      function mergeChildTasks(
+        finished: { result: Result, params: SchemaParamsType },
+        state
+      ) {
+        console.log("MERGE_CH_ARR", finished, state);
         return Seq.of(finished).reduce(
           (acc, { result, params }) => {
             return result instanceof Match
               ? !(result instanceof Empty)
-                  ? Object.assign(acc, {
-                      state: (acc.state || []).concat([result.value])
-                    })
+                  ? { state: (acc.state || []).concat([result.value]) }
                   : acc
               : { nonMatch: result };
           },
-          context,
+          { state },
           (acc, { result }) => !(result instanceof Match)
         );
       }

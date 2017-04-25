@@ -67,7 +67,7 @@ export function take(
 ) {
   const meta = { type: "take", schema, params: rawParams, predicate, options };
   const params = getDefaultParams(rawParams);
-
+  
   function fn(obj, context, key, parents, parentKeys) {
     return predicate(obj)
       ? typeof schema !== "undefined"

@@ -4,7 +4,7 @@ import type { EnvType, MetaType } from "../types";
 
 export default class Match extends Result {
   value: any;
-  
+
   constructor(value: any, env: EnvType, meta: MetaType) {
     super(env, meta);
     this.value = value;

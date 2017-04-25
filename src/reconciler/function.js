@@ -17,7 +17,7 @@ export default function(schema: SchemaType, params: SchemaParamsType, inner: boo
   return function(originalObj: any, context: ContextType, key: string, parents: Array<any>, parentKeys: Array<string>) {
     return function(obj: any, meta: MetaType) {
       function getChildTasks() {
-        return [{ task: schema(obj, context, key, parents, parentKeys) }];
+        return [{ task: schema(obj, context, key, parents, parentKeys), params }];
       }
 
       const common = external(schema, params, inner)(
