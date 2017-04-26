@@ -12,11 +12,7 @@ import type {
   MetaType
 } from "../types";
 
-export default function(
-  schema: SchemaType,
-  params: SchemaParamsType,
-  inner: boolean
-) {
+export default function(schema: SchemaType, params: SchemaParamsType) {
   return function(
     originalObj: any,
     context: ContextType,
@@ -30,20 +26,18 @@ export default function(
       So, we can consider the first item in finished as the only item.
       There can be multiple tasks though.
     */
-      function mergeChildTasks(
+      function mergeChildResult(
         finished: { result: Result, params: SchemaParamsType },
-        state
+        state: any
       ) {
-        console.log("MERGE_CH_EXT", finished, state);
-        const result = finished[0].result;
+        const { result, params } = finished;
+
         return result instanceof Match
-          ? !(result instanceof Empty)
-              ? { state: result.value }
-              : { state }
+          ? !(result instanceof Empty) ? { state: result.value } : { state }
           : { nonMatch: result };
       }
 
-      return { mergeChildTasks };
+      return { mergeChildResult };
     };
   };
 }

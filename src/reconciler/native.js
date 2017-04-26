@@ -15,8 +15,7 @@ import type {
 
 export default function(
   schema: NativeTypeSchemaType,
-  params: SchemaParamsType,
-  inner: boolean
+  params: SchemaParamsType
 ) {
   return function(
     originalObj: any,
@@ -30,6 +29,7 @@ export default function(
         const comparand = params.modifiers.value
           ? params.modifiers.value(obj)
           : obj;
+
         return schema !== comparand
           ? [
               {
@@ -37,7 +37,8 @@ export default function(
                   `Expected ${schema} but got ${comparand}.`,
                   { obj, context, key, parents, parentKeys },
                   meta
-                )
+                ),
+                type: "native"
               }
             ]
           : [
@@ -45,17 +46,21 @@ export default function(
                 task: new Empty(
                   { obj, context, key, parents, parentKeys },
                   meta
-                )
+                ),
+                type: "native"
               }
             ];
       }
 
-      function mergeChildTasks(finished: { result: Result, params: SchemaParamsType }, isRunningChildTasks: boolean) {
-        const result = finished[0].result;
-        return result instanceof Match ? context : { nonMatch: result };
+      function mergeChildResult(
+        finished: { result: Result, params: SchemaParamsType },
+        state: any
+      ) {
+        const { result, params } = finished;
+        return result instanceof Match ? { state } : { nonMatch: result };
       }
 
-      return { getChildTasks, mergeChildTasks };
+      return { getChildTasks, mergeChildResult };
     };
   };
 }

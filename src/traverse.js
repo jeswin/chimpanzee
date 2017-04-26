@@ -17,8 +17,8 @@ import type {
   MetaType
 } from "./types";
 
-export function traverse(schema: SchemaType, rawParams: RawSchemaParamsType, inner: boolean = false) {
-  const meta = { type: "traverse", schema, params: rawParams, inner };
+export function traverse(schema: SchemaType, rawParams: RawSchemaParamsType) {
+  const meta = { type: "traverse", schema, params: rawParams };
   const params = getDefaultParams(rawParams);
 
   const schemaType = getSchemaType(schema);
@@ -28,7 +28,7 @@ export function traverse(schema: SchemaType, rawParams: RawSchemaParamsType, inn
       ? params.modifiers.object(originalObj)
       : originalObj;
 
-    const childReconciler = getReconciler(schemaType)(schema, params, inner)(
+    const childReconciler = getReconciler(schemaType)(schema, params)(
       originalObj,
       context,
       key,
@@ -46,12 +46,12 @@ export function traverse(schema: SchemaType, rawParams: RawSchemaParamsType, inn
       t => t.params && t.params.defer
     );
 
-    const mergeChildTasks = results => childReconciler.mergeChildTasks(results);
+    const mergeChildResult = (result, state) => childReconciler.mergeChildResult(result, state);
 
     return reconcile(
       params,
       [immediateChildTasks, deferredChildTasks],
-      mergeChildTasks,
+      mergeChildResult,
       meta
     )(obj, context, key, parents, parentKeys);
   }

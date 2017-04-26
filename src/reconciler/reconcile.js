@@ -18,7 +18,7 @@ import type { TaskType } from "../traverse";
 export default function(
   params: SchemaParamsType,
   [immediateChildTasks, deferredChildTasks]: [Array<TaskType>, Array<TaskType>],
-  mergeChildTasks,
+  mergeChildResult,
   meta: MetaType
 ) {
   immediateChildTasks = immediateChildTasks || [];
@@ -31,16 +31,11 @@ export default function(
     parents: Array<any>,
     parentKeys: Array<string>
   ) {
-    function mergeTasks(finished) {
-      return Seq.of(finished).reduce(
-        (acc, { result, params }) => {
-          return result instanceof Match
-            ? !(result instanceof Empty) ? { ...acc, state: result.value } : acc
-            : { nonMatch: result };
-        },
-        context,
-        (acc, { result }) => !(result instanceof Match)
-      );
+    function mergeResult(finished, state) {
+      const { result, params } = finished;
+      return result instanceof Match
+        ? !(result instanceof Empty) ? { state: result.value } : { state }
+        : { nonMatch: result };
     }
 
     function getTask(builder) {
@@ -78,7 +73,13 @@ export default function(
                 Seq.of(predicates.concat(assertions))
                   .map(
                     predicate =>
-                      (predicate.fn(obj, { ...context, state }, key, parents, parentKeys)
+                      (predicate.fn(
+                        obj,
+                        { ...context, state },
+                        key,
+                        parents,
+                        parentKeys
+                      )
                         ? undefined
                         : predicate.invalid())
                   )
@@ -105,53 +106,41 @@ export default function(
             })()
           : fn;
       };
-      return { task };
+      return { task, type: "reconcile" };
     }
 
-    function run(tasksList, mainState) {
+    function run(tasksList, currentState) {
       const [[tasks, merge], ...rest] = tasksList;
 
-      const { finished, unfinished } = Seq.of(tasks).reduce(
-        (acc, { task, params }) =>
+      const { pending, result } = Seq.of(tasks).reduce(
+        (acc, { task, type, params }) =>
           (typeof task === "function"
             ? {
-                finished: acc.finished,
-                unfinished: acc.unfinished.concat({
-                  task: task(mainState),
+                pending: acc.pending.concat({
+                  task: task(acc.result.state),
+                  type,
                   params
-                })
+                }),
+                result: acc.result
               }
             : {
-                finished: acc.finished.concat({ result: task, params }),
-                unfinished: acc.unfinished
+                pending: acc.pending,
+                result: merge({ result: task, params }, acc.result.state)
               }),
-        { finished: [], unfinished: [] }
+        {
+          pending: [],
+          result: { state: currentState, nonMatch: undefined }
+        },
+        (acc, item) => typeof acc.result.nonMatch !== "undefined"
       );
 
-      console.log("MAINSTATE", mainState);
+      const { state, nonMatch } = result;
 
-      const { state, nonMatch } = finished.length
-        ? merge(finished, mainState)
-        : { state: mainState };
-
-      console.log(
-        "\n\nRUN",
-        "....",
-        finished,
-        state,
-        "/",
-        nonMatch,
-        finished.length,
-        unfinished.length,
-        "...",
-        rest.length,
-        "\n\n"
-      );
-
+      debugger;
       return nonMatch
         ? nonMatch
-        : unfinished.length
-            ? () => run([[unfinished, merge], ...rest], state)
+        : pending.length
+            ? () => run([[pending, merge], ...rest], state)
             : rest.length
                 ? () => run(rest, state)
                 : typeof state === "undefined"
@@ -161,7 +150,13 @@ export default function(
                       )
                     : new Match(
                         state,
-                        { obj, context, key, parents, parentKeys },
+                        {
+                          obj,
+                          context: { ...context, state },
+                          key,
+                          parents,
+                          parentKeys
+                        },
                         meta
                       );
     }
@@ -180,9 +175,9 @@ export default function(
             .toArray();
 
           const allTasks = [
-            [immediateChildTasks, mergeChildTasks],
-            [deferredChildTasks, mergeChildTasks],
-            [tasks, mergeTasks]
+            [immediateChildTasks, mergeChildResult],
+            [deferredChildTasks, mergeChildResult],
+            [tasks, mergeResult]
           ];
 
           return run(allTasks, context.state);

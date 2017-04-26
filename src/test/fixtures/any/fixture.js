@@ -16,6 +16,4 @@ const schema2 = traverse({
   }
 });
 
-//console.log("TEMP FIXME");
-
 export const schema = any([schema1, schema2]);

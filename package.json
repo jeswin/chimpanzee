@@ -3,7 +3,8 @@
   "version": "0.0.37",
   "author": "Jeswin<jeswinpk@agilehead.com>",
   "scripts": {
-    "test": "mocha dist/test/test.js"
+    "test": "mocha dist/test/test.js",
+    "debug": "mocha --debug-brk dist/test/test.js"
   },
   "main": "dist/chimpanzee.js",
   "dependencies": {

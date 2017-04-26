@@ -14,11 +14,7 @@ import type {
   MetaType
 } from "../types";
 
-export default function(
-  schema: ArraySchemaType,
-  params: SchemaParamsType,
-  inner: boolean
-) {
+export default function(schema: ArraySchemaType, params: SchemaParamsType) {
   return function(
     originalObj: any,
     context: ContextType,
@@ -55,6 +51,7 @@ export default function(
                         parents.concat(originalObj),
                         parentKeys.concat(key)
                       ),
+                    type: "array",
                     params: schema.params
                   }))
                   .toArray()
@@ -70,25 +67,20 @@ export default function(
       /*
       Array child tasks will always return an array.
     */
-      function mergeChildTasks(
+      function mergeChildResult(
         finished: { result: Result, params: SchemaParamsType },
-        state
+        state: any
       ) {
-        console.log("MERGE_CH_ARR", finished, state);
-        return Seq.of(finished).reduce(
-          (acc, { result, params }) => {
-            return result instanceof Match
-              ? !(result instanceof Empty)
-                  ? { state: (acc.state || []).concat([result.value]) }
-                  : acc
-              : { nonMatch: result };
-          },
-          { state },
-          (acc, { result }) => !(result instanceof Match)
-        );
+        const { result, params } = finished;
+
+        return result instanceof Match
+          ? !(result instanceof Empty)
+              ? { state: (state || []).concat([result.value]) }
+              : { state }
+          : { nonMatch: result };
       }
 
-      return { getChildTasks, mergeChildTasks };
+      return { getChildTasks, mergeChildResult };
     };
   };
 }

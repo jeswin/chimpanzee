@@ -13,11 +13,7 @@ import type {
   MetaType
 } from "../types";
 
-export default function(
-  schema: Schema,
-  params: SchemaParamsType,
-  inner: boolean
-) {
+export default function(schema: Schema, params: SchemaParamsType) {
   return function(
     originalObj: any,
     context: ContextType,
@@ -27,10 +23,16 @@ export default function(
   ) {
     return function(obj: any, meta: MetaType) {
       function getChildTasks() {
-        return [{ task: schema.fn(obj, context, key, parents, parentKeys), params: schema.params }];
+        return [
+          {
+            task: schema.fn(obj, context, key, parents, parentKeys),
+            type: "schema",
+            params: schema.params
+          }
+        ];
       }
 
-      const common = external(schema, params, inner)(
+      const common = external(schema, params)(
         originalObj,
         context,
         key,
@@ -38,7 +40,7 @@ export default function(
         parentKeys
       )(obj, meta);
 
-      return { getChildTasks, mergeChildTasks: common.mergeChildTasks };
+      return { getChildTasks, mergeChildResult: common.mergeChildResult };
     };
   };
 }

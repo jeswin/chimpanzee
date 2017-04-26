@@ -13,7 +13,7 @@ import type {
   ResultGeneratorType
 } from "../types";
 
-function getSchema(schema: SchemaType, paramSelector: string) : SchemaType {
+function getSchema(schema: SchemaType, paramSelector: string): SchemaType {
   const schemaSelector = schema.params && schema.params.selector
     ? schema.params.selector
     : "default";
@@ -32,7 +32,11 @@ function getSchema(schema: SchemaType, paramSelector: string) : SchemaType {
             : paramSelector === "default" ? schema : undefined;
 }
 
-export function composite(schema: SchemaType, _paramsList: Array<SchemaParamsType>, ownParams: SchemaParamsType) {
+export function composite(
+  schema: SchemaType,
+  _paramsList: Array<SchemaParamsType>,
+  ownParams: SchemaParamsType
+) {
   const meta = {
     type: "composite",
     schema,
@@ -53,17 +57,25 @@ export function composite(schema: SchemaType, _paramsList: Array<SchemaParamsTyp
   );
 
   function fn(obj, context, key, parents, parentKeys) {
+    const env = { obj, context, key, parents, parentKeys };
+
+    function merge(result, state) {
+      return { ...state, ...result.value };
+    }
+
     return schemas.length
-      ? (function run(schemas) {
+      ? (function run(schemas, state) {
           return waitForSchema(
             schemas[0],
             result =>
               (result instanceof Match
-                ? schemas.length > 1 ? run(schemas.slice(1)) : result
+                ? schemas.length > 1
+                    ? run(schemas.slice(1), merge(result, state))
+                    : new Match(merge(result, state), env, meta)
                 : result)
           )(obj, context, key, parents, parentKeys);
-        })(schemas)
-      : new Empty({ obj, context, key, parents, parentKeys }, meta);
+        })(schemas, {})
+      : new Empty(env, meta);
   }
 
   return traverse(fn, ownParams);

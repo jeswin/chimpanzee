@@ -1,3 +1,3 @@
 export const result = {
-  level1: { hello: "world" }
+  hello: "world"
 };

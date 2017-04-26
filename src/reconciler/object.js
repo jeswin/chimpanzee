@@ -15,11 +15,7 @@ import type {
 } from "../types";
 import { getSchemaType } from "../utils";
 
-export default function(
-  schema: Object,
-  params: SchemaParamsType,
-  inner: boolean
-) {
+export default function(schema: Object, params: SchemaParamsType) {
   return function(
     originalObj: any,
     context: ContextType,
@@ -55,6 +51,8 @@ export default function(
                         ? params.modifiers.property(obj, childKey)
                         : obj[childKey];
 
+              const childSchemaIsObject = getSchemaType(childSchema) === "object";
+
               return {
                 task: state =>
                   traverse(
@@ -69,19 +67,21 @@ export default function(
                     true
                   ).fn(
                     childItem,
-                    getSchemaType(childSchema) === "object"
+                     childSchemaIsObject
                       ? { ...context, state }
                       : { parent: { ...context, state } },
                     childKey,
                     parents.concat(originalObj),
                     parentKeys.concat(key)
                   ),
+                type: "object",
                 params: childSchema.params
                   ? {
                       ...childSchema.params,
-                      key: childSchema.params.key || childKey
+                      key: childSchema.params.key || childKey,
+                      isObject: childSchemaIsObject
                     }
-                  : { key: childKey }
+                  : { key: childKey, isObject: childSchemaIsObject }
               };
             })
           : [
@@ -90,7 +90,8 @@ export default function(
                   `Cannot traverse undefined.`,
                   { obj, context, key, parents, parentKeys },
                   meta
-                )
+                ),
+                type: "object"
               }
             ];
       }
@@ -99,34 +100,21 @@ export default function(
       Child tasks of objects will always return an object.
       Which will need to be spread.
     */
-      function mergeChildTasks(
+      function mergeChildResult(
         finished: { result: Result, params: SchemaParamsType },
-        state
+        state: any
       ) {
-        console.log("MERGE_CH_OBJ", finished);
-        return Seq.of(finished).reduce(
-          (acc, { result, params }) => {
-            return result instanceof Match
-              ? !(result instanceof Empty)
-                  ? params.replace
-                      ? {
-                          state: { ...(acc.state || {}), ...result.value }
-                        }
-                      : {
-                          state: {
-                            ...(acc.state || {}),
-                            [params.key]: result.value
-                          }
-                        }
-                  : acc
-              : { nonMatch: result };
-          },
-          { state },
-          (acc, { result }) => !(result instanceof Match)
-        );
+        const { result, params } = finished;
+        return result instanceof Match
+          ? !(result instanceof Empty)
+              ? params.replace || params.isObject
+                  ? { state: { ...(state || {}), ...result.value } }
+                  : { state: { ...(state || {}), [params.key]: result.value } }
+              : { state }
+          : { nonMatch: result };
       }
 
-      return { getChildTasks, mergeChildTasks };
+      return { getChildTasks, mergeChildResult };
     };
   };
 }

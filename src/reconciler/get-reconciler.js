@@ -25,14 +25,14 @@ const index = {
 };
 
 export default function(schemaType: string) {
-  return (schema: SchemaType, params: SchemaParamsType, inner: boolean) => (
+  return (schema: SchemaType, params: SchemaParamsType) => (
     originalObj: any,
     context: ContextType,
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
   ) => (obj: any, meta: MetaType) =>
-    index[schemaType](schema, params, inner)(
+    index[schemaType](schema, params)(
       originalObj,
       context,
       key,
