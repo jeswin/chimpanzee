@@ -34,7 +34,7 @@ export function getDefaultParams(
   return params;
 }
 
-export type WaitForSchemaOptionsType = { newContext?: boolean };
+export type WaitForSchemaOptionsType = {};
 
 export function waitForSchema(
   schema: SchemaType,

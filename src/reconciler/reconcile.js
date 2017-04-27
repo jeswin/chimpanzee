@@ -74,7 +74,6 @@ export default function(
                     predicate =>
                       (predicate.fn(
                         obj,
-                        { ...context, state },
                         key,
                         parents,
                         parentKeys
