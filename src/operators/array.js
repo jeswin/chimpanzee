@@ -37,14 +37,14 @@ export function repeatingItem(_schema: SchemaType, opts: RepeatingItemOptsType =
 
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
-    return new Schema((obj, context, key, parents, parentKeys) =>
+    return new Schema((obj, key, parents, parentKeys) =>
       (function run(items, results, needle) {
         const completed = (result, needle) =>
           (results.length >= min && (!max || results.length <= max)
             ? {
                 result: new Match(
                   results.concat(result ? [result.value] : []),
-                  { obj, context, key, parents, parentKeys },
+                  { obj, key, parents, parentKeys },
                   meta
                 ),
                 needle
@@ -52,7 +52,7 @@ export function repeatingItem(_schema: SchemaType, opts: RepeatingItemOptsType =
             : {
                 result: new Skip(
                   "Incorrect number of matches.",
-                  { obj, context, key, parents, parentKeys },
+                  { obj, key, parents, parentKeys },
                   meta
                 )
               });
@@ -67,7 +67,7 @@ export function repeatingItem(_schema: SchemaType, opts: RepeatingItemOptsType =
               : result instanceof Skip
                   ? completed(undefined, needle)
                   : { result, needle })
-        )(items, context, key, parents, parentKeys);
+        )(items, key, parents, parentKeys);
       })(obj, [], needle)
     );
   });
@@ -86,7 +86,7 @@ export function unorderedItem(_schema: SchemaType) {
 
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
-    return new Schema((obj, context, key, parents, parentKeys) =>
+    return new Schema((obj, key, parents, parentKeys) =>
       (function run(items, i) {
         return waitForSchema(
           schema(i),
@@ -98,12 +98,12 @@ export function unorderedItem(_schema: SchemaType) {
                   : {
                       result: new Skip(
                         `Unordered item was not found.`,
-                        { obj, context, key, parents, parentKeys },
+                        { obj, key, parents, parentKeys },
                         meta
                       ),
                       needle
                     })
-        )(items, context, key, parents, parentKeys);
+        )(items, key, parents, parentKeys);
       })(obj, 0)
     );
   });
@@ -119,7 +119,7 @@ export function optionalItem(_schema: SchemaType) {
 
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
-    return new Schema((obj, context, key, parents, parentKeys) =>
+    return new Schema((obj, key, parents, parentKeys) =>
       waitForSchema(
         schema(needle),
         ({ result }) =>
@@ -128,13 +128,13 @@ export function optionalItem(_schema: SchemaType) {
             : result instanceof Skip
                 ? {
                     result: new Empty(
-                      { obj, context, key, parents, parentKeys },
+                      { obj, key, parents, parentKeys },
                       meta
                     ),
                     needle
                   }
                 : { result, needle })
-      )(obj, context, key, parents, parentKeys)
+      )(obj, key, parents, parentKeys)
     );
   });
 }
@@ -145,7 +145,7 @@ export function optionalItem(_schema: SchemaType) {
 function regularItem(schema) {
   const meta = { type: "regularItem", schema };
   return needle =>
-    new Schema((obj, context, key, parents, parentKeys) =>
+    new Schema((obj, key, parents, parentKeys) =>
       waitForSchema(
         schema,
         result =>
@@ -154,7 +154,6 @@ function regularItem(schema) {
             : { result, needle })
       )(
         obj[needle],
-        context,
         `${key}.${needle}`,
         parents.concat(obj),
         parentKeys.concat(key)
@@ -173,7 +172,7 @@ export function array(schemas: Array<Schema>, rawParams: RawSchemaParamsType) {
   const meta = { type: "array", schemas, params: rawParams };
   const params = getDefaultParams(rawParams);
 
-  const fn = function(obj, context, key, parents, parentKeys) {
+  const fn = function(obj, key, parents, parentKeys) {
     return Array.isArray(obj)
       ? (function run(list, results, needle) {
           const schema = toNeedledSchema(list[0]);
@@ -192,14 +191,14 @@ export function array(schemas: Array<Schema>, rawParams: RawSchemaParamsType) {
                       )
                     : new Match(
                         results.concat(result.value),
-                        { obj, context, key, parents, parentKeys },
+                        { obj, key, parents, parentKeys },
                         meta
                       ))
           )(obj, { parent: context }, key, parents, parentKeys);
         })(schemas, [], 0)
       : new Fault(
           `Expected array but got ${typeof obj}.`,
-          { obj, context, key, parents, parentKeys },
+          { obj, key, parents, parentKeys },
           meta
         );
   };

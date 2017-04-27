@@ -17,7 +17,6 @@ import type {
 export default function(schema: ArraySchemaType, params: SchemaParamsType) {
   return function(
     originalObj: any,
-    context: ContextType,
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
@@ -28,7 +27,7 @@ export default function(schema: ArraySchemaType, params: SchemaParamsType) {
           ? schema.length !== obj.length
               ? new Skip(
                   `Expected array of length ${schema.length} but got ${obj.length}.`,
-                  { obj, context, key, parents, parentKeys },
+                  { obj, key, parents, parentKeys },
                   meta
                 )
               : Seq.of(schema)
@@ -58,7 +57,7 @@ export default function(schema: ArraySchemaType, params: SchemaParamsType) {
           : [
               new Skip(
                 `Schema is an array but property is a non-array.`,
-                { obj, context, key, parents, parentKeys },
+                { obj, key, parents, parentKeys },
                 meta
               )
             ];

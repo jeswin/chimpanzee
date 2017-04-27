@@ -16,7 +16,6 @@ import type {
 export default function(schema: SchemaType, params: SchemaParamsType) {
   return function(
     originalObj: any,
-    context: ContextType,
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
@@ -25,7 +24,7 @@ export default function(schema: SchemaType, params: SchemaParamsType) {
       function getChildTasks() {
         return [
           {
-            task: schema(obj, context, key, parents, parentKeys),
+            task: schema(obj, key, parents, parentKeys),
             type: "function",
             params
           }
@@ -34,7 +33,6 @@ export default function(schema: SchemaType, params: SchemaParamsType) {
 
       const common = external(schema, params)(
         originalObj,
-        context,
         key,
         parents,
         parentKeys

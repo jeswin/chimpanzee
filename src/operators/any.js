@@ -21,12 +21,10 @@ export function any(
 
   function fn(
     obj: any,
-    context: ContextType,
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
   ): ResultGeneratorType {
-    const effectiveContext = { ...context };
     return (function run(schemas, nonMatching) {
       return waitForSchema(
         schemas[0],
@@ -39,7 +37,6 @@ export function any(
                     "None of the items matched.",
                     {
                       obj,
-                      effectiveContext,
                       key,
                       parents,
                       parentKeys,
@@ -47,7 +44,7 @@ export function any(
                     },
                     meta
                   ))
-      )(obj, effectiveContext, key, parents, parentKeys);
+      )(obj, key, parents, parentKeys);
     })(schemas, []);
   }
 

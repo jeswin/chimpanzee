@@ -56,8 +56,8 @@ export function composite(
     traverse(getSchema(schema, (params && params.name) || "default"), params)
   );
 
-  function fn(obj, context, key, parents, parentKeys) {
-    const env = { obj, context, key, parents, parentKeys };
+  function fn(obj, key, parents, parentKeys) {
+    const env = { obj, key, parents, parentKeys };
 
     function merge(result, state) {
       return { ...state, ...result.value };
@@ -73,7 +73,7 @@ export function composite(
                     ? run(schemas.slice(1), merge(result, state))
                     : new Match(merge(result, state), env, meta)
                 : result)
-          )(obj, context, key, parents, parentKeys);
+          )(obj, key, parents, parentKeys);
         })(schemas, {})
       : new Empty(env, meta);
   }

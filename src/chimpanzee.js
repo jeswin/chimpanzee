@@ -48,5 +48,5 @@ function _match(traverseResult: ResultGeneratorType) {
 
 export function match(schema: SchemaType, input: any) {
   const fn = typeof schema === "function" ? schema : schema.fn;
-  return _match(fn(input, {}, "__INIT__", [], []));
+  return _match(fn(input, "__INIT__", [], []));
 }

@@ -26,7 +26,6 @@ export default function(
 
   return function(
     obj: any,
-    context: ContextType,
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
@@ -42,7 +41,7 @@ export default function(
       const task = function fn(state) {
         const readyToRun =
           !builder.precondition ||
-          builder.precondition(obj, context, key, parents, parentKeys);
+          builder.precondition(obj, key, parents, parentKeys);
         return readyToRun
           ? (() => {
               const predicates = !builder.predicates
@@ -52,7 +51,7 @@ export default function(
                     invalid: () =>
                       new Skip(
                         p.message || `Predicate returned false.`,
-                        { obj, context, key, parents, parentKeys },
+                        { obj, key, parents, parentKeys },
                         meta
                       )
                   }));
@@ -64,7 +63,7 @@ export default function(
                     invalid: () =>
                       new Fault(
                         a.error,
-                        { obj, context, key, parents, parentKeys },
+                        { obj, key, parents, parentKeys },
                         meta
                       )
                   }));
@@ -98,7 +97,7 @@ export default function(
                     ? result
                     : new Match(
                         result,
-                        { obj, context, key, parents, parentKeys },
+                        { obj, key, parents, parentKeys },
                         meta
                       );
                 })()
@@ -145,7 +144,7 @@ export default function(
                 ? () => run(rest, state)
                 : typeof state === "undefined"
                     ? new Empty(
-                        { obj, context, key, parents, parentKeys },
+                        { obj, key, parents, parentKeys },
                         meta
                       )
                     : new Match(
@@ -166,7 +165,7 @@ export default function(
     return !mustRun
       ? new Skip(
           `Predicate returned false.`,
-          { obj, context, key, parents, parentKeys },
+          { obj, key, parents, parentKeys },
           meta
         )
       : () => {

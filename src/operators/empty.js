@@ -5,12 +5,12 @@ import Schema from "../schema";
 export function empty() {
   const meta = { type: "empty" };
 
-  function fn(obj, context, key, parents, parentKeys) {
+  function fn(obj, key, parents, parentKeys) {
     return obj === undefined
-      ? new Empty({ obj, context, key, parents, parentKeys }, meta)
+      ? new Empty({ obj, key, parents, parentKeys }, meta)
       : new Skip(
           "Not empty.",
-          { obj, context, key, parents, parentKeys },
+          { obj, key, parents, parentKeys },
           meta
         );
   }

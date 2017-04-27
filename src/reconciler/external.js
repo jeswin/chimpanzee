@@ -15,7 +15,6 @@ import type {
 export default function(schema: SchemaType, params: SchemaParamsType) {
   return function(
     originalObj: any,
-    context: ContextType,
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>

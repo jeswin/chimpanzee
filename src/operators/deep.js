@@ -16,7 +16,7 @@ export function deep(schema: SchemaType, rawParams: RawSchemaParamsType) {
   const meta = { type: "deep", schema, params: rawParams };
   const params = getDefaultParams(rawParams);
 
-  function fn(obj, context, key, parents, parentKeys) {
+  function fn(obj, key, parents, parentKeys) {
     function traverseObject(keys) {
       return keys.length
         ? waitForSchema(
@@ -25,14 +25,13 @@ export function deep(schema: SchemaType, rawParams: RawSchemaParamsType) {
               (!(result instanceof Skip) ? result : traverseObject(keys.slice(1)))
           )(
             obj[keys[0]],
-            context,
             key,
             parents.concat(obj),
             parentKeys.concat(keys[0])
           )
         : new Skip(
             "Not found in deep.",
-            { obj, context, key, parents, parentKeys },
+            { obj, key, parents, parentKeys },
             meta
           );
     }
@@ -43,10 +42,10 @@ export function deep(schema: SchemaType, rawParams: RawSchemaParamsType) {
             deep(schema, params),
             result =>
               (!(result instanceof Skip) ? result : traverseArray(items.slice(1)))
-          )(items[0], context, key, parents, parentKeys)
+          )(items[0], key, parents, parentKeys)
         : new Skip(
             "Not found in deep.",
-            { obj, context, key, parents, parentKeys },
+            { obj, key, parents, parentKeys },
             meta
           );
     }
@@ -62,10 +61,10 @@ export function deep(schema: SchemaType, rawParams: RawSchemaParamsType) {
                   ? traverseArray(obj)
                   : new Skip(
                       "Not found in deep.",
-                      { obj, context, key, parents, parentKeys },
+                      { obj, key, parents, parentKeys },
                       meta
                     ))
-    )(obj, context, key, parents, parentKeys);
+    )(obj, key, parents, parentKeys);
   }
 
   return new Schema(fn, params);

@@ -18,7 +18,6 @@ import { getSchemaType } from "../utils";
 export default function(schema: Object, params: SchemaParamsType) {
   return function(
     originalObj: any,
-    context: ContextType,
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
@@ -67,9 +66,6 @@ export default function(schema: Object, params: SchemaParamsType) {
                     true
                   ).fn(
                     childItem,
-                     childSchemaIsObject
-                      ? { ...context, state }
-                      : { parent: { ...context, state } },
                     childKey,
                     parents.concat(originalObj),
                     parentKeys.concat(key)
@@ -88,7 +84,7 @@ export default function(schema: Object, params: SchemaParamsType) {
               {
                 task: new Skip(
                   `Cannot traverse undefined.`,
-                  { obj, context, key, parents, parentKeys },
+                  { obj, key, parents, parentKeys },
                   meta
                 ),
                 type: "object"

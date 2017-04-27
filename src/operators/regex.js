@@ -16,7 +16,7 @@ export function regex(regex: string | RegExp, rawParams: RawSchemaParamsType) {
   const meta = { type: "regex", regex, params: rawParams };
   const params = getDefaultParams(rawParams);
 
-  function fn(obj, context, key, parents, parentKeys) {
+  function fn(obj, key, parents, parentKeys) {
     return waitForSchema(
       captureIf(
         obj =>
@@ -28,11 +28,11 @@ export function regex(regex: string | RegExp, rawParams: RawSchemaParamsType) {
         (result instanceof Skip
           ? new Skip(
               `Did not match regex.`,
-              { obj, context, key, parents, parentKeys },
+              { obj, key, parents, parentKeys },
               meta
             )
           : result)
-    )(obj, context, key, parents, parentKeys);
+    )(obj, key, parents, parentKeys);
   }
 
   return new Schema(fn, params);

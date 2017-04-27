@@ -36,18 +36,18 @@ function checkType(type, rawParams: RawSchemaParamsType) {
   const meta = { type, params: rawParams };
   const params = getDefaultParams(rawParams);
 
-  function fn(obj, context, key, parents, parentKeys) {
+  function fn(obj, key, parents, parentKeys) {
     return waitForSchema(
       captureIf(obj => typeof obj === type),
       result =>
         (result instanceof Skip
           ? new Skip(
               `Expected ${type} but got ${typeof obj}.`,
-              { obj, context, key, parents, parentKeys },
+              { obj, key, parents, parentKeys },
               meta
             )
           : result)
-    )(obj, context, key, parents, parentKeys);
+    )(obj, key, parents, parentKeys);
   }
 
   return new Schema(fn, params);

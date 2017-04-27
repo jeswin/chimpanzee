@@ -19,7 +19,6 @@ export default function(
 ) {
   return function(
     originalObj: any,
-    context: ContextType,
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
@@ -35,7 +34,7 @@ export default function(
               {
                 task: new Skip(
                   `Expected ${schema} but got ${comparand}.`,
-                  { obj, context, key, parents, parentKeys },
+                  { obj, key, parents, parentKeys },
                   meta
                 ),
                 type: "native"
@@ -44,7 +43,7 @@ export default function(
           : [
               {
                 task: new Empty(
-                  { obj, context, key, parents, parentKeys },
+                  { obj, key, parents, parentKeys },
                   meta
                 ),
                 type: "native"

@@ -15,14 +15,14 @@ export function optional(schema: SchemaType, rawParams: RawSchemaParamsType) {
   const meta = { type: "optional", schema, params: rawParams };
   const params = getDefaultParams(rawParams);
 
-  function fn(obj, context, key, parents, parentKeys) {
+  function fn(obj, key, parents, parentKeys) {
     return waitForSchema(
       schema,
       result =>
         (!(result instanceof Skip)
           ? result
-          : new Empty({ obj, context, key, parents, parentKeys }, meta))
-    )(obj, context, key, parents, parentKeys);
+          : new Empty({ obj, key, parents, parentKeys }, meta))
+    )(obj, key, parents, parentKeys);
   }
 
   return new Schema(fn, params);

@@ -44,7 +44,6 @@ export function waitForSchema(
   then = then || (result => result);
   return function(
     obj: any,
-    context: ContextType,
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
@@ -54,11 +53,10 @@ export function waitForSchema(
         return typeof task === "function" ? (state) => loop(task(state)) : then(task);
       }
 
-      const effectiveContext = options.newContext ? { ...context } : context;
       const schemaFn = typeof schema === "function"
         ? schema
         : schema instanceof Schema ? schema.fn : traverse(schema).fn;
-      return loop(schemaFn(obj, effectiveContext, key, parents, parentKeys));
+      return loop(schemaFn(obj, key, parents, parentKeys));
     }
     return next(schema);
   };

@@ -18,18 +18,18 @@ export function map(schema: SchemaType, mapper: MapperType, rawParams: RawSchema
   const meta = { type: "map", schema, mapper, params: rawParams };
   const params = getDefaultParams(rawParams);
 
-  function fn(obj, context, key, parents, parentKeys) {
+  function fn(obj, key, parents, parentKeys) {
     return waitForSchema(
       schema,
       result =>
         (result instanceof Match
           ? new Match(
               mapper(result.value),
-              { obj, context, key, parents, parentKeys },
+              { obj, key, parents, parentKeys },
               meta
             )
           : result)
-    )(obj, context, key, parents, parentKeys);
+    )(obj, key, parents, parentKeys);
   }
 
   return new Schema(fn, params);

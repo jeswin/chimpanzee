@@ -15,7 +15,7 @@ export const input = {
 export const schema = traverse({
   level1: array([
     repeatingItem(
-      (obj, context, key, parents, parentKeys) =>
+      (obj, key, parents, parentKeys) =>
         (obj !== "three" ? new Match(obj) : new Fault("THREE can't happen."))
     )
   ])

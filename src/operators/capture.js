@@ -68,7 +68,7 @@ export function take(
   const meta = { type: "take", schema, params: rawParams, predicate, options };
   const params = getDefaultParams(rawParams);
   
-  function fn(obj, context, key, parents, parentKeys) {
+  function fn(obj, key, parents, parentKeys) {
     return predicate(obj)
       ? typeof schema !== "undefined"
           ? waitForSchema(
@@ -82,27 +82,27 @@ export function take(
                           ? options.modifier(result.value)
                           : result.value)
                       },
-                      { obj, context, key, parents, parentKeys },
+                      { obj, key, parents, parentKeys },
                       meta
                     )
                   : result instanceof Skip
                       ? new Skip(
                           "Capture failed in inner schema.",
-                          { obj, context, key, parents, parentKeys },
+                          { obj, key, parents, parentKeys },
                           meta
                         )
                       : result) //Fault
-            )(obj, context, key, parents, parentKeys)
+            )(obj, key, parents, parentKeys)
           : new Match(
               options.modifier ? options.modifier(obj) : obj,
-              { obj, context, key, parents, parentKeys },
+              { obj, key, parents, parentKeys },
               meta
             )
       : new Skip(
           options.skipMessage
             ? options.skipMessage(obj)
             : `Predicate returned false. Predicate was ${predicate.toString()}`,
-          { obj, context, key, parents, parentKeys },
+          { obj, key, parents, parentKeys },
           meta
         );
   }

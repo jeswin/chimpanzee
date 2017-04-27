@@ -12,7 +12,6 @@ export type ContextType = {
 
 export type FuncSchemaType = (
   obj: Object,
-  context: ContextType,
   key: string,
   parents: Array<Object>,
   parentKeys: Array<string>
@@ -50,7 +49,6 @@ export type ResultTransformType = (result: ResultType) => ResultGeneratorType;
 
 export type SchemaInvocationFnType = (
   obj: Object,
-  context: ContextType,
   key: string,
   parents: Array<Object>,
   parentKeys: Array<string>
@@ -58,7 +56,6 @@ export type SchemaInvocationFnType = (
 
 export type EnvType = {
   obj: Object,
-  context: ContextType,
   key: string,
   parents: Array<Object>,
   parentKeys: Array<string>

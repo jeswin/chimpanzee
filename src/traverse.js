@@ -23,14 +23,13 @@ export function traverse(schema: SchemaType, rawParams: RawSchemaParamsType) {
 
   const schemaType = getSchemaType(schema);
 
-  function fn(originalObj, context = {}, key, parents, parentKeys) {
+  function fn(originalObj, key, parents, parentKeys) {
     const obj = params.modifiers.object
       ? params.modifiers.object(originalObj)
       : originalObj;
 
     const childReconciler = getReconciler(schemaType)(schema, params)(
       originalObj,
-      context,
       key,
       parents,
       parentKeys
@@ -53,7 +52,7 @@ export function traverse(schema: SchemaType, rawParams: RawSchemaParamsType) {
       [immediateChildTasks, deferredChildTasks],
       mergeChildResult,
       meta
-    )(obj, context, key, parents, parentKeys);
+    )(obj, key, parents, parentKeys);
   }
 
   return new Schema(fn, params);
