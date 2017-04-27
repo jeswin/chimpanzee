@@ -11,7 +11,7 @@ export const schema = traverse(
   {
     builders: [
       {
-        get: (obj, context) => new Skip("We skipped it!")
+        get: context => new Skip("We skipped it!")
       }
     ]
   }

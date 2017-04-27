@@ -11,13 +11,13 @@ export const schema = traverse({
   hello: traverse(
     { prop1: capture() },
     {
-      builders: [{ get: (_, { state }) => ({ ...state, counter: counter++ }) }]
+      builders: [{ get: ({ state }) => ({ ...state, counter: counter++ }) }]
     }
   ),
   world: traverse(
     { prop2: capture() },
     {
-      builders: [{ get: (_, { state }) => ({ ...state, counter: counter++ }) }]
+      builders: [{ get: ({ state }) => ({ ...state, counter: counter++ }) }]
     }
   )
 });

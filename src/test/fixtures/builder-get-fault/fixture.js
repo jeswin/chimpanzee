@@ -11,7 +11,7 @@ export const schema = traverse(
   {
     builders: [
       {
-        get: (obj, context) => new Fault("We faulted!")
+        get: context => new Fault("We faulted!")
       }
     ]
   }

@@ -124,6 +124,7 @@ describe("chimpanzee", () => {
     ["traverse-traverse-traverse", "traverse-traverse-traverse", "match"],
     ["traverse-wrapper", "traverse-wrapper", "match"],
     ["value-modifier", "value-modifier", "match"]
+
   ];
 
   for (const test of tests) {

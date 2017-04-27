@@ -50,10 +50,11 @@ export default function(schema: Object, params: SchemaParamsType) {
                         ? params.modifiers.property(obj, childKey)
                         : obj[childKey];
 
-              const childSchemaIsObject = getSchemaType(childSchema) === "object";
+              const childSchemaIsObject =
+                getSchemaType(childSchema) === "object";
 
               return {
-                task: state =>
+                task: context =>
                   traverse(
                     childSchema,
                     {
@@ -98,15 +99,28 @@ export default function(schema: Object, params: SchemaParamsType) {
     */
       function mergeChildResult(
         finished: { result: Result, params: SchemaParamsType },
-        state: any
+        context: any
       ) {
         const { result, params } = finished;
         return result instanceof Match
           ? !(result instanceof Empty)
               ? params.replace || params.isObject
-                  ? { state: { ...(state || {}), ...result.value } }
-                  : { state: { ...(state || {}), [params.key]: result.value } }
-              : { state }
+                  ? {
+                      context: {
+                        ...context,
+                        state: { ...(context.state || {}), ...result.value }
+                      }
+                    }
+                  : {
+                      context: {
+                        ...context,
+                        state: {
+                          ...(context.state || {}),
+                          [params.key]: result.value
+                        }
+                      }
+                    }
+              : { context }
           : { nonMatch: result };
       }
 

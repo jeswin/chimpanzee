@@ -28,7 +28,7 @@ export type SchemaType =
 
 export type RawSchemaParamsType = {
   key?: string,
-  builders: Array<{ get: (obj: any, context: ContextType) => any }>,
+  builders: Array<{ get: (context: ContextType) => any }>,
   modifiers?: {
     property?: (a: any) => any,
     object?: (a: any) => any,

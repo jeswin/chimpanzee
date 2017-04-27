@@ -17,7 +17,7 @@ export const schema = traverse(
             message: "prop1 cannot be hello"
           }
         ],
-        get: (obj, context) => ({ prop1: context.state.prop1 + " world" })
+        get: context => ({ prop1: context.state.prop1 + " world" })
       }
     ]
   }

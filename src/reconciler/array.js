@@ -68,14 +68,19 @@ export default function(schema: ArraySchemaType, params: SchemaParamsType) {
     */
       function mergeChildResult(
         finished: { result: Result, params: SchemaParamsType },
-        state: any
+        context: any
       ) {
         const { result, params } = finished;
 
         return result instanceof Match
           ? !(result instanceof Empty)
-              ? { state: (state || []).concat([result.value]) }
-              : { state }
+              ? {
+                  context: {
+                    ...context,
+                    state: (context.state || []).concat([result.value])
+                  }
+                }
+              : { context }
           : { nonMatch: result };
       }
 

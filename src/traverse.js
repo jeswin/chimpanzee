@@ -45,7 +45,7 @@ export function traverse(schema: SchemaType, rawParams: RawSchemaParamsType) {
       t => t.params && t.params.defer
     );
 
-    const mergeChildResult = (result, state) => childReconciler.mergeChildResult(result, state);
+    const mergeChildResult = (finished, context) => childReconciler.mergeChildResult(finished, context);
 
     return reconcile(
       params,

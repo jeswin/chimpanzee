@@ -53,10 +53,10 @@ export default function(
 
       function mergeChildResult(
         finished: { result: Result, params: SchemaParamsType },
-        state: any
+        context: any
       ) {
         const { result, params } = finished;
-        return result instanceof Match ? { state } : { nonMatch: result };
+        return result instanceof Match ? { context } : { nonMatch: result };
       }
 
       return { getChildTasks, mergeChildResult };

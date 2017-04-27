@@ -59,23 +59,26 @@ export function composite(
   function fn(obj, key, parents, parentKeys) {
     const env = { obj, key, parents, parentKeys };
 
-    function merge(result, state) {
-      return { ...state, ...result.value };
+    function merge(result, context) {
+      return {
+        context: { ...context, state: { ...context.state, ...result.value } }
+      };
     }
 
     return schemas.length
-      ? (function run(schemas, state) {
+      ? (function run(schemas, context) {
           return waitForSchema(
             schemas[0],
             result =>
               (result instanceof Match
                 ? schemas.length > 1
-                    ? run(schemas.slice(1), merge(result, state))
-                    : new Match(merge(result, state), env, meta)
+                    ? run(schemas.slice(1), merge(result, context).context)
+                    : new Match(merge(result, context).context.state, env, meta)
                 : result)
           )(obj, key, parents, parentKeys);
         })(schemas, {})
       : new Empty(env, meta);
+
   }
 
   return traverse(fn, ownParams);

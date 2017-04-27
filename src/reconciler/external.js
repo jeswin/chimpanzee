@@ -27,12 +27,14 @@ export default function(schema: SchemaType, params: SchemaParamsType) {
     */
       function mergeChildResult(
         finished: { result: Result, params: SchemaParamsType },
-        state: any
+        context: any
       ) {
         const { result, params } = finished;
 
         return result instanceof Match
-          ? !(result instanceof Empty) ? { state: result.value } : { state }
+          ? !(result instanceof Empty)
+              ? { context: { ...context, state: result.value } }
+              : { context }
           : { nonMatch: result };
       }
 

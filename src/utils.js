@@ -29,7 +29,7 @@ export function getDefaultParams(
   const params: SchemaParamsType = typeof rawParams === "string"
     ? { key: rawParams }
     : (rawParams || {});
-  params.builders = params.builders || [{ get: (obj, { state }) => state }];
+  params.builders = params.builders || [{ get: context => context.state }];
   params.modifiers = params.modifiers || {};
   return params;
 }
@@ -50,7 +50,7 @@ export function waitForSchema(
   ) {
     function next(schema) {
       function loop(task) {
-        return typeof task === "function" ? (state) => loop(task(state)) : then(task);
+        return typeof task === "function" ? (context) => loop(task(context)) : then(task);
       }
 
       const schemaFn = typeof schema === "function"

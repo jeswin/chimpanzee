@@ -482,7 +482,7 @@ export const schema = traverse(
       {
         builders: [{
           precondition: (obj, context) => context.parent.state && context.parent.state.prop2,
-          get: (obj, context) => ({ prop3: `${context.state.prop1} ${context.parent.state.prop2}` })
+          get: context => ({ prop3: `${context.state.prop1} ${context.parent.state.prop2}` })
         }]
       },
     ),
@@ -507,7 +507,7 @@ export const schema = traverse(
   {
     builders: [{
       asserts: [{ predicate: (obj, context) => context.state.prop1 !== "hello", error: "prop1 cannot be hello" }],
-      get: (obj, context) => ({ prop1: context.state.prop1 + " world" })
+      get: context => ({ prop1: context.state.prop1 + " world" })
     }]
   }
 )
@@ -530,7 +530,7 @@ export const schema = traverse(
   {
     builders: [{
       predicates: [{ predicate: (obj, context) => context.state.prop1 !== "hello", message: "prop1 cannot be hello" }],
-      get: (obj, context) => ({ prop1: context.state.prop1 + " world" })
+      get: context => ({ prop1: context.state.prop1 + " world" })
     }]
   }
 )

@@ -30,15 +30,17 @@ export default function(
     parents: Array<any>,
     parentKeys: Array<string>
   ) {
-    function mergeResult(finished, state) {
+    function mergeResult(finished, context) {
       const { result, params } = finished;
       return result instanceof Match
-        ? !(result instanceof Empty) ? { state: result.value } : { state }
+        ? !(result instanceof Empty)
+            ? { context: { ...context, state: result.value } }
+            : { context }
         : { nonMatch: result };
     }
 
     function getTask(builder) {
-      const task = function fn(state) {
+      const task = function fn(context) {
         const readyToRun =
           !builder.precondition ||
           builder.precondition(obj, key, parents, parentKeys);
@@ -72,24 +74,13 @@ export default function(
                 Seq.of(predicates.concat(assertions))
                   .map(
                     predicate =>
-                      (predicate.fn(
-                        obj,
-                        key,
-                        parents,
-                        parentKeys
-                      )
+                      (predicate.fn(obj, key, parents, parentKeys)
                         ? undefined
                         : predicate.invalid())
                   )
                   .first(x => typeof x !== "undefined") ||
                 (() => {
-                  const result = builder.get(
-                    obj,
-                    { ...context, state },
-                    key,
-                    parents,
-                    parentKeys
-                  );
+                  const result = builder.get(context);
                   return [Match, Skip, Fault].some(
                     resultType => result instanceof resultType
                   )
@@ -107,15 +98,27 @@ export default function(
       return { task, type: "reconcile" };
     }
 
-    function run(tasksList, currentState) {
+    function run(tasksList, currentContext) {
       const [[tasks, merge], ...rest] = tasksList;
 
       const { pending, result } = Seq.of(tasks).reduce(
         (acc, { task, type, params }) =>
+          (() => {
+            if (acc.result.context === undefined) {
+              debugger;
+            }
+            if (
+              typeof task !== "function" &&
+              merge({ result: task, params }, acc.result.context).context ===
+                undefined
+            ) {
+              debugger;
+            }
+          })() ||
           (typeof task === "function"
             ? {
                 pending: acc.pending.concat({
-                  task: task(acc.result.state),
+                  task: task(acc.result.context),
                   type,
                   params
                 }),
@@ -123,28 +126,29 @@ export default function(
               }
             : {
                 pending: acc.pending,
-                result: merge({ result: task, params }, acc.result.state)
+                result: merge({ result: task, params }, acc.result.context)
               }),
         {
           pending: [],
-          result: { state: currentState, nonMatch: undefined }
+          result: { context: currentContext }
         },
         (acc, item) => typeof acc.result.nonMatch !== "undefined"
       );
 
-      const { state, nonMatch } = result;
+      const { context, nonMatch } = result;
 
-      debugger;
+      //debugger;
+
       return nonMatch
         ? nonMatch
         : pending.length
-            ? () => run([[pending, merge], ...rest], state)
+            ? () => run([[pending, merge], ...rest], context)
             : rest.length
-                ? () => run(rest, state)
-                : typeof state === "undefined"
+                ? () => run(rest, context)
+                : typeof context.state === "undefined"
                     ? new Empty({ obj, key, parents, parentKeys }, meta)
                     : new Match(
-                        state,
+                        context.state,
                         {
                           obj,
                           key,
@@ -163,7 +167,7 @@ export default function(
           { obj, key, parents, parentKeys },
           meta
         )
-      : () => {
+      : (context: any) => {
           const tasks = Seq.of(params.builders)
             .map(builder => getTask(builder))
             .toArray();
@@ -174,7 +178,7 @@ export default function(
             [tasks, mergeResult]
           ];
 
-          return run(allTasks, context.state);
+          return run(allTasks, context || {});
         };
   };
 }
