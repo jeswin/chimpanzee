@@ -143,15 +143,11 @@ export default function(
             : rest.length
                 ? () => run(rest, state)
                 : typeof state === "undefined"
-                    ? new Empty(
-                        { obj, key, parents, parentKeys },
-                        meta
-                      )
+                    ? new Empty({ obj, key, parents, parentKeys }, meta)
                     : new Match(
                         state,
                         {
                           obj,
-                          context: { ...context, state },
                           key,
                           parents,
                           parentKeys

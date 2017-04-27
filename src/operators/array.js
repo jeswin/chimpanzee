@@ -194,7 +194,7 @@ export function array(schemas: Array<Schema>, rawParams: RawSchemaParamsType) {
                         { obj, key, parents, parentKeys },
                         meta
                       ))
-          )(obj, { parent: context }, key, parents, parentKeys);
+          )(obj, key, parents, parentKeys);
         })(schemas, [], 0)
       : new Fault(
           `Expected array but got ${typeof obj}.`,
