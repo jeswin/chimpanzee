@@ -40,61 +40,46 @@ export default function(
     }
 
     function getTask(builder) {
-      const task = function fn(context) {
-        const readyToRun =
-          !builder.precondition ||
-          builder.precondition(obj, key, parents, parentKeys);
-        return readyToRun
-          ? (() => {
-              const predicates = !builder.predicates
-                ? []
-                : builder.predicates.map(p => ({
-                    fn: p.predicate,
-                    invalid: () =>
-                      new Skip(
-                        p.message || `Predicate returned false.`,
-                        { obj, key, parents, parentKeys },
-                        meta
-                      )
-                  }));
+      function task(context) {
+        const predicates = !builder.predicates
+          ? []
+          : builder.predicates.map(p => ({
+              fn: p.predicate,
+              invalid: () =>
+                new Skip(
+                  p.message || `Predicate returned false.`,
+                  { obj, key, parents, parentKeys },
+                  meta
+                )
+            }));
 
-              const assertions = !builder.asserts
-                ? []
-                : builder.asserts.map(a => ({
-                    fn: a.predicate,
-                    invalid: () =>
-                      new Fault(
-                        a.error,
-                        { obj, key, parents, parentKeys },
-                        meta
-                      )
-                  }));
+        const assertions = !builder.asserts
+          ? []
+          : builder.asserts.map(a => ({
+              fn: a.predicate,
+              invalid: () =>
+                new Fault(a.error, { obj, key, parents, parentKeys }, meta)
+            }));
 
-              return (
-                Seq.of(predicates.concat(assertions))
-                  .map(
-                    predicate =>
-                      (predicate.fn(obj, key, parents, parentKeys)
-                        ? undefined
-                        : predicate.invalid())
-                  )
-                  .first(x => typeof x !== "undefined") ||
-                (() => {
-                  const result = builder.get(context);
-                  return [Match, Skip, Fault].some(
-                    resultType => result instanceof resultType
-                  )
-                    ? result
-                    : new Match(
-                        result,
-                        { obj, key, parents, parentKeys },
-                        meta
-                      );
-                })()
-              );
-            })()
-          : fn;
-      };
+        return (
+          Seq.of(predicates.concat(assertions))
+            .map(
+              predicate =>
+                (predicate.fn(obj, key, parents, parentKeys)(context)
+                  ? undefined
+                  : predicate.invalid())
+            )
+            .first(x => typeof x !== "undefined") ||
+          (() => {
+            const result = builder.get(obj, key, parents, parentKeys)(context);
+            return [Match, Skip, Fault].some(
+              resultType => result instanceof resultType
+            )
+              ? result
+              : new Match(result, { obj, key, parents, parentKeys }, meta);
+          })()
+        );
+      }
       return { task, type: "reconcile" };
     }
 
@@ -179,7 +164,7 @@ export default function(
             [tasks, mergeResult]
           ];
 
-          return run(allTasks, context || {});
+          return run(allTasks, context);
         };
   };
 }

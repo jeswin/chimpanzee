@@ -15,7 +15,6 @@ describe("chimpanzee", () => {
       global.__chimpanzeeTestContext = [];
       const fixture = require(`./fixtures/${dir}/fixture`);
       const actual = match(fixture.schema, fixture.input);
-      console.log(actual);
       const expected = require(`./fixtures/${dir}/expected`);
       if (resultType === "match") {
         actual.should.be.an.instanceOf(Match);
@@ -63,11 +62,11 @@ describe("chimpanzee", () => {
     ["array-mixed", "array-mixed", "match"],
     ["bool", "bool", "match"],
     ["bool-negative", "bool-negative", "skip"],
-    //["builder-assert", "builder-assert", "fault"],
+    ["builder-assert", "builder-assert", "fault"],
     ["builder-get-fault", "builder-get-fault", "fault"],
     ["builder-get-match", "builder-get-match", "match"],
     ["builder-get-skip", "builder-get-skip", "skip"],
-    //["builder-predicate", "builder-predicate", "skip"],
+    ["builder-predicate", "builder-predicate", "skip"],
     ["capture-if", "capture-if", "match"],
     ["capture-if-negative", "capture-if-negative", "skip"],
     ["capture-parent-child", "capture-parent-child", "match"],
@@ -113,10 +112,8 @@ describe("chimpanzee", () => {
     ["object-negative", "object-negative", "skip"],
     ["optional", "optional", "match"],
     ["optional-fault", "optional-fault", "fault"],
-    // ["precondition", "precondition", "match"],
     ["property-modifier", "property-modifier", "match"],
     ["property-modifier-skip", "property-modifier-skip", "match"],
-    // ["reference-parent-state", "reference-parent-state", "match"],
     ["regex", "regex", "match"],
     ["regex-negative", "regex-negative", "skip"],
     ["string", "string", "match"],

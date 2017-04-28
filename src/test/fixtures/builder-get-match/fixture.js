@@ -11,7 +11,7 @@ export const schema = traverse(
   {
     builders: [
       {
-        get: context => new Match("We matched it!")
+        get: () => context => new Match("We matched it!")
       }
     ]
   }

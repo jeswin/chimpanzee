@@ -458,40 +458,6 @@ const schema = traverse({
 ### Builders
 Advanced features which let you:
 - modify the result of the capture (builder.get)
-- Pause traversing until another subtree finishes (builder.precondition)
-
-In the following example, level1 matching waits until level2 is complete (builder.precondition).
-And then proceeds to build the result of level1 (builder.get).
-
-```
-export const input = {
-  level1: {
-    prop1: "hello",
-  },
-  level2: {
-    prop2: "world"
-  }
-}
-
-export const schema = traverse(
-  {
-    level1: traverse(
-      {
-        prop1: capture()
-      },
-      {
-        builders: [{
-          precondition: (obj, context) => context.parent.state && context.parent.state.prop2,
-          get: context => ({ prop3: `${context.state.prop1} ${context.parent.state.prop2}` })
-        }]
-      },
-    ),
-    level2: {
-      prop2: capture(),
-    },
-  }
-)
-```
 
 ### Builder Asserts
 Generates a Fault which will stop the matching on the tree.

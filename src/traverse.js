@@ -45,14 +45,16 @@ export function traverse(schema: SchemaType, rawParams: RawSchemaParamsType) {
       t => t.params && t.params.defer
     );
 
-    const mergeChildResult = (finished, context) => childReconciler.mergeChildResult(finished, context);
+    const mergeChildResult = (finished, context) =>
+      childReconciler.mergeChildResult(finished, context);
 
-    return reconcile(
-      params,
-      [immediateChildTasks, deferredChildTasks],
-      mergeChildResult,
-      meta
-    )(obj, key, parents, parentKeys);
+    return context =>
+      reconcile(
+        params,
+        [immediateChildTasks, deferredChildTasks],
+        mergeChildResult,
+        meta
+      )(obj, key, parents, parentKeys)({});
   }
 
   return new Schema(fn, params);

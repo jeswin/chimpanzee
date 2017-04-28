@@ -18,7 +18,7 @@ export const schema = composite(
   [{ name: "default", modifiers: { object: x => x.node } }, { name: "alt" }],
   {
     builders: [
-      { get: context => ({ ...context.state, third: "yaaay" }) }
+      { get: () => context => ({ ...context.state, third: "yaaay" }) }
     ]
   }
 );
