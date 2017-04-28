@@ -26,7 +26,7 @@ export const schema = traverse({
     level2a: deep(
       traverse({
         level5a: {
-          prop3: obj => new Fault("SCHEMA has a fault.")
+          prop3: obj => context => new Fault("SCHEMA has a fault.")
         }
       }),
       "prop1"

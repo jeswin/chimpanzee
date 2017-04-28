@@ -7,7 +7,7 @@ export const input = {
 };
 
 const schema1 = traverse({
-  level4: obj => new Fault("SCHEMA1 has a Fault.")
+  level4: obj => context => new Fault("SCHEMA1 has a Fault.")
 });
 
 const schema2 = traverse({
