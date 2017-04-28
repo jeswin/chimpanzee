@@ -13,6 +13,6 @@ export const input = {
 export const schema = traverse({
   level1: {
     prop1: capture(),
-    prop2: optional(obj => new Fault("SCHEMA has a fault."))
+    prop2: optional(obj => context => new Fault("SCHEMA has a fault."))
   }
 });
