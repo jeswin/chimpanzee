@@ -77,7 +77,7 @@ export function composite(
                 : result)
           )(obj, key, parents, parentKeys);
         })(schemas, {})
-      : new Empty(env, meta);
+      : context => new Empty(env, meta);
 
   }
 

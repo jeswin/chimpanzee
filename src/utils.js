@@ -56,7 +56,8 @@ export function waitForSchema(
       const schemaFn = typeof schema === "function"
         ? schema
         : schema instanceof Schema ? schema.fn : traverse(schema).fn;
-      return loop(schemaFn(obj, key, parents, parentKeys));
+      console.log(schemaFn);
+      return loop(context => schemaFn(obj, key, parents, parentKeys)(context));
     }
     return next(schema);
   };

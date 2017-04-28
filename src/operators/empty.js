@@ -7,8 +7,8 @@ export function empty() {
 
   function fn(obj, key, parents, parentKeys) {
     return obj === undefined
-      ? new Empty({ obj, key, parents, parentKeys }, meta)
-      : new Skip(
+      ? context => new Empty({ obj, key, parents, parentKeys }, meta)
+      : context => new Skip(
           "Not empty.",
           { obj, key, parents, parentKeys },
           meta

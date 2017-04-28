@@ -23,8 +23,8 @@ export function exists(predicate: PredicateType, schema: SchemaType) : SchemaTyp
     return predicate(obj)
       ? schema
           ? waitForSchema(schema)(obj, key, parents, parentKeys)
-          : new Empty({ obj, key, parents, parentKeys }, meta)
-      : new Skip(
+          : context => new Empty({ obj, key, parents, parentKeys }, meta)
+      : context => new Skip(
           "Does not exist.",
           { obj, key, parents, parentKeys },
           meta

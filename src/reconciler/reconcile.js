@@ -162,11 +162,12 @@ export default function(
     const mustRun = !params.predicate || params.predicate(obj);
 
     return !mustRun
-      ? new Skip(
-          `Predicate returned false.`,
-          { obj, key, parents, parentKeys },
-          meta
-        )
+      ? context =>
+          new Skip(
+            `Predicate returned false.`,
+            { obj, key, parents, parentKeys },
+            meta
+          )
       : (context: any) => {
           const tasks = Seq.of(params.builders)
             .map(builder => getTask(builder))

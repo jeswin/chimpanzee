@@ -32,7 +32,7 @@ export default function(schema: ArraySchemaType, params: SchemaParamsType) {
                 )
               : Seq.of(schema)
                   .map((rhs, i) => ({
-                    task: state =>
+                    task: context =>
                       traverse(
                         rhs,
                         {
@@ -45,7 +45,6 @@ export default function(schema: ArraySchemaType, params: SchemaParamsType) {
                         false
                       ).fn(
                         obj[i],
-                        { parent: context, state },
                         `${key}.${i}`,
                         parents.concat(originalObj),
                         parentKeys.concat(key)
