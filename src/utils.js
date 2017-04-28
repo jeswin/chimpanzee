@@ -53,7 +53,7 @@ export function waitForSchema(
     function next(schema) {
       function loop(task) {
         return typeof task === "function"
-          ? context => loop(task(context))
+          ? (context: ContextType) => loop(task(context))
           : then(task);
       }
 

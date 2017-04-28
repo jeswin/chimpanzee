@@ -1,9 +1,10 @@
 //export type ResultGenerator =
 import Schema from "./schema";
+import Result from "./results/result";
 
 export type PredicateType = (obj: any) => boolean;
 
-export type ResultGeneratorType = ResultType | (() => ResultGeneratorType);
+export type ResultGeneratorType = Result | (() => ResultGeneratorType);
 
 export type ContextType = {
   parent?: ContextType,
@@ -45,7 +46,7 @@ export type SchemaParamsType = {
   }
 };
 
-export type ResultTransformType = (result: ResultType) => ResultGeneratorType;
+export type ResultTransformType = (result: Result) => ResultGeneratorType;
 
 export type SchemaInvocationFnType = (
   obj: Object,
@@ -66,3 +67,7 @@ export type MetaType = {
   schema: SchemaType,
   params: SchemaParamsType
 };
+
+export type MergeResultType = { context: ContextType } | { nonMatch: Skip | Fault }
+
+export type TaskType = (context: ContextType) => Result;

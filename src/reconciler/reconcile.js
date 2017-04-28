@@ -10,15 +10,15 @@ import type {
   SchemaParamsType,
   ResultGeneratorType,
   EnvType,
-  MetaType
+  MetaType,
+  MergeResultType,
+  TaskType
 } from "../types";
-
-import type { TaskType } from "../traverse";
 
 export default function(
   params: SchemaParamsType,
   [immediateChildTasks, deferredChildTasks]: [Array<TaskType>, Array<TaskType>],
-  mergeChildResult,
+  mergeChildResult: (finished: any, context: ContextType) => MergeResultType,
   meta: MetaType
 ) {
   immediateChildTasks = immediateChildTasks || [];
@@ -83,23 +83,16 @@ export default function(
       return { task, type: "reconcile" };
     }
 
-    function run(tasksList, currentContext) {
+    type TaskReduceResultType = {
+      pending: Array<ResultGeneratorType>,
+      result: MergeResultType
+    };
+
+    function run(tasksList, currentContext: ContextType) {
       const [[tasks, merge], ...rest] = tasksList;
 
-      const { pending, result } = Seq.of(tasks).reduce(
-        (acc, { task, type, params }) =>
-          (() => {
-            if (acc.result.context === undefined) {
-              debugger;
-            }
-            if (
-              typeof task !== "function" &&
-              merge({ result: task, params }, acc.result.context).context ===
-                undefined
-            ) {
-              debugger;
-            }
-          })() ||
+      const { pending, result }: TaskReduceResultType = Seq.of(tasks).reduce(
+        (acc: TaskReduceResultType, { task, type, params }) =>
           (typeof task === "function"
             ? {
                 pending: acc.pending.concat({
@@ -117,12 +110,10 @@ export default function(
           pending: [],
           result: { context: currentContext }
         },
-        (acc, item) => typeof acc.result.nonMatch !== "undefined"
+        (acc: TaskReduceResultType) => typeof acc.result.nonMatch !== "undefined"
       );
 
       const { context, nonMatch } = result;
-
-      //debugger;
 
       return nonMatch
         ? nonMatch
@@ -147,7 +138,7 @@ export default function(
     const mustRun = !params.predicate || params.predicate(obj);
 
     return !mustRun
-      ? context =>
+      ? (context: ContextType) =>
           new Skip(
             `Predicate returned false.`,
             { obj, key, parents, parentKeys },

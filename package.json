@@ -8,7 +8,7 @@
   },
   "main": "dist/chimpanzee.js",
   "dependencies": {
-    "lazily": "0.0.12"
+    "lazily": "0.0.15"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -18,7 +18,7 @@
     "babel-preset-latest": "^6.22.0",
     "babel-preset-modern-browsers": "^8.0.0",
     "babel-preset-stage-2": "^6.22.0",
-    "flow-bin": "^0.44.2",
+    "flow-bin": "^0.45.0",
     "mocha": "*",
     "should": "*",
     "source-map-support": "^0.4.8"
