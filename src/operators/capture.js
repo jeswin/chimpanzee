@@ -38,17 +38,11 @@ export function modify<T>(
   );
 }
 
-export function captureAndTraverse(
-  schema: Schema,
-  params: RawSchemaParamsType
-) {
+export function captureAndTraverse(schema: Schema, params: RawSchemaParamsType) {
   return take(obj => typeof obj !== "undefined", schema, params);
 }
 
-export function literal(
-  what: NativeTypeSchemaType,
-  params: RawSchemaParamsType
-): TaskType {
+export function literal(what: NativeTypeSchemaType, params: RawSchemaParamsType): TaskType {
   return take(x => x === what, undefined, params, {
     skipMessage: x => `Expected value to be ${what} but got ${x.toString()}.`
   });
@@ -64,42 +58,43 @@ export function take<T, TOut>(
   const params = getDefaultParams(rawParams);
 
   function fn(obj, key, parents, parentKeys) {
-    return context =>
-      (predicate(obj)
-        ? typeof schema !== "undefined"
-            ? (() => {
-                const result = parseWithSchema(schema, meta)(
-                  obj,
-                  key,
-                  parents,
-                  parentKeys
-                )(context);
+    return [
+      {
+        task: context =>
+          (predicate(obj)
+            ? typeof schema !== "undefined"
+                ? (() => {
+                    const result = parseWithSchema(schema, meta)(obj, key, parents, parentKeys)(
+                      context
+                    );
 
-                return result instanceof Match
-                  ? new Match(
-                      {
-                        ...obj,
-                        ...result.value
-                      },
-                      { obj, key, parents, parentKeys },
-                      meta
-                    )
-                  : result instanceof Skip
-                      ? new Skip(
-                          "Capture failed in inner schema.",
+                    return result instanceof Match
+                      ? new Match(
+                          {
+                            ...obj,
+                            ...result.value
+                          },
                           { obj, key, parents, parentKeys },
                           meta
                         )
-                      : result; //Fault
-              })()
-            : new Match(obj, { obj, key, parents, parentKeys }, meta)
-        : new Skip(
-            options.skipMessage
-              ? options.skipMessage(obj)
-              : `Predicate returned false. Predicate was ${predicate.toString()}`,
-            { obj, key, parents, parentKeys },
-            meta
-          ));
+                      : result instanceof Skip
+                          ? new Skip(
+                              "Capture failed in inner schema.",
+                              { obj, key, parents, parentKeys },
+                              meta
+                            )
+                          : result; //Fault
+                  })()
+                : new Match(obj, { obj, key, parents, parentKeys }, meta)
+            : new Skip(
+                options.skipMessage
+                  ? options.skipMessage(obj)
+                  : `Predicate returned false. Predicate was ${predicate.toString()}`,
+                { obj, key, parents, parentKeys },
+                meta
+              ))
+      }
+    ];
   }
 
   return new Schema(fn, params);

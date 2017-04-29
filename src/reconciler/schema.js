@@ -20,24 +20,15 @@ export default function(schema: Schema, params: SchemaParamsType) {
     parentKeys: Array<string>
   ) {
     return function(obj: any, meta: MetaType) {
-      function getChildTasks() {
-        return [
-          {
-            task: context => schema.fn(obj, key, parents, parentKeys)(context),
-            type: "schema",
-            params: schema.params
-          }
-        ];
-      }
+      const common = external(schema, params)(originalObj, key, parents, parentKeys)(obj, meta);
 
-      const common = external(schema, params)(
-        originalObj,
-        key,
-        parents,
-        parentKeys
-      )(obj, meta);
-
-      return { getChildTasks, mergeChildResult: common.mergeChildResult };
+      return [
+        {
+          task: schema.fn(obj, key, parents, parentKeys),
+          merge: common.mergeChildResult,
+          params: schema.params
+        }
+      ];
     };
   };
 }

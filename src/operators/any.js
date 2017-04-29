@@ -20,33 +20,31 @@ export function any(
     parents: Array<any>,
     parentKeys: Array<string>
   ): TaskType<any> {
-    return context =>
-      (function run(
-        schemas: Array<Schema<any>>,
-        nonMatching: Array<Schema<any>>
-      ) {
-        const result = parseWithSchema(schemas[0], meta)(
-          obj,
-          key,
-          parents,
-          parentKeys
-        )(context);
-        return result instanceof Match || result instanceof Fault
-          ? result
-          : schemas.length > 1
-              ? run(schemas.slice(1), nonMatching.concat(schemas[0]))
-              : new Skip(
-                  "None of the items matched.",
-                  {
-                    obj,
-                    key,
-                    parents,
-                    parentKeys,
-                    nonMatching: nonMatching.concat(schemas[0])
-                  },
-                  meta
-                );
-      })(schemas, []);
+    return [
+      {
+        task: context =>
+          (function run(schemas: Array<Schema<any>>, nonMatching: Array<Schema<any>>) {
+            const result = parseWithSchema(schemas[0], meta)(obj, key, parents, parentKeys)(
+              context
+            );
+            return result instanceof Match || result instanceof Fault
+              ? result
+              : schemas.length > 1
+                  ? run(schemas.slice(1), nonMatching.concat(schemas[0]))
+                  : new Skip(
+                      "None of the items matched.",
+                      {
+                        obj,
+                        key,
+                        parents,
+                        parentKeys,
+                        nonMatching: nonMatching.concat(schemas[0])
+                      },
+                      meta
+                    );
+          })(schemas, [])
+      }
+    ];
   }
 
   return new Schema(fn, params);

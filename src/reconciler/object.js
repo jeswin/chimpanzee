@@ -3,6 +3,7 @@ import { Seq } from "lazily";
 import { traverse } from "../traverse";
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
+import { makeSchema, parseWithSchema } from "../utils";
 
 import type {
   ContextType,
@@ -22,76 +23,6 @@ export default function(schema: Object, params: SchemaParamsType) {
     parentKeys: Array<string>
   ) {
     return function(obj: any, meta: MetaType) {
-      function getChildTasks() {
-        return typeof obj !== "undefined"
-          ? Seq.of(Object.keys(schema)).map(childKey => {
-              const childSchema = schema[childKey];
-              const childUnmodified = (childSchema.params &&
-                childSchema.params.unmodified) || {
-                object: false,
-                property: false
-              };
-
-              const childItem = childUnmodified.object
-                ? childUnmodified.property
-                    ? originalObj[childKey]
-                    : params.modifiers.propertyOnUnmodified
-                        ? params.modifiers.propertyOnUnmodified(
-                            originalObj,
-                            childKey
-                          )
-                        : params.modifiers.property
-                            ? params.modifiers.property(originalObj, childKey)
-                            : originalObj[childKey]
-                : childUnmodified.property
-                    ? obj[childKey]
-                    : params.modifiers.property
-                        ? params.modifiers.property(obj, childKey)
-                        : obj[childKey];
-
-              const childSchemaIsObject =
-                getSchemaType(childSchema) === "object";
-
-              return {
-                task: context =>
-                  traverse(
-                    childSchema,
-                    {
-                      value: params.value,
-                      modifiers: {
-                        property: params.modifiers.property,
-                        value: params.modifiers.value
-                      }
-                    },
-                    true
-                  ).fn(
-                    childItem,
-                    childKey,
-                    parents.concat(originalObj),
-                    parentKeys.concat(key)
-                  )(context),
-                type: "object",
-                params: childSchema.params
-                  ? {
-                      ...childSchema.params,
-                      key: childSchema.params.key || childKey,
-                      isObject: childSchemaIsObject
-                    }
-                  : { key: childKey, isObject: childSchemaIsObject }
-              };
-            })
-          : [
-              {
-                task: context => new Skip(
-                  `Cannot traverse undefined.`,
-                  { obj, key, parents, parentKeys },
-                  meta
-                ),
-                type: "object"
-              }
-            ];
-      }
-
       /*
       Child tasks of objects will always return an object.
       Which will need to be spread.
@@ -123,7 +54,62 @@ export default function(schema: Object, params: SchemaParamsType) {
           : { nonMatch: result };
       }
 
-      return { getChildTasks, mergeChildResult };
+      return typeof obj !== "undefined"
+        ? Seq.of(Object.keys(schema)).map(childKey => {
+            const childSchema = schema[childKey];
+            const childUnmodified = (childSchema.params && childSchema.params.unmodified) || {
+              object: false,
+              property: false
+            };
+
+            const childItem = childUnmodified.object
+              ? childUnmodified.property
+                  ? originalObj[childKey]
+                  : params.modifiers.propertyOnUnmodified
+                      ? params.modifiers.propertyOnUnmodified(originalObj, childKey)
+                      : params.modifiers.property
+                          ? params.modifiers.property(originalObj, childKey)
+                          : originalObj[childKey]
+              : childUnmodified.property
+                  ? obj[childKey]
+                  : params.modifiers.property
+                      ? params.modifiers.property(obj, childKey)
+                      : obj[childKey];
+
+            const childSchemaIsObject = getSchemaType(childSchema) === "object";
+
+            const schema = makeSchema(childSchema, {
+              value: params.value,
+              modifiers: {
+                property: params.modifiers.property,
+                value: params.modifiers.value
+              }
+            });
+
+            return {
+              task: context =>
+                parseWithSchema(schema)(
+                  childItem,
+                  childKey,
+                  parents.concat(originalObj),
+                  parentKeys.concat(key)
+                )(context),
+              merge: mergeChildResult,
+              params: childSchema.params
+                ? {
+                    ...childSchema.params,
+                    key: childSchema.params.key || childKey,
+                    isObject: childSchemaIsObject
+                  }
+                : { key: childKey, isObject: childSchemaIsObject }
+            };
+          })
+        : [
+            {
+              task: context =>
+                new Skip(`Cannot traverse undefined.`, { obj, key, parents, parentKeys }, meta)
+            }
+          ];
     };
   };
 }

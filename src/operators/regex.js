@@ -4,12 +4,7 @@ import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { getDefaultParams, parseWithSchema } from "../utils";
 
-import type {
-  ContextType,
-  RawSchemaParamsType,
-  SchemaParamsType,
-  TaskType
-} from "../types";
+import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
 
 export function regex(
   regex: string | RegExp,
@@ -19,24 +14,24 @@ export function regex(
   const params = getDefaultParams(rawParams);
 
   function fn(obj, key, parents, parentKeys) {
-    return context => {
-      const result = parseWithSchema(
-        captureIf(
-          obj =>
-            (typeof regex === "string"
-              ? typeof obj === "string" && new RegExp(regex).test(obj)
-              : typeof obj === "string" && regex.test(obj))
-        ),
-        meta
-      )(obj, key, parents, parentKeys)(context);
-      return result instanceof Skip
-        ? new Skip(
-            `Did not match regex.`,
-            { obj, key, parents, parentKeys },
+    return [
+      {
+        task: context => {
+          const result = parseWithSchema(
+            captureIf(
+              obj =>
+                (typeof regex === "string"
+                  ? typeof obj === "string" && new RegExp(regex).test(obj)
+                  : typeof obj === "string" && regex.test(obj))
+            ),
             meta
-          )
-        : result;
-    };
+          )(obj, key, parents, parentKeys)(context);
+          return result instanceof Skip
+            ? new Skip(`Did not match regex.`, { obj, key, parents, parentKeys }, meta)
+            : result;
+        }
+      }
+    ];
   }
 
   return new Schema(fn, params);

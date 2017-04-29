@@ -18,14 +18,11 @@ import type {
 
 export function traverse(schema: Schema, rawParams: RawSchemaParamsType) {
   const meta = { type: "traverse", schema, params: rawParams };
-  const params = getDefaultParams(rawParams);
-
+  const params = { ...getDefaultParams(rawParams), wrapped: true };
   const schemaType = getSchemaType(schema);
 
   function fn(originalObj, key, parents, parentKeys) {
-    const obj = params.modifiers.object
-      ? params.modifiers.object(originalObj)
-      : originalObj;
+    const obj = params.modifiers.object ? params.modifiers.object(originalObj) : originalObj;
 
     const childReconciler = getReconciler(schemaType)(schema, params)(
       originalObj,
@@ -37,14 +34,8 @@ export function traverse(schema: Schema, rawParams: RawSchemaParamsType) {
     const childTasks = childReconciler.getChildTasks();
 
     function sortFn(task1, task2) {
-      const task1Order = task1.params && task1.params.order
-        ? task1.params.order
-        : 0;
-
-      const task2Order = task2.params && task2.params.order
-        ? task2.params.order
-        : 0;
-
+      const task1Order = task1.params && task1.params.order ? task1.params.order : 0;
+      const task2Order = task2.params && task2.params.order ? task2.params.order : 0;
       return task1Order - task2Order;
     }
 
@@ -52,20 +43,9 @@ export function traverse(schema: Schema, rawParams: RawSchemaParamsType) {
       .filter(t => !t.params || !t.params.defer)
       .sort(sortFn);
 
-    const deferredChildTasks = childTasks
-      .filter(t => t.params && t.params.defer)
-      .sort(sortFn);
+    const deferredChildTasks = childTasks.filter(t => t.params && t.params.defer).sort(sortFn);
 
-    const mergeChildResult = (finished, context) =>
-      childReconciler.mergeChildResult(finished, context);
-
-    return context =>
-      reconcile(
-        params,
-        [immediateChildTasks, deferredChildTasks],
-        mergeChildResult,
-        meta
-      )(obj, key, parents, parentKeys)(params.reuseContext ? context : {});
+    return immediateChildTasks.concat(deferredChildTasks);
   }
 
   return new Schema(fn, params);

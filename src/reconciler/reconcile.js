@@ -15,13 +15,10 @@ import type {
 
 export default function(
   params: SchemaParamsType,
-  [immediateChildTasks, deferredChildTasks]: [Array<TaskType>, Array<TaskType>],
+  tasks: Array<TaskType>,
   mergeChildResult: (finished: any, context: ContextType) => MergeResultType,
   meta: MetaType
 ) {
-  immediateChildTasks = immediateChildTasks || [];
-  deferredChildTasks = deferredChildTasks || [];
-
   return function(
     obj: any,
     key: string,
@@ -122,8 +119,7 @@ export default function(
           )
         : (() => {
             const allTasks = [
-              [immediateChildTasks, mergeChildResult],
-              [deferredChildTasks, mergeChildResult],
+              [tasks, mergeChildResult],
               [[getTask()], mergeResult]
             ];
 

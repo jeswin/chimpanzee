@@ -5,12 +5,7 @@ import Schema from "../schema";
 import { Seq } from "lazily";
 import { getDefaultParams, parseWithSchema } from "../utils";
 
-import type {
-  ContextType,
-  RawSchemaParamsType,
-  SchemaParamsType,
-  TaskType
-} from "../types";
+import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
 
 function getSchema(schema: Schema, paramSelector: string): Schema {
   const schemaSelector = schema.params && schema.params.selector
@@ -18,9 +13,7 @@ function getSchema(schema: Schema, paramSelector: string): Schema {
     : "default";
 
   return Array.isArray(schema)
-    ? schema
-        .map(item => getSchema(item, paramSelector))
-        .filter(x => x !== undefined)
+    ? schema.map(item => getSchema(item, paramSelector)).filter(x => x !== undefined)
     : schema instanceof Schema
         ? schemaSelector === paramSelector ? schema : undefined
         : typeof schema === "object"
@@ -56,30 +49,31 @@ export function composite<T>(
   );
 
   function fn(obj, key, parents, parentKeys) {
-    return context => {
-      const env = { obj, key, parents, parentKeys };
+    return [
+      {
+        task: context => {
+          const env = { obj, key, parents, parentKeys };
 
-      function merge(state, result) {
-        return { ...state, ...result.value };
+          function merge(state, result) {
+            return { ...state, ...result.value };
+          }
+
+          return schemas.length
+            ? (function run(schemas, state) {
+                const result = parseWithSchema(schemas[0], meta)(obj, key, parents, parentKeys)(
+                  context
+                );
+                return result instanceof Match
+                  ? schemas.length > 1
+                      ? run(schemas.slice(1), merge(state, result))
+                      : new Match(merge(state, result), env, meta)
+                  : result;
+              })(schemas, {})
+            : new Empty(env, meta);
+        }
       }
-
-      return schemas.length
-        ? (function run(schemas, state) {
-            const result = parseWithSchema(schemas[0], meta)(
-              obj,
-              key,
-              parents,
-              parentKeys
-            )(context);
-            return result instanceof Match
-              ? schemas.length > 1
-                  ? run(schemas.slice(1), merge(state, result))
-                  : new Match(merge(state, result), env, meta)
-              : result;
-          })(schemas, {})
-        : new Empty(env, meta);
-    };
+    ];
   }
 
-  return traverse(fn, ownParams);
+  return new Schema(fn, ownParams);
 }

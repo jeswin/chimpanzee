@@ -2,6 +2,7 @@
 import { traverse } from "./traverse";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
+import reconcile from "./reconciler/reconcile";
 
 import type {
   ContextType,
@@ -22,9 +23,7 @@ export function getSchemaType(schema: Schema): string {
                 : typeof schema === "object" ? "object" : typeof schema;
 }
 
-export function getDefaultParams(
-  rawParams?: string | RawSchemaParamsType
-): SchemaParamsType {
+export function getDefaultParams(rawParams?: string | RawSchemaParamsType): SchemaParamsType {
   const params: SchemaParamsType = typeof rawParams === "string"
     ? { key: rawParams }
     : rawParams || {};
@@ -46,35 +45,21 @@ function mergeChildResult(
     : { nonMatch: result };
 }
 
-export function parseWithSchema(schema: Schema, meta) {
-  return function(
-    obj: any,
-    key: string,
-    parents: Array<any>,
-    parentKeys: Array<string>
-  ) {
-    const { fn, params } = typeof schema === "function"
-      ? { fn: schema, params: getDefaultParams() }
-      : schema instanceof Schema
-          ? { fn: schema.fn, params: schema.params }
-          : { fn: traverse(schema).fn, params: getDefaultParams() };
+export function makeSchema(schema, params) {
+  return typeof schema === "function"
+    ? new Schema(schema, params || getDefaultParams())
+    : schema instanceof Schema
+        ? schema
+        : traverse(schema, { ...(params || getDefaultParams()) });
+}
 
-    const immediateTasks = [
-      {
-        task: context => fn(obj, key, parents, parentKeys)(context),
-        type: "operator",
-        params
-      }
-    ];
-
+export function parseWithSchema(_schema: Schema, meta) {
+  return function(obj: any, key: string, parents: Array<any>, parentKeys: Array<string>) {
+    const schema = makeSchema(_schema);
+    const tasks = schema.fn(obj, key, parents, parentKeys);
     return context =>
-      reconcile(params, [immediateTasks], mergeChildResult, meta)(
-        obj,
-        key,
-        parents,
-        parentKeys
-      )(params.reuseContext ? context : {});
-
-    //return schemaFn(obj, key, parents, parentKeys)(context);
+      reconcile(schema.params, tasks, mergeChildResult, meta)(obj, key, parents, parentKeys)(
+        schema.params.reuseContext ? context : {}
+      );
   };
 }

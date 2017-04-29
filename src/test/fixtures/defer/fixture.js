@@ -21,6 +21,15 @@ export const schema = traverse({
     { prop2: capture() },
     { build: () => ({ state }) => ({ ...state, counter: counter++ }) }
   ),
+  // world: traverse(
+  //   { prop2: capture() },
+  //   { build: () => ({ state }) => {
+  //     if (counter === 1) {
+  //       throw new Error();
+  //     }
+  //     return console.log("CALLED", counter) || ({ ...state, counter: counter++ }) }
+  //   }
+  // ),
   good: traverse(
     { prop3: capture() },
     { build: () => ({ state }) => ({ ...state, counter: counter++ }) }

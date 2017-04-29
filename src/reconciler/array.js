@@ -3,6 +3,7 @@ import { Seq } from "lazily";
 import { traverse } from "../traverse";
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
+import { makeSchema, parseWithSchema } from "../utils";
 
 import type {
   ContextType,
@@ -22,59 +23,9 @@ export default function(schema: ArraySchemaType, params: SchemaParamsType) {
     parentKeys: Array<string>
   ) {
     return function(obj: any, meta: MetaType) {
-      function getChildTasks() {
-        return Array.isArray(obj)
-          ? schema.length !== obj.length
-              ? [
-                  {
-                    task: () =>
-                      new Skip(
-                        `Expected array of length ${schema.length} but got ${obj.length}.`,
-                        { obj, key, parents, parentKeys },
-                        meta
-                      ),
-                    type: "array"
-                  }
-                ]
-              : Seq.of(schema)
-                  .map((rhs, i) => ({
-                    task: context =>
-                      traverse(
-                        rhs,
-                        {
-                          value: params.value,
-                          modifiers: {
-                            property: params.modifiers.property,
-                            value: params.modifiers.value
-                          }
-                        },
-                        false
-                      ).fn(
-                        obj[i],
-                        `${key}.${i}`,
-                        parents.concat(originalObj),
-                        parentKeys.concat(key)
-                      )(context),
-                    type: "array",
-                    params: schema.params
-                  }))
-                  .toArray()
-          : [
-              {
-                task: () =>
-                  new Skip(
-                    `Schema is an array but property is a non-array.`,
-                    { obj, key, parents, parentKeys },
-                    meta
-                  ),
-                type: "array"
-              }
-            ];
-      }
-
       /*
-      Array child tasks will always return an array.
-    */
+        Array child tasks will always return an array.
+      */
       function mergeChildResult(
         finished: { result: Result, params: SchemaParamsType },
         context: any
@@ -93,7 +44,49 @@ export default function(schema: ArraySchemaType, params: SchemaParamsType) {
           : { nonMatch: result };
       }
 
-      return { getChildTasks, mergeChildResult };
+      return Array.isArray(obj)
+        ? schema.length !== obj.length
+            ? [
+                {
+                  task: () =>
+                    new Skip(
+                      `Expected array of length ${schema.length} but got ${obj.length}.`,
+                      { obj, key, parents, parentKeys },
+                      meta
+                    )
+                }
+              ]
+            : Seq.of(schema)
+                .map((rhs, i) => {
+                  const schema = makeSchema(rhs, {
+                    value: params.value,
+                    modifiers: {
+                      property: params.modifiers.property,
+                      value: params.modifiers.value
+                    }
+                  });
+                  return {
+                    task: context =>
+                      parseWithSchema(schema)(
+                        obj[i],
+                        `${key}.${i}`,
+                        parents.concat(originalObj),
+                        parentKeys.concat(key)
+                      )(context),
+                    merge: mergeChildResult
+                  };
+                })
+                .toArray()
+        : [
+            {
+              task: () =>
+                new Skip(
+                  `Schema is an array but property is a non-array.`,
+                  { obj, key, parents, parentKeys },
+                  meta
+                )
+            }
+          ];
     };
   };
 }
