@@ -5,5 +5,5 @@ export const input = {
 };
 
 export const schema = traverse({
-  hello: item => new Match(`${item}!!!`)
+  hello: item => context => new Match(`${item}!!!`)
 });

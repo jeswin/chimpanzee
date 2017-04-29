@@ -5,6 +5,7 @@ import {
   array,
   bool,
   string,
+  Match,
   Skip,
   Fault
 } from "../../../chimpanzee";

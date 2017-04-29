@@ -67,7 +67,7 @@ export function repeatingItem<T>(
                 : completed(result, needle)
             : result instanceof Skip
                 ? completed(undefined, needle)
-                : { result, needle };
+                : { result, needle }; //Fault
         })(obj, [], needle))
   );
 }
@@ -94,7 +94,7 @@ export function unorderedItem<T>(_schema: Schema<T>): ArrayItem<T> {
           parentKeys
         )(context);
 
-        return result instanceof Match
+        return result instanceof Match || result instanceof Fault
           ? { result, needle }
           : items.length > i
               ? run(items, i + 1)
@@ -121,7 +121,7 @@ export function optionalItem<T>(_schema: Schema<T>): ArrayItem<T> {
 
   return new ArrayItem(needle => {
     return new Schema((obj, key, parents, parentKeys) => context => {
-      const result = parseWithSchema(schema(needle))(
+      const { result } = parseWithSchema(schema(needle))(
         obj,
         key,
         parents,

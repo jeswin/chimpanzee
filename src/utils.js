@@ -49,12 +49,10 @@ export function parseWithSchema(
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
-  ) => {
-    return context => {
-      const schemaFn = typeof schema === "function"
-        ? schema
-        : schema instanceof Schema ? schema.fn : traverse(schema).fn;
-      return then(schemaFn(obj, key, parents, parentKeys)(context));
-    };
+  ) => context => {
+    const schemaFn = typeof schema === "function"
+      ? schema
+      : schema instanceof Schema ? schema.fn : traverse(schema).fn;
+    return then(schemaFn(obj, key, parents, parentKeys)(context));
   };
 }
