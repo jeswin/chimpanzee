@@ -68,7 +68,7 @@ export function take<T, TOut>(
       (predicate(obj)
         ? typeof schema !== "undefined"
             ? (() => {
-                const result = parseWithSchema(schema)(
+                const result = parseWithSchema(schema, meta)(
                   obj,
                   key,
                   parents,

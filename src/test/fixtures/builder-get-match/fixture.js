@@ -9,10 +9,6 @@ export const schema = traverse(
     prop1: capture()
   },
   {
-    builders: [
-      {
-        get: () => context => new Match("We matched it!")
-      }
-    ]
+    build: () => context => new Match("We matched it!")
   }
 );

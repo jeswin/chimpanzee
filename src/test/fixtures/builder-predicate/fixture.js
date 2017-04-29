@@ -9,16 +9,12 @@ export const schema = traverse(
     prop1: capture()
   },
   {
-    builders: [
+    predicates: [
       {
-        predicates: [
-          {
-            predicate: () => context => context.state.prop1 !== "hello",
-            message: "prop1 cannot be hello"
-          }
-        ],
-        get: () => context => ({ prop1: context.state.prop1 + " world" })
+        predicate: () => context => context.state.prop1 !== "hello",
+        message: "prop1 cannot be hello"
       }
-    ]
+    ],
+    build: () => context => ({ prop1: context.state.prop1 + " world" })
   }
 );

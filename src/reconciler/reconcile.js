@@ -37,11 +37,11 @@ export default function(
         : { nonMatch: result };
     }
 
-    function getTask(builder) {
+    function getTask() {
       function task(context) {
-        const predicates = !builder.predicates
+        const predicates = !params.predicates
           ? []
-          : builder.predicates.map(p => ({
+          : params.predicates.map(p => ({
               fn: p.predicate,
               invalid: () =>
                 new Skip(
@@ -51,9 +51,9 @@ export default function(
                 )
             }));
 
-        const assertions = !builder.asserts
+        const assertions = !params.asserts
           ? []
-          : builder.asserts.map(a => ({
+          : params.asserts.map(a => ({
               fn: a.predicate,
               invalid: () =>
                 new Fault(a.error, { obj, key, parents, parentKeys }, meta)
@@ -69,7 +69,7 @@ export default function(
             )
             .first(x => typeof x !== "undefined") ||
           (() => {
-            const result = builder.get(obj, key, parents, parentKeys)(context);
+            const result = params.build(obj, key, parents, parentKeys)(context);
             return [Match, Skip, Fault].some(
               resultType => result instanceof resultType
             )
@@ -90,8 +90,8 @@ export default function(
           return merge({ result: taskResult, params }, acc.context);
         },
         { context: currentContext },
-        (acc) => typeof acc.nonMatch !== "undefined"
-      )
+        acc => typeof acc.nonMatch !== "undefined"
+      );
 
       return nonMatch
         ? nonMatch
@@ -121,14 +121,10 @@ export default function(
             meta
           )
         : (() => {
-            const tasks = Seq.of(params.builders)
-              .map(builder => getTask(builder))
-              .toArray();
-
             const allTasks = [
               [immediateChildTasks, mergeChildResult],
               [deferredChildTasks, mergeChildResult],
-              [tasks, mergeResult]
+              [[getTask()], mergeResult]
             ];
 
             return run(allTasks, context);

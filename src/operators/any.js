@@ -25,7 +25,7 @@ export function any(
         schemas: Array<Schema<any>>,
         nonMatching: Array<Schema<any>>
       ) {
-        const result = parseWithSchema(schemas[0])(
+        const result = parseWithSchema(schemas[0], meta)(
           obj,
           key,
           parents,

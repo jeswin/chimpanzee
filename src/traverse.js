@@ -36,13 +36,25 @@ export function traverse(schema: Schema, rawParams: RawSchemaParamsType) {
 
     const childTasks = childReconciler.getChildTasks();
 
-    const immediateChildTasks = childTasks.filter(
-      t => !t.params || !t.params.defer
-    );
+    function sortFn(task1, task2) {
+      const task1Order = task1.params && task1.params.order
+        ? task1.params.order
+        : 0;
 
-    const deferredChildTasks = childTasks.filter(
-      t => t.params && t.params.defer
-    );
+      const task2Order = task2.params && task2.params.order
+        ? task2.params.order
+        : 0;
+
+      return task1Order - task2Order;
+    }
+
+    const immediateChildTasks = childTasks
+      .filter(t => !t.params || !t.params.defer)
+      .sort(sortFn);
+
+    const deferredChildTasks = childTasks
+      .filter(t => t.params && t.params.defer)
+      .sort(sortFn);
 
     const mergeChildResult = (finished, context) =>
       childReconciler.mergeChildResult(finished, context);
@@ -53,7 +65,7 @@ export function traverse(schema: Schema, rawParams: RawSchemaParamsType) {
         [immediateChildTasks, deferredChildTasks],
         mergeChildResult,
         meta
-      )(obj, key, parents, parentKeys)({});
+      )(obj, key, parents, parentKeys)(params.reuseContext ? context : {});
   }
 
   return new Schema(fn, params);

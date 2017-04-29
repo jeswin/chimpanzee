@@ -58,7 +58,8 @@ export function repeatingItem<T>(
                 });
 
           const { result, needle: updatedNeedle } = parseWithSchema(
-            schema(needle)
+            schema(needle),
+            meta
           )(items, key, parents, parentKeys)(context);
 
           return result instanceof Match
@@ -87,7 +88,7 @@ export function unorderedItem<T>(_schema: Schema<T>): ArrayItem<T> {
   return new ArrayItem(needle => {
     return new Schema((obj, key, parents, parentKeys) => context =>
       (function run(items, i) {
-        const { result } = parseWithSchema(schema(i))(
+        const { result } = parseWithSchema(schema(i), meta)(
           items,
           key,
           parents,
@@ -121,7 +122,7 @@ export function optionalItem<T>(_schema: Schema<T>): ArrayItem<T> {
 
   return new ArrayItem(needle => {
     return new Schema((obj, key, parents, parentKeys) => context => {
-      const { result } = parseWithSchema(schema(needle))(
+      const { result } = parseWithSchema(schema(needle), meta)(
         obj,
         key,
         parents,
@@ -147,7 +148,7 @@ function regularItem<T>(schema: Schema<T>): ArrayItemFnType<T> {
   const meta = { type: "regularItem", schema };
   return needle =>
     new Schema((obj, key, parents, parentKeys) => context => {
-      const result = parseWithSchema(schema)(
+      const result = parseWithSchema(schema, meta)(
         obj[needle],
         `${key}.${needle}`,
         parents.concat(obj),
@@ -179,7 +180,8 @@ export function array(
         ? (function run(list, results, needle) {
             const schema = toNeedledSchema(list[0]);
             const { result, needle: updatedNeedle } = parseWithSchema(
-              schema(needle)
+              schema(needle),
+              meta
             )(obj, key, parents, parentKeys)(context);
 
             return result instanceof Skip || result instanceof Fault

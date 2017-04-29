@@ -16,9 +16,5 @@ export const schema = composite(
     prop: capture({ key: "second", selector: "alt" })
   },
   [{ name: "default", modifiers: { object: x => x.node } }, { name: "alt" }],
-  {
-    builders: [
-      { get: () => context => ({ ...context.state, third: "yaaay" }) }
-    ]
-  }
+  { build: () => context => ({ ...context.state, third: "yaaay" }) }
 );

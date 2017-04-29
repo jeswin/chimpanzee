@@ -42,12 +42,10 @@ function checkType(
 
   function fn(obj, key, parents, parentKeys) {
     return context => {
-      const result = parseWithSchema(captureIf(obj => typeof obj === type))(
-        obj,
-        key,
-        parents,
-        parentKeys
-      )(context);
+      const result = parseWithSchema(
+        captureIf(obj => typeof obj === type),
+        meta
+      )(obj, key, parents, parentKeys)(context);
       return result instanceof Skip
         ? new Skip(
             `Expected ${type} but got ${typeof obj}.`,

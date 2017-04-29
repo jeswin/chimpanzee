@@ -73,6 +73,7 @@ describe("chimpanzee", () => {
     ["capture-if-negative", "capture-if-negative", "skip"],
     ["capture-parent-child", "capture-parent-child", "match"],
     ["capture-simple", "capture-simple", "match"],
+    ["child-task-order", "child-task-order", "match"],
     ["composite", "composite", "match"],
     ["composite-complex", "composite-complex", "match"],
     ["composite-own-params", "composite-own-params", "match"],

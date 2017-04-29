@@ -28,22 +28,14 @@ export function getDefaultParams(
   const params: SchemaParamsType = typeof rawParams === "string"
     ? { key: rawParams }
     : rawParams || {};
-  params.builders = params.builders || [
-    { get: () => context => context.state }
-  ];
+  params.build = params.build || (() => context => context.state);
   params.modifiers = params.modifiers || {};
   return params;
 }
 
-export type ParseWithSchemaOptionsType = {};
+function mergeResult() {}
 
-export function parseWithSchema(
-  schema: Schema,
-  then?: ResultTransformerType,
-  options?: ParseWithSchemaOptionsType = {}
-) {
-  then = then || (result => result);
-
+export function parseWithSchema(schema: Schema, meta) {
   return (
     obj: any,
     key: string,
@@ -53,6 +45,15 @@ export function parseWithSchema(
     const schemaFn = typeof schema === "function"
       ? schema
       : schema instanceof Schema ? schema.fn : traverse(schema).fn;
-    return then(schemaFn(obj, key, parents, parentKeys)(context));
+
+    // return context =>
+    //   reconcile(params, [], mergeChildResult, meta)(
+    //     obj,
+    //     key,
+    //     parents,
+    //     parentKeys
+    //   )(params.reuseContext ? context : {});
+
+    return schemaFn(obj, key, parents, parentKeys)(context);
   };
 }

@@ -471,10 +471,8 @@ export const schema = traverse(
     prop1: capture(),
   },
   {
-    builders: [{
-      asserts: [{ predicate: (obj, context) => context.state.prop1 !== "hello", error: "prop1 cannot be hello" }],
-      get: context => ({ prop1: context.state.prop1 + " world" })
-    }]
+    asserts: [{ predicate: (obj, context) => context.state.prop1 !== "hello", error: "prop1 cannot be hello" }],
+    build: context => ({ prop1: context.state.prop1 + " world" })
   }
 )
 
@@ -494,10 +492,8 @@ export const schema = traverse(
     prop1: capture(),
   },
   {
-    builders: [{
-      predicates: [{ predicate: (obj, context) => context.state.prop1 !== "hello", message: "prop1 cannot be hello" }],
-      get: context => ({ prop1: context.state.prop1 + " world" })
-    }]
+    predicates: [{ predicate: (obj, context) => context.state.prop1 !== "hello", message: "prop1 cannot be hello" }],
+    build: context => ({ prop1: context.state.prop1 + " world" })
   }
 )
 

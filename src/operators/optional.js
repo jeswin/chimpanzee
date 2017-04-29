@@ -19,9 +19,12 @@ export function optional<T>(
 
   function fn(obj, key, parents, parentKeys) {
     return context => {
-      const result = parseWithSchema(schema)(obj, key, parents, parentKeys)(
-        context
-      );
+      const result = parseWithSchema(schema, meta)(
+        obj,
+        key,
+        parents,
+        parentKeys
+      )(context);
       return !(result instanceof Skip)
         ? result
         : new Empty({ obj, key, parents, parentKeys }, meta);

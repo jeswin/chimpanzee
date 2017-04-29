@@ -20,11 +20,10 @@ export function deep<T>(
 
   function fn(obj, key, parents, parentKeys) {
     return context => {
-
       function traverseObject(keys) {
         return keys.length
           ? (() => {
-              const result = parseWithSchema(deep(schema))(
+              const result = parseWithSchema(deep(schema), meta)(
                 obj[keys[0]],
                 key,
                 parents.concat(obj),
@@ -44,7 +43,7 @@ export function deep<T>(
       function traverseArray(items) {
         return items.length
           ? (() => {
-              const result = parseWithSchema(deep(schema, params))(
+              const result = parseWithSchema(deep(schema, params), meta)(
                 items[0],
                 key,
                 parents,
@@ -61,9 +60,12 @@ export function deep<T>(
             );
       }
 
-      const result = parseWithSchema(schema)(obj, key, parents, parentKeys)(
-        context
-      );
+      const result = parseWithSchema(schema, meta)(
+        obj,
+        key,
+        parents,
+        parentKeys
+      )(context);
 
       return !(result instanceof Skip)
         ? result

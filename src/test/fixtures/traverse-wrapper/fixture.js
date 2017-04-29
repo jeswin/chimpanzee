@@ -7,10 +7,6 @@ export const input = {
 export const schema = traverse(
   traverse(
     { prop1: capture() },
-    {
-      builders: [
-        { get: () => context => ({ prop2: `${context.state.prop1} world` }) }
-      ]
-    }
+    { build: () => context => ({ prop2: `${context.state.prop1} world` }) }
   )
 );

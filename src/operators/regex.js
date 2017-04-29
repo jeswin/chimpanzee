@@ -26,7 +26,8 @@ export function regex(
             (typeof regex === "string"
               ? typeof obj === "string" && new RegExp(regex).test(obj)
               : typeof obj === "string" && regex.test(obj))
-        )
+        ),
+        meta
       )(obj, key, parents, parentKeys)(context);
       return result instanceof Skip
         ? new Skip(

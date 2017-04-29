@@ -9,10 +9,6 @@ export const schema = traverse(
     prop1: capture()
   },
   {
-    builders: [
-      {
-        get: () => context => new Fault("We faulted!")
-      }
-    ]
+    build: () => context => new Fault("We faulted!")
   }
 );

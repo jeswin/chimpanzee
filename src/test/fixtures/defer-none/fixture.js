@@ -10,14 +10,10 @@ export const input = {
 export const schema = traverse({
   hello: traverse(
     { prop1: capture() },
-    {
-      builders: [{ get: () => ({ state }) => ({ ...state, counter: counter++ }) }]
-    }
+    { build: () => ({ state }) => ({ ...state, counter: counter++ }) }
   ),
   world: traverse(
     { prop2: capture() },
-    {
-      builders: [{ get: () => ({ state }) => ({ ...state, counter: counter++ }) }]
-    }
+    { build: () => ({ state }) => ({ ...state, counter: counter++ }) }
   )
 });

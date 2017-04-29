@@ -65,7 +65,7 @@ export function composite<T>(
 
       return schemas.length
         ? (function run(schemas, state) {
-            const result = parseWithSchema(schemas[0])(
+            const result = parseWithSchema(schemas[0], meta)(
               obj,
               key,
               parents,

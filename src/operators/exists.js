@@ -25,7 +25,9 @@ export function exists(
     return context =>
       (predicate(obj)
         ? schema
-            ? parseWithSchema(schema)(obj, key, parents, parentKeys)(context)
+            ? parseWithSchema(schema, meta)(obj, key, parents, parentKeys)(
+                context
+              )
             : new Empty({ obj, key, parents, parentKeys }, meta)
         : new Skip("Does not exist.", { obj, key, parents, parentKeys }, meta));
   }

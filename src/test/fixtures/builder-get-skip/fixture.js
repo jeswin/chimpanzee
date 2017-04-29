@@ -9,10 +9,6 @@ export const schema = traverse(
     prop1: capture()
   },
   {
-    builders: [
-      {
-        get: () => context => new Skip("We skipped it!")
-      }
-    ]
+    build: () => context => new Skip("We skipped it!")
   }
 );
