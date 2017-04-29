@@ -3,6 +3,7 @@ import { traverse } from "./traverse";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import reconcile from "./reconciler/reconcile";
+import getReconciler from "./reconciler/get-reconciler";
 
 import type {
   ContextType,
@@ -32,23 +33,38 @@ export function getDefaultParams(rawParams?: string | RawSchemaParamsType): Sche
   return params;
 }
 
-export function makeSchema(schema, params) {
-  return typeof schema === "function"
-    ? new Schema(schema, params || getDefaultParams())
-    : schema instanceof Schema
-        ? schema
-        : traverse(schema, { ...(params || getDefaultParams()) });
-}
+export function parseWithSchema(schema: Schema, meta) {
+  return function(
+    originalObj: any,
+    key: string,
+    parents: Array<any>,
+    parentKeys: Array<string>
+  ) {
+    const schemaType = getSchemaType(schema);
+    const reconciler = getReconciler(schemaType);
+    const params = schema instanceof Schema && schema.params
+      ? schema.params
+      : getDefaultParams();
+    const obj = params.modifiers.object ? params.modifiers.object(originalObj) : originalObj;
+    const _tasks = reconciler.getTasks(schema, params)(
+      originalObj,
+      key,
+      parents,
+      parentKeys
+    )(obj, meta);
 
-export function parseWithSchema(_schema: Schema, meta) {
-  return function(obj: any, key: string, parents: Array<any>, parentKeys: Array<string>) {
-    const schema = makeSchema(_schema);
-    const tasks = schema.fn(obj, key, parents, parentKeys);
+    function sortFn(task1, task2) {
+      const task1Order = task1.params && task1.params.order ? task1.params.order : 0;
+      const task2Order = task2.params && task2.params.order ? task2.params.order : 0;
+      return task1Order - task2Order;
+    }
 
-    console.log("+++", tasks.toArray ? tasks.toArray() : tasks);
-    return context =>
-      reconcile(schema.params, tasks, meta)(obj, key, parents, parentKeys)(
+    const tasks = _tasks.filter(sortFn);
+
+    return context => {
+      return reconcile(schema.params, tasks, meta)(obj, key, parents, parentKeys)(
         schema.params.reuseContext ? context : {}
       );
+    };
   };
 }

@@ -50,8 +50,8 @@ describe("chimpanzee", () => {
   }
 
   const tests = [
-    // ["any", "any", "match"],
-    // ["any-fault", "any-fault", "fault"],
+    ["any", "any", "match"],
+    ["any-fault", "any-fault", "fault"],
     // ["any-native-types", "any-native-types", "empty"],
     // ["any-negative", "any-negative", "skip"],
     // ["array", "array", "match"],
@@ -80,7 +80,7 @@ describe("chimpanzee", () => {
     // ["composite-skip", "composite-skip", "skip"],
     // ["deep", "deep", "match"],
     // ["deep-fault", "deep-fault", "fault"],
-    ["defer", "defer", "match"],
+    // ["defer", "defer", "match"],
     // ["defer-none", "defer-none", "match"],
     // ["empty", "empty", "match"],
     // ["empty-negative", "empty-negative", "skip"],

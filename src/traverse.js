@@ -18,7 +18,7 @@ import type {
 
 export function traverse(schema: Schema, rawParams: RawSchemaParamsType) {
   const meta = { type: "traverse", schema, params: rawParams };
-  const params = { ...getDefaultParams(rawParams), wrapped: true };
+  const params = { ...getDefaultParams(rawParams) };
   const schemaType = getSchemaType(schema);
 
   function fn(originalObj, key, parents, parentKeys) {
@@ -30,9 +30,6 @@ export function traverse(schema: Schema, rawParams: RawSchemaParamsType) {
       parents,
       parentKeys
     )(obj, meta);
-
-    console.log(schemaType);
-    console.log("---", childTasks.toArray());
 
     function sortFn(task1, task2) {
       const task1Order = task1.params && task1.params.order ? task1.params.order : 0;

@@ -15,7 +15,7 @@ import type {
   MetaType
 } from "../types";
 
-export default function(schema: ArraySchemaType, params: SchemaParamsType) {
+export function getTasks(schema: ArraySchemaType, params: SchemaParamsType) {
   return function(
     originalObj: any,
     key: string,

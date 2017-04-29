@@ -75,12 +75,18 @@ export default function(params: SchemaParamsType, tasks: Array<TaskType>, meta: 
           })()
         );
       }
-      return { task };
+      return task;
     }
 
+    global.ctr = global.ctr || 0;
     function run(tasks, currentContext: ContextType) {
+      console.log(++ctr);
+      if (ctr === 3) debugger;
       const { context, nonMatch } = Seq.of(tasks).reduce(
         (acc, { task, merge, params }) => {
+          if (typeof task !== "function") {
+            debugger;
+          }
           const taskResult = task(acc.context);
           return (merge || defaultMerge)({ result: taskResult, params }, acc.context);
         },
@@ -90,20 +96,18 @@ export default function(params: SchemaParamsType, tasks: Array<TaskType>, meta: 
 
       return nonMatch
         ? nonMatch
-        : rest.length
-            ? run(rest, context)
-            : typeof context.state === "undefined"
-                ? new Empty({ obj, key, parents, parentKeys }, meta)
-                : new Match(
-                    context.state,
-                    {
-                      obj,
-                      key,
-                      parents,
-                      parentKeys
-                    },
-                    meta
-                  );
+        : typeof context.state === "undefined"
+            ? new Empty({ obj, key, parents, parentKeys }, meta)
+            : new Match(
+                context.state,
+                {
+                  obj,
+                  key,
+                  parents,
+                  parentKeys
+                },
+                meta
+              );
     }
 
     return context => {
@@ -112,12 +116,12 @@ export default function(params: SchemaParamsType, tasks: Array<TaskType>, meta: 
       return !mustRun
         ? new Skip(`Predicate returned false.`, { obj, key, parents, parentKeys }, meta)
         : (() => {
-            const allTasks = tasks.concat([
+            const allTasks = Seq.of(tasks).concat(Seq.of([
               {
                 task: getTask(),
                 merge: mergeResult
               }
-            ]);
+            ]));
 
             return run(allTasks, context);
           })();

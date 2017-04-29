@@ -1,10 +1,10 @@
 /* @flow */
-import func from "./function";
-import schema from "./schema";
-import array from "./array";
-import native from "./native";
-import obj from "./object";
-import Schema from "../schema";
+import * as func from "./function";
+import * as schema from "./schema";
+import * as array from "./array";
+import * as native from "./native";
+import * as obj from "./object";
+import * as Schema from "../schema";
 
 import type {
   ContextType,
@@ -23,17 +23,6 @@ const index = {
   object: obj
 };
 
-export default function(Schema: string) {
-  return (schema: Schema, params: SchemaParamsType) => (
-    originalObj: any,
-    key: string,
-    parents: Array<any>,
-    parentKeys: Array<string>
-  ) => (obj: any, meta: MetaType) =>
-    index[Schema](schema, params)(
-      originalObj,
-      key,
-      parents,
-      parentKeys
-    )(obj, meta);
+export default function(type) {
+  return index[type];
 }

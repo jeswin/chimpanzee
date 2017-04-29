@@ -15,7 +15,7 @@ import type {
 } from "../types";
 import { getSchemaType } from "../utils";
 
-export default function(schema: Object, params: SchemaParamsType) {
+export function getTasks(schema: Object, params: SchemaParamsType) {
   return function(
     originalObj: any,
     key: string,

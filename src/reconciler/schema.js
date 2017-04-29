@@ -12,7 +12,7 @@ import type {
   MetaType
 } from "../types";
 
-export default function(schema: Schema, params: SchemaParamsType) {
+export function getTasks(schema: Schema, params: SchemaParamsType) {
   return function(
     originalObj: any,
     key: string,
@@ -24,7 +24,7 @@ export default function(schema: Schema, params: SchemaParamsType) {
 
       return [
         {
-          task: schema.fn(obj, key, parents, parentKeys),
+          task: context => schema.fn(obj, key, parents, parentKeys)(context),
           merge: common.mergeChildResult,
           params: schema.params
         }

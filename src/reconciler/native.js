@@ -12,7 +12,7 @@ import type {
   MetaType
 } from "../types";
 
-export default function(schema: NativeTypeSchemaType, params: SchemaParamsType) {
+export function getTasks(schema: NativeTypeSchemaType, params: SchemaParamsType) {
   return function(
     originalObj: any,
     key: string,
