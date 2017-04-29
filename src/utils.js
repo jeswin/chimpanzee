@@ -33,27 +33,48 @@ export function getDefaultParams(
   return params;
 }
 
-function mergeResult() {}
+function mergeChildResult(
+  finished: { result: Result, params: SchemaParamsType },
+  context: any
+) {
+  const { result, params } = finished;
+
+  return result instanceof Match
+    ? !(result instanceof Empty)
+        ? { context: { ...context, state: result.value } }
+        : { context }
+    : { nonMatch: result };
+}
 
 export function parseWithSchema(schema: Schema, meta) {
-  return (
+  return function(
     obj: any,
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
-  ) => context => {
-    const schemaFn = typeof schema === "function"
-      ? schema
-      : schema instanceof Schema ? schema.fn : traverse(schema).fn;
+  ) {
+    const { fn, params } = typeof schema === "function"
+      ? { fn: schema, params: getDefaultParams() }
+      : schema instanceof Schema
+          ? { fn: schema.fn, params: schema.params }
+          : { fn: traverse(schema).fn, params: getDefaultParams() };
 
-    // return context =>
-    //   reconcile(params, [], mergeChildResult, meta)(
-    //     obj,
-    //     key,
-    //     parents,
-    //     parentKeys
-    //   )(params.reuseContext ? context : {});
+    const immediateTasks = [
+      {
+        task: context => fn(obj, key, parents, parentKeys)(context),
+        type: "operator",
+        params
+      }
+    ];
 
-    return schemaFn(obj, key, parents, parentKeys)(context);
+    return context =>
+      reconcile(params, [immediateTasks], mergeChildResult, meta)(
+        obj,
+        key,
+        parents,
+        parentKeys
+      )(params.reuseContext ? context : {});
+
+    //return schemaFn(obj, key, parents, parentKeys)(context);
   };
 }
