@@ -86,9 +86,6 @@ export default function(
 
       const { context, nonMatch } = Seq.of(tasks).reduce(
         (acc, { task, type, params }) => {
-          if (typeof task !== "function") {
-            debugger;
-          }
           const taskResult = task(acc.context);
           return merge({ result: taskResult, params }, acc.context);
         },
