@@ -25,11 +25,17 @@ export default function(schema: ArraySchemaType, params: SchemaParamsType) {
       function getChildTasks() {
         return Array.isArray(obj)
           ? schema.length !== obj.length
-              ? new Skip(
-                  `Expected array of length ${schema.length} but got ${obj.length}.`,
-                  { obj, key, parents, parentKeys },
-                  meta
-                )
+              ? [
+                  {
+                    task: () =>
+                      new Skip(
+                        `Expected array of length ${schema.length} but got ${obj.length}.`,
+                        { obj, key, parents, parentKeys },
+                        meta
+                      ),
+                    type: "array"
+                  }
+                ]
               : Seq.of(schema)
                   .map((rhs, i) => ({
                     task: context =>
@@ -54,11 +60,15 @@ export default function(schema: ArraySchemaType, params: SchemaParamsType) {
                   }))
                   .toArray()
           : [
-              new Skip(
-                `Schema is an array but property is a non-array.`,
-                { obj, key, parents, parentKeys },
-                meta
-              )
+              {
+                task: () =>
+                  new Skip(
+                    `Schema is an array but property is a non-array.`,
+                    { obj, key, parents, parentKeys },
+                    meta
+                  ),
+                type: "array"
+              }
             ];
       }
 
