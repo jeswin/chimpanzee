@@ -50,6 +50,7 @@ export function parseWithSchema(
     parents: Array<any>,
     parentKeys: Array<string>
   ) => {
+    if (obj && obj.length) debugger;
     return context => {
       const schemaFn = typeof schema === "function"
         ? schema
