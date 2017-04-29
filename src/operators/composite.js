@@ -3,7 +3,7 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { traverse } from "../traverse";
 import Schema from "../schema";
 import { Seq } from "lazily";
-import { getDefaultParams, waitForSchema } from "../utils";
+import { getDefaultParams, parseWithSchema } from "../utils";
 
 import type {
   ContextType,
@@ -35,7 +35,7 @@ export function composite<T>(
   schema: Object,
   _paramsList: Array<RawSchemaParamsType<any>>,
   ownParams: RawSchemaParamsType<T>
-) : Schema<T> {
+): Schema<T> {
   const meta = {
     type: "composite",
     schema,
@@ -56,28 +56,29 @@ export function composite<T>(
   );
 
   function fn(obj, key, parents, parentKeys) {
-    const env = { obj, key, parents, parentKeys };
+    return context => {
+      const env = { obj, key, parents, parentKeys };
 
-    function merge(result, context) {
-      return {
-        context: { ...context, state: { ...context.state, ...result.value } }
-      };
-    }
+      function merge(state, result) {
+        return { ...state, ...result.value };
+      }
 
-    return schemas.length
-      ? (function run(schemas, context) {
-          return waitForSchema(
-            schemas[0],
-            result =>
-              (result instanceof Match
-                ? schemas.length > 1
-                    ? run(schemas.slice(1), merge(result, context).context)
-                    : new Match(merge(result, context).context.state, env, meta)
-                : result)
-          )(obj, key, parents, parentKeys);
-        })(schemas, {})
-      : context => new Empty(env, meta);
-
+      return schemas.length
+        ? (function run(schemas, state) {
+            const result = parseWithSchema(schemas[0])(
+              obj,
+              key,
+              parents,
+              parentKeys
+            )(context);
+            return result instanceof Match
+              ? schemas.length > 1
+                  ? run(schemas.slice(1), merge(state, result))
+                  : new Match(merge(state, result), env, meta)
+              : result;
+          })(schemas, {})
+        : new Empty(env, meta);
+    };
   }
 
   return traverse(fn, ownParams);

@@ -31,7 +31,7 @@ export default function(
         return schema !== comparand
           ? [
               {
-                task: new Skip(
+                task: (context) => new Skip(
                   `Expected ${schema} but got ${comparand}.`,
                   { obj, key, parents, parentKeys },
                   meta
@@ -41,7 +41,7 @@ export default function(
             ]
           : [
               {
-                task: new Empty(
+                task: (context) => new Empty(
                   { obj, key, parents, parentKeys },
                   meta
                 ),

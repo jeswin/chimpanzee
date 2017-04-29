@@ -2,13 +2,9 @@
 import { traverse } from "../traverse";
 import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
-import { getDefaultParams, waitForSchema } from "../utils";
+import { getDefaultParams, parseWithSchema } from "../utils";
 
-import type {
-  ContextType,
-  RawSchemaParamsType,
-  TaskType
-} from "../types";
+import type { ContextType, RawSchemaParamsType, TaskType } from "../types";
 
 type ArrayItemFnType<T> = (needle: number) => Schema<T>;
 
@@ -39,41 +35,41 @@ export function repeatingItem<T>(
 
   const schema = toNeedledSchema(_schema);
 
-  return new ArrayItem(needle => {
-    return new Schema((obj, key, parents, parentKeys) =>
-      (function run(items, results, needle) {
-        const completed = (result, needle) =>
-          (results.length >= min && (!max || results.length <= max)
-            ? {
-                result: new Match(
-                  results.concat(result ? [result.value] : []),
-                  { obj, key, parents, parentKeys },
-                  meta
-                ),
-                needle
-              }
-            : {
-                result: new Skip(
-                  "Incorrect number of matches.",
-                  { obj, key, parents, parentKeys },
-                  meta
-                )
-              });
+  return new ArrayItem(
+    needle =>
+      new Schema((obj, key, parents, parentKeys) => context =>
+        (function run(items, results, needle) {
+          const completed = (result, needle) =>
+            (results.length >= min && (!max || results.length <= max)
+              ? {
+                  result: new Match(
+                    results.concat(result ? [result.value] : []),
+                    { obj, key, parents, parentKeys },
+                    meta
+                  ),
+                  needle
+                }
+              : {
+                  result: new Skip(
+                    "Incorrect number of matches.",
+                    { obj, key, parents, parentKeys },
+                    meta
+                  )
+                });
 
-        return waitForSchema(
-          schema(needle),
-          ({ result, needle }) =>
-            (result instanceof Match
-              ? items.length > needle
-                  ? run(items, results.concat([result.value]), needle)
-                  : completed(result, needle)
-              : result instanceof Skip
-                  ? completed(undefined, needle)
-                  : { result, needle })
-        )(items, key, parents, parentKeys);
-      })(obj, [], needle)
-    );
-  });
+          const { result, needle: updatedNeedle } = parseWithSchema(
+            schema(needle)
+          )(items, key, parents, parentKeys)(context);
+
+          return result instanceof Match
+            ? items.length > needle
+                ? run(items, results.concat([result.value]), updatedNeedle)
+                : completed(result, needle)
+            : result instanceof Skip
+                ? completed(undefined, needle)
+                : { result, needle };
+        })(obj, [], needle))
+  );
 }
 
 /*
@@ -89,26 +85,28 @@ export function unorderedItem<T>(_schema: Schema<T>): ArrayItem<T> {
 
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
-    return new Schema((obj, key, parents, parentKeys) =>
+    return new Schema((obj, key, parents, parentKeys) => context =>
       (function run(items, i) {
-        return waitForSchema(
-          schema(i),
-          ({ result }) =>
-            (result instanceof Match || result instanceof Fault
-              ? { result, needle }
-              : items.length > i
-                  ? run(items, i + 1)
-                  : {
-                      result: new Skip(
-                        `Unordered item was not found.`,
-                        { obj, key, parents, parentKeys },
-                        meta
-                      ),
-                      needle
-                    })
-        )(items, key, parents, parentKeys);
-      })(obj, 0)
-    );
+        const { result } = parseWithSchema(schema(i))(
+          items,
+          key,
+          parents,
+          parentKeys
+        )(context);
+
+        return result instanceof Match
+          ? { result, needle }
+          : items.length > i
+              ? run(items, i + 1)
+              : {
+                  result: new Skip(
+                    `Unordered item was not found.`,
+                    { obj, key, parents, parentKeys },
+                    meta
+                  ),
+                  needle
+                };
+      })(obj, 0));
   });
 }
 
@@ -119,24 +117,26 @@ export function unorderedItem<T>(_schema: Schema<T>): ArrayItem<T> {
 */
 export function optionalItem<T>(_schema: Schema<T>): ArrayItem<T> {
   const meta = { type: "optionalItem", schema: _schema };
-
   const schema = toNeedledSchema(_schema);
 
   return new ArrayItem(needle => {
-    return new Schema((obj, key, parents, parentKeys) =>
-      waitForSchema(
-        schema(needle),
-        ({ result }) =>
-          (result instanceof Match
-            ? { result, needle: needle + 1 }
-            : result instanceof Skip
-                ? {
-                    result: new Empty({ obj, key, parents, parentKeys }, meta),
-                    needle
-                  }
-                : { result, needle })
-      )(obj, key, parents, parentKeys)
-    );
+    return new Schema((obj, key, parents, parentKeys) => context => {
+      const result = parseWithSchema(schema(needle))(
+        obj,
+        key,
+        parents,
+        parentKeys
+      )(context);
+
+      return result instanceof Match
+        ? { result, needle: needle + 1 }
+        : result instanceof Skip
+            ? {
+                result: new Empty({ obj, key, parents, parentKeys }, meta),
+                needle
+              }
+            : { result, needle };
+    });
   });
 }
 
@@ -146,20 +146,18 @@ export function optionalItem<T>(_schema: Schema<T>): ArrayItem<T> {
 function regularItem<T>(schema: Schema<T>): ArrayItemFnType<T> {
   const meta = { type: "regularItem", schema };
   return needle =>
-    new Schema((obj, key, parents, parentKeys) =>
-      waitForSchema(
-        schema,
-        result =>
-          (result instanceof Match
-            ? { result, needle: needle + 1 }
-            : { result, needle })
-      )(
+    new Schema((obj, key, parents, parentKeys) => context => {
+      const result = parseWithSchema(schema)(
         obj[needle],
         `${key}.${needle}`,
         parents.concat(obj),
         parentKeys.concat(key)
-      )
-    );
+      )(context);
+
+      return result instanceof Match
+        ? { result, needle: needle + 1 }
+        : { result, needle };
+    });
 }
 
 function toNeedledSchema<T>(
@@ -175,36 +173,36 @@ export function array(
   const meta = { type: "array", schemas, params: rawParams };
   const params = getDefaultParams(rawParams);
 
-  const fn = function(obj, key, parents, parentKeys) {
-    return Array.isArray(obj)
-      ? (function run(list, results, needle) {
-          const schema = toNeedledSchema(list[0]);
-          return waitForSchema(
-            schema(needle),
-            ({ result, needle }) =>
-              (result instanceof Skip || result instanceof Fault
-                ? result.updateEnv({ needle })
-                : list.length > 1
-                    ? run(
-                        list.slice(1),
-                        results.concat(
-                          result instanceof Empty ? [] : [result.value]
-                        ),
-                        needle
-                      )
-                    : new Match(
-                        results.concat(result.value),
-                        { obj, key, parents, parentKeys },
-                        meta
-                      ))
-          )(obj, key, parents, parentKeys);
-        })(schemas, [], 0)
-      : context =>
-          new Fault(
+  function fn(obj, key, parents, parentKeys) {
+    return context =>
+      (Array.isArray(obj)
+        ? (function run(list, results, needle) {
+            const schema = toNeedledSchema(list[0]);
+            const { result, needle: updatedNeedle } = parseWithSchema(
+              schema(needle)
+            )(obj, key, parents, parentKeys)(context);
+
+            return result instanceof Skip || result instanceof Fault
+              ? result.updateEnv({ needle })
+              : list.length > 1
+                  ? run(
+                      list.slice(1),
+                      results.concat(
+                        result instanceof Empty ? [] : [result.value]
+                      ),
+                      updatedNeedle
+                    )
+                  : new Match(
+                      results.concat(result.value),
+                      { obj, key, parents, parentKeys },
+                      meta
+                    );
+          })(schemas, [], 0)
+        : new Fault(
             `Expected array but got ${typeof obj}.`,
             { obj, key, parents, parentKeys },
             meta
-          );
-  };
+          ));
+  }
   return new Schema(fn, params);
 }

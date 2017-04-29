@@ -2,7 +2,7 @@
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
-import { getDefaultParams, waitForSchema } from "../utils";
+import { getDefaultParams, parseWithSchema } from "../utils";
 
 import type {
   ContextType,
@@ -36,22 +36,23 @@ export function func(params: RawSchemaParamsType<TypesType>) {
 function checkType(
   type: string,
   rawParams: RawSchemaParamsType<TypesType>
-) : Schema<TypesType> {
+): Schema<TypesType> {
   const meta = { type, params: rawParams };
   const params = getDefaultParams(rawParams);
 
   function fn(obj, key, parents, parentKeys) {
-    return waitForSchema(
-      captureIf(obj => typeof obj === type),
-      result =>
-        (result instanceof Skip
-          ? new Skip(
-              `Expected ${type} but got ${typeof obj}.`,
-              { obj, key, parents, parentKeys },
-              meta
-            )
-          : result)
-    )(obj, key, parents, parentKeys);
+    return context => {
+      const result = parseWithSchema(captureIf(obj => typeof obj === type))(
+        (obj, key, parents, parentKeys)
+      )(context);
+      return result instanceof Skip
+        ? new Skip(
+            `Expected ${type} but got ${typeof obj}.`,
+            { obj, key, parents, parentKeys },
+            meta
+          )
+        : result;
+    };
   }
 
   return new Schema(fn, params);

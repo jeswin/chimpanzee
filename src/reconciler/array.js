@@ -48,7 +48,7 @@ export default function(schema: ArraySchemaType, params: SchemaParamsType) {
                         `${key}.${i}`,
                         parents.concat(originalObj),
                         parentKeys.concat(key)
-                      ),
+                      )(context),
                     type: "array",
                     params: schema.params
                   }))

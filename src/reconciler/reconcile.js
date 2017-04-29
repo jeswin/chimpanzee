@@ -10,7 +10,7 @@ import type {
   TaskType,
   EnvType,
   MetaType,
-  MergeResultType,
+  MergeResultType
 } from "../types";
 
 export default function(
@@ -81,79 +81,61 @@ export default function(
       return { task, type: "reconcile" };
     }
 
-    type TaskReduceResultType = {
-      pending: Array<TaskType>,
-      result: MergeResultType
-    };
-
     function run(tasksList, currentContext: ContextType) {
       const [[tasks, merge], ...rest] = tasksList;
 
-      const { pending, result }: TaskReduceResultType = Seq.of(tasks).reduce(
-        (acc: TaskReduceResultType, { task, type, params }) =>
-          (typeof task === "function"
-            ? {
-                pending: acc.pending.concat({
-                  task: task(acc.result.context),
-                  type,
-                  params
-                }),
-                result: acc.result
-              }
-            : {
-                pending: acc.pending,
-                result: merge({ result: task, params }, acc.result.context)
-              }),
-        {
-          pending: [],
-          result: { context: currentContext }
+      const { context, nonMatch } = Seq.of(tasks).reduce(
+        (acc, { task, type, params }) => {
+          if (typeof task !== "function") {
+            debugger;
+          }
+          const taskResult = task(acc.context);
+          return merge({ result: taskResult, params }, acc.context);
         },
-        (acc: TaskReduceResultType) => typeof acc.result.nonMatch !== "undefined"
-      );
-
-      const { context, nonMatch } = result;
+        { context: currentContext },
+        (acc) => typeof acc.nonMatch !== "undefined"
+      )
 
       return nonMatch
         ? nonMatch
-        : pending.length
-            ? () => run([[pending, merge], ...rest], context)
-            : rest.length
-                ? () => run(rest, context)
-                : typeof context.state === "undefined"
-                    ? new Empty({ obj, key, parents, parentKeys }, meta)
-                    : new Match(
-                        context.state,
-                        {
-                          obj,
-                          key,
-                          parents,
-                          parentKeys
-                        },
-                        meta
-                      );
+        : rest.length
+            ? run(rest, context)
+            : typeof context.state === "undefined"
+                ? new Empty({ obj, key, parents, parentKeys }, meta)
+                : new Match(
+                    context.state,
+                    {
+                      obj,
+                      key,
+                      parents,
+                      parentKeys
+                    },
+                    meta
+                  );
     }
 
-    const mustRun = !params.predicate || params.predicate(obj);
+    return context => {
+      const mustRun = !params.predicate || params.predicate(obj);
 
-    return !mustRun
-      ? (context: ContextType) =>
-          new Skip(
+      return !mustRun
+        ? new Skip(
             `Predicate returned false.`,
             { obj, key, parents, parentKeys },
             meta
           )
-      : (context: any) => {
-          const tasks = Seq.of(params.builders)
-            .map(builder => getTask(builder))
-            .toArray();
+        : (() => {
+            const tasks = Seq.of(params.builders)
+              .map(builder => getTask(builder))
+              .toArray();
 
-          const allTasks = [
-            [immediateChildTasks, mergeChildResult],
-            [deferredChildTasks, mergeChildResult],
-            [tasks, mergeResult]
-          ];
+            const allTasks = [
+              [immediateChildTasks, mergeChildResult],
+              [deferredChildTasks, mergeChildResult],
+              [tasks, mergeResult]
+            ];
 
-          return run(allTasks, context);
-        };
+            return run(allTasks, context);
+          })();
+    };
   };
 }

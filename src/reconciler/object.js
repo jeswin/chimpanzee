@@ -69,7 +69,7 @@ export default function(schema: Object, params: SchemaParamsType) {
                     childKey,
                     parents.concat(originalObj),
                     parentKeys.concat(key)
-                  ),
+                  )(context),
                 type: "object",
                 params: childSchema.params
                   ? {
@@ -82,7 +82,7 @@ export default function(schema: Object, params: SchemaParamsType) {
             })
           : [
               {
-                task: new Skip(
+                task: context => new Skip(
                   `Cannot traverse undefined.`,
                   { obj, key, parents, parentKeys },
                   meta

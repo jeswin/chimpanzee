@@ -2,7 +2,7 @@
 import { traverse } from "../traverse";
 import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
-import { getDefaultParams, waitForSchema } from "../utils";
+import { getDefaultParams, parseWithSchema } from "../utils";
 
 import type {
   ContextType,
@@ -22,17 +22,19 @@ export function map<T, TMapped>(
   const params = getDefaultParams(rawParams);
 
   function fn(obj, key, parents, parentKeys) {
-    return waitForSchema(
-      schema,
-      (result: T) =>
-        (result instanceof Match
-          ? new Match(
-              mapper(result.value),
-              { obj, key, parents, parentKeys },
-              meta
-            )
-          : result)
-    )(obj, key, parents, parentKeys);
+    return context => {
+      const result = parseWithSchema(schema)(obj, key, parents, parentKeys)(
+        context
+      );
+
+      return result instanceof Match
+        ? new Match(
+            mapper(result.value),
+            { obj, key, parents, parentKeys },
+            meta
+          )
+        : result;
+    };
   }
 
   return new Schema(fn, params);

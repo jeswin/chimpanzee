@@ -1,7 +1,7 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
-import { getDefaultParams, waitForSchema } from "../utils";
+import { getDefaultParams, parseWithSchema } from "../utils";
 
 import type {
   RawSchemaParamsType,
@@ -64,18 +64,22 @@ export function take<T, TOut>(
   const params = getDefaultParams(rawParams);
 
   function fn(obj, key, parents, parentKeys) {
-    return predicate(obj)
-      ? typeof schema !== "undefined"
-          ? waitForSchema(
-              schema,
-              result =>
-                (result instanceof Match
+    return context =>
+      (predicate(obj)
+        ? typeof schema !== "undefined"
+            ? (() => {
+                const result = parseWithSchema(schema)(
+                  obj,
+                  key,
+                  parents,
+                  parentKeys
+                )(context);
+
+                return result instanceof Match
                   ? new Match(
                       {
                         ...obj,
-                        ...(options.modifier
-                          ? options.modifier(result.value)
-                          : result.value)
+                        ...result.value
                       },
                       { obj, key, parents, parentKeys },
                       meta
@@ -86,22 +90,16 @@ export function take<T, TOut>(
                           { obj, key, parents, parentKeys },
                           meta
                         )
-                      : result) //Fault
-            )(obj, key, parents, parentKeys)
-          : context =>
-              new Match(
-                options.modifier ? options.modifier(obj) : obj,
-                { obj, key, parents, parentKeys },
-                meta
-              )
-      : context =>
-          new Skip(
+                      : result; //Fault
+              })()
+            : new Match(obj, { obj, key, parents, parentKeys }, meta)
+        : new Skip(
             options.skipMessage
               ? options.skipMessage(obj)
               : `Predicate returned false. Predicate was ${predicate.toString()}`,
             { obj, key, parents, parentKeys },
             meta
-          );
+          ));
   }
 
   return new Schema(fn, params);

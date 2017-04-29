@@ -39,14 +39,9 @@ export { Match, Empty, Skip, Fault } from "./results";
 
 export { default as Schema } from "./schema";
 
-export { waitForSchema } from "./utils";
-
-function _match(traverseResult: TaskType) {
-  const result = traverseResult;
-  return typeof result === "function" ? _match(result()) : result;
-}
+export { parseWithSchema } from "./utils";
 
 export function match(schema: Schema<any>, input: any) {
   const fn = typeof schema === "function" ? schema : schema.fn;
-  return _match(fn(input, "__INIT__", [], []));
+  return fn(input, "__INIT__", [], [])({});
 }

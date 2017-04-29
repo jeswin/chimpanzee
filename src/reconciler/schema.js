@@ -23,7 +23,7 @@ export default function(schema: Schema, params: SchemaParamsType) {
       function getChildTasks() {
         return [
           {
-            task: schema.fn(obj, key, parents, parentKeys),
+            task: context => schema.fn(obj, key, parents, parentKeys)(context),
             type: "schema",
             params: schema.params
           }

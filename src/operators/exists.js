@@ -2,7 +2,7 @@
 import { traverse } from "../traverse";
 import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
-import { getDefaultParams, waitForSchema } from "../utils";
+import { getDefaultParams, parseWithSchema } from "../utils";
 
 import type {
   ContextType,
@@ -22,12 +22,12 @@ export function exists(
   predicate = predicate || (x => typeof x !== "undefined");
 
   function fn(obj, key, parents, parentKeys) {
-    return predicate(obj)
-      ? schema
-          ? waitForSchema(schema)(obj, key, parents, parentKeys)
-          : context => new Empty({ obj, key, parents, parentKeys }, meta)
-      : context =>
-          new Skip("Does not exist.", { obj, key, parents, parentKeys }, meta);
+    return context =>
+      (predicate(obj)
+        ? schema
+            ? parseWithSchema(schema)(obj, key, parents, parentKeys)(context)
+            : new Empty({ obj, key, parents, parentKeys }, meta)
+        : new Skip("Does not exist.", { obj, key, parents, parentKeys }, meta));
   }
 
   return new Schema(fn, undefined);

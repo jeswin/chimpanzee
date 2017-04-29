@@ -35,32 +35,26 @@ export function getDefaultParams(
   return params;
 }
 
-export type WaitForSchemaOptionsType = {};
+export type ParseWithSchemaOptionsType = {};
 
-export function waitForSchema(
+export function parseWithSchema(
   schema: Schema,
-  then: ResultTransformerType,
-  options: WaitForSchemaOptionsType = {}
+  then?: ResultTransformerType,
+  options?: ParseWithSchemaOptionsType = {}
 ) {
   then = then || (result => result);
-  return function(
+
+  return (
     obj: any,
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
-  ) {
-    function next(schema) {
-      function loop(task) {
-        return typeof task === "function"
-          ? (context: ContextType) => loop(task(context))
-          : then(task);
-      }
-
+  ) => {
+    return context => {
       const schemaFn = typeof schema === "function"
         ? schema
         : schema instanceof Schema ? schema.fn : traverse(schema).fn;
-      return loop(context => schemaFn(obj, key, parents, parentKeys)(context));
-    }
-    return next(schema);
+      return then(schemaFn(obj, key, parents, parentKeys)(context));
+    };
   };
 }

@@ -1,7 +1,7 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
-import { getDefaultParams, waitForSchema } from "../utils";
+import { getDefaultParams, parseWithSchema } from "../utils";
 
 import type {
   ContextType,
@@ -18,13 +18,14 @@ export function optional<T>(
   const params = getDefaultParams(rawParams);
 
   function fn(obj, key, parents, parentKeys) {
-    return waitForSchema(
-      schema,
-      result =>
-        (!(result instanceof Skip)
-          ? result
-          : new Empty({ obj, key, parents, parentKeys }, meta))
-    )(obj, key, parents, parentKeys);
+    return context => {
+      const result = parseWithSchema(schema)(obj, key, parents, parentKeys)(
+        context
+      );
+      return !(result instanceof Skip)
+        ? result
+        : new Empty({ obj, key, parents, parentKeys }, meta);
+    };
   }
 
   return new Schema(fn, params);
