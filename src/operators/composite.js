@@ -7,13 +7,12 @@ import { getDefaultParams, waitForSchema } from "../utils";
 
 import type {
   ContextType,
-  SchemaType,
   RawSchemaParamsType,
   SchemaParamsType,
   ResultGeneratorType
 } from "../types";
 
-function getSchema(schema: SchemaType, paramSelector: string): SchemaType {
+function getSchema(schema: Schema, paramSelector: string): Schema {
   const schemaSelector = schema.params && schema.params.selector
     ? schema.params.selector
     : "default";
@@ -32,11 +31,11 @@ function getSchema(schema: SchemaType, paramSelector: string): SchemaType {
             : paramSelector === "default" ? schema : undefined;
 }
 
-export function composite(
-  schema: SchemaType,
-  _paramsList: Array<SchemaParamsType>,
-  ownParams: SchemaParamsType
-) {
+export function composite<T>(
+  schema: Object,
+  _paramsList: Array<RawSchemaParamsType<any>>,
+  ownParams: RawSchemaParamsType<T>
+) : Schema<T> {
   const meta = {
     type: "composite",
     schema,

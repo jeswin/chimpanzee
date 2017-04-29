@@ -6,16 +6,15 @@ import { getDefaultParams, waitForSchema } from "../utils";
 
 import type {
   ContextType,
-  SchemaType,
   RawSchemaParamsType,
   ResultGeneratorType
 } from "../types";
 
-type ArrayItemFnType = (needle: number) => Schema
+type ArrayItemFnType<T> = (needle: number) => Schema<T>;
 
-class ArrayItem {
-  fn: ArrayItemFnType;
-  constructor(fn: ArrayItemFnType) {
+class ArrayItem<T> {
+  fn: ArrayItemFnType<T>;
+  constructor(fn: ArrayItemFnType<T>) {
     this.fn = fn;
   }
 }
@@ -27,15 +26,19 @@ class ArrayItem {
             ^needle
   returns [4, 4], with needle moved to 5.
 */
-type RepeatingItemOptsType = { min?: number, max?: number }
+type RepeatingItemOptsType = { min?: number, max?: number };
 
-export function repeatingItem(_schema: SchemaType, opts: RepeatingItemOptsType = {}) {
+export function repeatingItem<T>(
+  _schema: Schema<T>,
+  opts: RepeatingItemOptsType = {}
+): ArrayItem<T> {
   const meta = { type: "repeatingItem", schema: _schema };
 
   const min = opts.min || 0;
   const max = opts.max;
 
   const schema = toNeedledSchema(_schema);
+
   return new ArrayItem(needle => {
     return new Schema((obj, key, parents, parentKeys) =>
       (function run(items, results, needle) {
@@ -81,7 +84,7 @@ export function repeatingItem(_schema: SchemaType, opts: RepeatingItemOptsType =
   returns 1, with needle still pointing at 4.
   We don't care about the needle.
 */
-export function unorderedItem(_schema: SchemaType) {
+export function unorderedItem<T>(_schema: Schema<T>): ArrayItem<T> {
   const meta = { type: "unorderedItem", schema: _schema };
 
   const schema = toNeedledSchema(_schema);
@@ -114,10 +117,11 @@ export function unorderedItem(_schema: SchemaType) {
   A Skip() is not issued when an item is not found.
   The needle is incrementd by 1 if found, otherwise it remains the same.
 */
-export function optionalItem(_schema: SchemaType) {
+export function optionalItem<T>(_schema: Schema<T>): ArrayItem<T> {
   const meta = { type: "optionalItem", schema: _schema };
 
   const schema = toNeedledSchema(_schema);
+
   return new ArrayItem(needle => {
     return new Schema((obj, key, parents, parentKeys) =>
       waitForSchema(
@@ -127,10 +131,7 @@ export function optionalItem(_schema: SchemaType) {
             ? { result, needle: needle + 1 }
             : result instanceof Skip
                 ? {
-                    result: new Empty(
-                      { obj, key, parents, parentKeys },
-                      meta
-                    ),
+                    result: new Empty({ obj, key, parents, parentKeys }, meta),
                     needle
                   }
                 : { result, needle })
@@ -142,7 +143,7 @@ export function optionalItem(_schema: SchemaType) {
 /*
   Not array types, viz optional, unordered or repeating.
 */
-function regularItem(schema) {
+function regularItem<T>(schema: Schema<T>): ArrayItemFnType<T> {
   const meta = { type: "regularItem", schema };
   return needle =>
     new Schema((obj, key, parents, parentKeys) =>
@@ -161,14 +162,16 @@ function regularItem(schema) {
     );
 }
 
-function toNeedledSchema(schema) {
+function toNeedledSchema<T>(
+  schema: ArrayItem<T> | Schema<T>
+): ArrayItemFnType<T> {
   return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
 }
 
-/*
-  You'd call this like
-*/
-export function array(schemas: Array<Schema>, rawParams: RawSchemaParamsType) {
+export function array(
+  schemas: Array<Schema<any>>,
+  rawParams: RawSchemaParamsType<any>
+): Schema<Array<any>> {
   const meta = { type: "array", schemas, params: rawParams };
   const params = getDefaultParams(rawParams);
 
@@ -196,11 +199,12 @@ export function array(schemas: Array<Schema>, rawParams: RawSchemaParamsType) {
                       ))
           )(obj, key, parents, parentKeys);
         })(schemas, [], 0)
-      : context => new Fault(
-          `Expected array but got ${typeof obj}.`,
-          { obj, key, parents, parentKeys },
-          meta
-        );
+      : context =>
+          new Fault(
+            `Expected array but got ${typeof obj}.`,
+            { obj, key, parents, parentKeys },
+            meta
+          );
   };
   return new Schema(fn, params);
 }

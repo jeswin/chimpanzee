@@ -91,8 +91,6 @@ describe("chimpanzee", () => {
     ["literal-negative", "literal-negative", "skip"],
     ["map", "map", "match"],
     ["match-negative", "match-negative", "skip"],
-    ["modify-predicate", "modify-predicate", "match"],
-    ["modify-replace", "modify-replace", "match"],
     ["named-capture", "named-capture", "match"],
     ["native-array-simple", "native-array-simple", "match"],
     ["nested-any", "nested-any", "match"],

@@ -5,13 +5,15 @@ import { getDefaultParams, waitForSchema } from "../utils";
 
 import type {
   ContextType,
-  SchemaType,
   RawSchemaParamsType,
   SchemaParamsType,
   ResultGeneratorType
 } from "../types";
 
-export function optional(schema: SchemaType, rawParams: RawSchemaParamsType) {
+export function optional<T>(
+  schema: Schema<T>,
+  rawParams: RawSchemaParamsType<T>
+): Schema<?T> {
   const meta = { type: "optional", schema, params: rawParams };
   const params = getDefaultParams(rawParams);
 

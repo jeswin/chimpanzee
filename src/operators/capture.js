@@ -8,43 +8,38 @@ import type {
   ResultGeneratorType,
   PredicateType,
   ContextType,
-  NativeTypeSchemaType,
-  SchemaType
+  NativeTypeSchemaType
 } from "../types";
 
-export function capture(params: RawSchemaParamsType): ResultGeneratorType {
+export function capture<T>(params: RawSchemaParamsType<T>): Schema<T> {
   return captureIf(obj => typeof obj !== "undefined", params);
 }
 
-export function captureIf(
+export function captureIf<T>(
   predicate: PredicateType,
-  params: RawSchemaParamsType
-): ResultGeneratorType {
+  params: RawSchemaParamsType<T>
+): Schema<T> {
   return take(predicate, undefined, params);
 }
 
-export type ModifierType = (obj: any) => any;
-
 export type TakeOptions = {
-  modifier?: ModifierType,
-  skipMessage?: (obj: Object) => string
-}
+  skipMessage?: (obj: any) => string
+};
 
-export function modify(
+export function modify<T>(
   comparand: NativeTypeSchemaType | PredicateType,
-  modifier: ModifierType,
-  params: RawSchemaParamsType
-): ResultGeneratorType {
+  params: RawSchemaParamsType<T>
+): Schema<T> {
   return take(
     typeof comparand === "function" ? comparand : x => x === comparand,
     undefined,
     params,
-    { modifier: typeof modifier === "function" ? modifier : x => modifier }
+    {}
   );
 }
 
 export function captureAndTraverse(
-  schema: SchemaType,
+  schema: Schema,
   params: RawSchemaParamsType
 ) {
   return take(obj => typeof obj !== "undefined", schema, params);
@@ -59,9 +54,9 @@ export function literal(
   });
 }
 
-export function take(
+export function take<T, TOut>(
   predicate: PredicateType,
-  schema: SchemaType,
+  schema: Schema,
   rawParams: RawSchemaParamsType,
   options: TakeOptions = {}
 ) {
@@ -93,18 +88,20 @@ export function take(
                         )
                       : result) //Fault
             )(obj, key, parents, parentKeys)
-          : context => new Match(
-              options.modifier ? options.modifier(obj) : obj,
-              { obj, key, parents, parentKeys },
-              meta
-            )
-      : context => new Skip(
-          options.skipMessage
-            ? options.skipMessage(obj)
-            : `Predicate returned false. Predicate was ${predicate.toString()}`,
-          { obj, key, parents, parentKeys },
-          meta
-        );
+          : context =>
+              new Match(
+                options.modifier ? options.modifier(obj) : obj,
+                { obj, key, parents, parentKeys },
+                meta
+              )
+      : context =>
+          new Skip(
+            options.skipMessage
+              ? options.skipMessage(obj)
+              : `Predicate returned false. Predicate was ${predicate.toString()}`,
+            { obj, key, parents, parentKeys },
+            meta
+          );
   }
 
   return new Schema(fn, params);

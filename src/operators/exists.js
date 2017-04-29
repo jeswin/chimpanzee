@@ -6,7 +6,6 @@ import { getDefaultParams, waitForSchema } from "../utils";
 
 import type {
   ContextType,
-  SchemaType,
   RawSchemaParamsType,
   SchemaParamsType,
   ResultGeneratorType
@@ -14,7 +13,10 @@ import type {
 
 type PredicateType = (obj: any) => boolean;
 
-export function exists(predicate: PredicateType, schema: SchemaType) : SchemaType {
+export function exists(
+  predicate: PredicateType,
+  schema: Schema<any>
+): Schema<typeof undefined> {
   const meta = { type: "exists" };
 
   predicate = predicate || (x => typeof x !== "undefined");
@@ -24,11 +26,8 @@ export function exists(predicate: PredicateType, schema: SchemaType) : SchemaTyp
       ? schema
           ? waitForSchema(schema)(obj, key, parents, parentKeys)
           : context => new Empty({ obj, key, parents, parentKeys }, meta)
-      : context => new Skip(
-          "Does not exist.",
-          { obj, key, parents, parentKeys },
-          meta
-        );
+      : context =>
+          new Skip("Does not exist.", { obj, key, parents, parentKeys }, meta);
   }
 
   return new Schema(fn, undefined);

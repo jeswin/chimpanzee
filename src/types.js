@@ -1,35 +1,40 @@
-//export type ResultGenerator =
+/* @flow */
+
+// Result<T> = Match<T> | Empty | Skip | Fault
+import { Result, Match, Empty, Skip, Fault } from "./results/index";
+
+//Schema<T>
 import Schema from "./schema";
-import Result from "./results/result";
 
 export type PredicateType = (obj: any) => boolean;
 
-export type ResultGeneratorType = Result | (() => ResultGeneratorType);
+export type ResultGeneratorType<T> =
+  | Result<T>
+  | ((context: ContextType<T>) => ResultGeneratorType<T>);
 
-export type ContextType = {
-  parent?: ContextType,
-  state?: Object | number | string | boolean
-};
+export type ContextType<T> = { state?: T };
 
-export type FuncSchemaType = (
-  obj: Object,
-  key: string,
-  parents: Array<Object>,
-  parentKeys: Array<string>
-) => ResultGenerator;
+export type ResultType<T> = Match<T> | Empty | Skip | Fault;
+
+export type FuncSchemaType<T> = (
+  obj?: Object,
+  key?: string,
+  parents?: Array<Object>,
+  parentKeys?: Array<string>
+) => (context: ContextType<T>) => ResultGeneratorType<T>;
 
 export type NativeTypeSchemaType = string | boolean | number;
-export type ArraySchemaType = Array<SchemaType>;
-export type SchemaType =
+
+export type SchemaType<T: any> =
   | Object
   | NativeTypeSchemaType
-  | FuncSchemaType
-  | Schema
-  | ArraySchemaType;
+  | FuncSchemaType<T>
+  | Schema<T>
+  | Array<Schema<any>>;
 
-export type RawSchemaParamsType = {
+export type RawSchemaParamsType<T> = {
   key?: string,
-  builders: Array<{ get: (context: ContextType) => any }>,
+  builders?: Array<{ get: (context: ContextType<T>) => T | Result<T> }>,
   modifiers?: {
     property?: (a: any) => any,
     object?: (a: any) => any,
@@ -37,7 +42,8 @@ export type RawSchemaParamsType = {
   }
 };
 
-export type SchemaParamsType = {
+export type SchemaParamsType<T> = {
+  builders?: Array<{ get: (context: ContextType<T>) => T | Result<T> }>,
   key?: string,
   modifiers?: {
     property?: (a: any) => any,
@@ -46,14 +52,14 @@ export type SchemaParamsType = {
   }
 };
 
-export type ResultTransformType = (result: Result) => ResultGeneratorType;
+export type ResultTransformType<T> = (result: Result) => ResultGeneratorType<T>;
 
-export type SchemaInvocationFnType = (
+export type SchemaInvocationFnType<T> = (
   obj: Object,
   key: string,
   parents: Array<Object>,
   parentKeys: Array<string>
-) => ResultGeneratorType;
+) => ResultGeneratorType<T>;
 
 export type EnvType = {
   obj: Object,
@@ -62,12 +68,14 @@ export type EnvType = {
   parentKeys: Array<string>
 };
 
-export type MetaType = {
+export type MetaType<T> = {
   type: string,
-  schema: SchemaType,
-  params: SchemaParamsType
+  schema?: Schema<T>,
+  params?: SchemaParamsType<T>
 };
 
-export type MergeResultType = { context: ContextType } | { nonMatch: Skip | Fault }
+export type MergeResultType<T> =
+  | { context: ContextType<T> }
+  | { nonMatch: Skip | Fault };
 
-export type TaskType = (context: ContextType) => Result;
+export type TaskType<T> = (context: ContextType<T>) => Result;

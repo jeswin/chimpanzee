@@ -7,15 +7,14 @@ import { getDefaultParams, waitForSchema } from "../utils";
 
 import type {
   ContextType,
-  SchemaType,
   RawSchemaParamsType,
   ResultGeneratorType
 } from "../types";
 
 export function any(
-  schemas: Array<SchemaType>,
-  rawParams: RawSchemaParamsType = {}
-) {
+  schemas: Array<Schema<any>>,
+  rawParams: RawSchemaParamsType<any> = {}
+): Schema<any> {
   const meta = { type: "any", schemas, params: rawParams };
   const params = getDefaultParams(rawParams);
 
@@ -24,8 +23,11 @@ export function any(
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
-  ): ResultGeneratorType {
-    return (function run(schemas, nonMatching) {
+  ): ResultGeneratorType<any> {
+    return (function run(
+      schemas: Array<Schema<any>>,
+      nonMatching: Array<Schema<any>>
+    ) {
       return waitForSchema(
         schemas[0],
         result =>

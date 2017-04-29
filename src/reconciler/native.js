@@ -4,7 +4,6 @@ import Schema from "../schema";
 
 import type {
   ContextType,
-  SchemaType,
   NativeTypeSchemaType,
   RawSchemaParamsType,
   SchemaParamsType,

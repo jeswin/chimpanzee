@@ -5,7 +5,6 @@ import Schema from "../schema";
 
 import type {
   ContextType,
-  SchemaType,
   RawSchemaParamsType,
   SchemaParamsType,
   ResultGeneratorType,
@@ -13,7 +12,7 @@ import type {
   MetaType
 } from "../types";
 
-export default function(schema: SchemaType, params: SchemaParamsType) {
+export default function(schema: Schema, params: SchemaParamsType) {
   return function(
     originalObj: any,
     key: string,

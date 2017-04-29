@@ -6,22 +6,25 @@ import { getDefaultParams, waitForSchema } from "../utils";
 
 import type {
   ContextType,
-  SchemaType,
   RawSchemaParamsType,
   SchemaParamsType,
   ResultGeneratorType
 } from "../types";
 
-type MapperType = (a: any) => any
+type MapperType<T, TMapped> = (a: T) => TMapped;
 
-export function map(schema: SchemaType, mapper: MapperType, rawParams: RawSchemaParamsType) {
+export function map<T, TMapped>(
+  schema: Schema<T>,
+  mapper: MapperType<T, TMapped>,
+  rawParams: RawSchemaParamsType<T>
+) {
   const meta = { type: "map", schema, mapper, params: rawParams };
   const params = getDefaultParams(rawParams);
 
   function fn(obj, key, parents, parentKeys) {
     return waitForSchema(
       schema,
-      result =>
+      (result: T) =>
         (result instanceof Match
           ? new Match(
               mapper(result.value),

@@ -6,12 +6,11 @@ import Schema from "./schema";
 import type {
   ContextType,
   RawSchemaParamsType,
-  SchemaType,
   SchemaParamsType,
   ResultTransformerType
 } from "./types";
 
-export function getSchemaType(schema: SchemaType): string {
+export function getSchemaType(schema: Schema): string {
   return ["string", "number", "boolean", "symbol"].includes(typeof schema)
     ? "native"
     : typeof schema === "function"
@@ -39,7 +38,7 @@ export function getDefaultParams(
 export type WaitForSchemaOptionsType = {};
 
 export function waitForSchema(
-  schema: SchemaType,
+  schema: Schema,
   then: ResultTransformerType,
   options: WaitForSchemaOptionsType = {}
 ) {

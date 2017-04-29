@@ -8,7 +8,6 @@ import Schema from "../schema";
 
 import type {
   ContextType,
-  SchemaType,
   RawSchemaParamsType,
   SchemaParamsType,
   ResultGeneratorType,
@@ -24,14 +23,14 @@ const index = {
   object: obj
 };
 
-export default function(schemaType: string) {
-  return (schema: SchemaType, params: SchemaParamsType) => (
+export default function(Schema: string) {
+  return (schema: Schema, params: SchemaParamsType) => (
     originalObj: any,
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
   ) => (obj: any, meta: MetaType) =>
-    index[schemaType](schema, params)(
+    index[Schema](schema, params)(
       originalObj,
       key,
       parents,

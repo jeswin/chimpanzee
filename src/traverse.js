@@ -8,7 +8,6 @@ import { getSchemaType } from "./utils";
 
 import type {
   ContextType,
-  SchemaType,
   SchemaInvocationFnType,
   RawSchemaParamsType,
   SchemaParamsType,
@@ -17,7 +16,7 @@ import type {
   MetaType
 } from "./types";
 
-export function traverse(schema: SchemaType, rawParams: RawSchemaParamsType) {
+export function traverse(schema: Schema, rawParams: RawSchemaParamsType) {
   const meta = { type: "traverse", schema, params: rawParams };
   const params = getDefaultParams(rawParams);
 

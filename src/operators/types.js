@@ -6,33 +6,37 @@ import { getDefaultParams, waitForSchema } from "../utils";
 
 import type {
   ContextType,
-  SchemaType,
   RawSchemaParamsType,
   SchemaParamsType,
   ResultGeneratorType
 } from "../types";
 
-export function number(params: RawSchemaParamsType) {
+export type TypesType = number | string | boolean | Object | Function;
+
+export function number(params: RawSchemaParamsType<TypesType>) {
   return checkType("number", params);
 }
 
-export function bool(params: RawSchemaParamsType) {
+export function bool(params: RawSchemaParamsType<TypesType>) {
   return checkType("boolean", params);
 }
 
-export function string(params: RawSchemaParamsType) {
+export function string(params: RawSchemaParamsType<TypesType>) {
   return checkType("string", params);
 }
 
-export function object(params: RawSchemaParamsType) {
+export function object(params: RawSchemaParamsType<TypesType>) {
   return checkType("object", params);
 }
 
-export function func(params: RawSchemaParamsType) {
+export function func(params: RawSchemaParamsType<TypesType>) {
   return checkType("function", params);
 }
 
-function checkType(type, rawParams: RawSchemaParamsType) {
+function checkType(
+  type: string,
+  rawParams: RawSchemaParamsType<TypesType>
+) : Schema<TypesType> {
   const meta = { type, params: rawParams };
   const params = getDefaultParams(rawParams);
 

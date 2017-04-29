@@ -1,13 +1,14 @@
 /* @flow */
 import type {
   ContextType,
-  SchemaType,
   RawSchemaParamsType,
   SchemaParamsType,
   ResultGeneratorType,
   EnvType,
   MetaType
 } from "./types";
+
+import Schema from "./schema";
 
 export { traverse } from "./traverse";
 export { composite } from "./operators/composite";
@@ -16,7 +17,6 @@ export {
   captureIf,
   captureAndTraverse,
   literal,
-  modify,
   take
 } from "./operators/capture";
 export { any } from "./operators/any";
@@ -46,7 +46,7 @@ function _match(traverseResult: ResultGeneratorType) {
   return typeof result === "function" ? _match(result()) : result;
 }
 
-export function match(schema: SchemaType, input: any) {
+export function match(schema: Schema<any>, input: any) {
   const fn = typeof schema === "function" ? schema : schema.fn;
   return _match(fn(input, "__INIT__", [], []));
 }

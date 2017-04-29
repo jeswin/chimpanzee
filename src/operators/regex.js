@@ -6,13 +6,15 @@ import { getDefaultParams, waitForSchema } from "../utils";
 
 import type {
   ContextType,
-  SchemaType,
   RawSchemaParamsType,
   SchemaParamsType,
   ResultGeneratorType
 } from "../types";
 
-export function regex(regex: string | RegExp, rawParams: RawSchemaParamsType) {
+export function regex(
+  regex: string | RegExp,
+  rawParams: RawSchemaParamsType<string>
+): Schema<string> {
   const meta = { type: "regex", regex, params: rawParams };
   const params = getDefaultParams(rawParams);
 

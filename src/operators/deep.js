@@ -6,13 +6,15 @@ import { getDefaultParams, waitForSchema } from "../utils";
 
 import type {
   ContextType,
-  SchemaType,
   RawSchemaParamsType,
   SchemaParamsType,
   ResultGeneratorType
 } from "../types";
 
-export function deep(schema: SchemaType, rawParams: RawSchemaParamsType) {
+export function deep<T>(
+  schema: Schema<T>,
+  rawParams: RawSchemaParamsType<T>
+): Schema<T> {
   const meta = { type: "deep", schema, params: rawParams };
   const params = getDefaultParams(rawParams);
 
@@ -22,13 +24,10 @@ export function deep(schema: SchemaType, rawParams: RawSchemaParamsType) {
         ? waitForSchema(
             deep(schema),
             result =>
-              (!(result instanceof Skip) ? result : traverseObject(keys.slice(1)))
-          )(
-            obj[keys[0]],
-            key,
-            parents.concat(obj),
-            parentKeys.concat(keys[0])
-          )
+              (!(result instanceof Skip)
+                ? result
+                : traverseObject(keys.slice(1)))
+          )(obj[keys[0]], key, parents.concat(obj), parentKeys.concat(keys[0]))
         : new Skip(
             "Not found in deep.",
             { obj, key, parents, parentKeys },
@@ -41,7 +40,9 @@ export function deep(schema: SchemaType, rawParams: RawSchemaParamsType) {
         ? waitForSchema(
             deep(schema, params),
             result =>
-              (!(result instanceof Skip) ? result : traverseArray(items.slice(1)))
+              (!(result instanceof Skip)
+                ? result
+                : traverseArray(items.slice(1)))
           )(items[0], key, parents, parentKeys)
         : new Skip(
             "Not found in deep.",
