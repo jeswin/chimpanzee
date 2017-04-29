@@ -13,20 +13,23 @@ import type {
   MergeResultType
 } from "../types";
 
-export default function(
-  params: SchemaParamsType,
-  tasks: Array<TaskType>,
-  mergeChildResult: (finished: any, context: ContextType) => MergeResultType,
-  meta: MetaType
-) {
-  return function(
-    obj: any,
-    key: string,
-    parents: Array<any>,
-    parentKeys: Array<string>
-  ) {
+export default function(params: SchemaParamsType, tasks: Array<TaskType>, meta: MetaType) {
+  return function(obj: any, key: string, parents: Array<any>, parentKeys: Array<string>) {
     function mergeResult(finished, context) {
       const { result, params } = finished;
+      return result instanceof Match
+        ? !(result instanceof Empty)
+            ? { context: { ...context, state: result.value } }
+            : { context }
+        : { nonMatch: result };
+    }
+
+    function defaultMerge(
+      finished: { result: Result, params: SchemaParamsType },
+      context: any
+    ) {
+      const { result, params } = finished;
+
       return result instanceof Match
         ? !(result instanceof Empty)
             ? { context: { ...context, state: result.value } }
@@ -52,8 +55,7 @@ export default function(
           ? []
           : params.asserts.map(a => ({
               fn: a.predicate,
-              invalid: () =>
-                new Fault(a.error, { obj, key, parents, parentKeys }, meta)
+              invalid: () => new Fault(a.error, { obj, key, parents, parentKeys }, meta)
             }));
 
         return (
@@ -67,24 +69,20 @@ export default function(
             .first(x => typeof x !== "undefined") ||
           (() => {
             const result = params.build(obj, key, parents, parentKeys)(context);
-            return [Match, Skip, Fault].some(
-              resultType => result instanceof resultType
-            )
+            return [Match, Skip, Fault].some(resultType => result instanceof resultType)
               ? result
               : new Match(result, { obj, key, parents, parentKeys }, meta);
           })()
         );
       }
-      return { task, type: "reconcile" };
+      return { task };
     }
 
-    function run(tasksList, currentContext: ContextType) {
-      const [[tasks, merge], ...rest] = tasksList;
-
+    function run(tasks, currentContext: ContextType) {
       const { context, nonMatch } = Seq.of(tasks).reduce(
-        (acc, { task, type, params }) => {
+        (acc, { task, merge, params }) => {
           const taskResult = task(acc.context);
-          return merge({ result: taskResult, params }, acc.context);
+          return (merge || defaultMerge)({ result: taskResult, params }, acc.context);
         },
         { context: currentContext },
         acc => typeof acc.nonMatch !== "undefined"
@@ -112,16 +110,14 @@ export default function(
       const mustRun = !params.predicate || params.predicate(obj);
 
       return !mustRun
-        ? new Skip(
-            `Predicate returned false.`,
-            { obj, key, parents, parentKeys },
-            meta
-          )
+        ? new Skip(`Predicate returned false.`, { obj, key, parents, parentKeys }, meta)
         : (() => {
-            const allTasks = [
-              [tasks, mergeChildResult],
-              [[getTask()], mergeResult]
-            ];
+            const allTasks = tasks.concat([
+              {
+                task: getTask(),
+                merge: mergeResult
+              }
+            ]);
 
             return run(allTasks, context);
           })();

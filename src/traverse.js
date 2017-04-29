@@ -24,14 +24,15 @@ export function traverse(schema: Schema, rawParams: RawSchemaParamsType) {
   function fn(originalObj, key, parents, parentKeys) {
     const obj = params.modifiers.object ? params.modifiers.object(originalObj) : originalObj;
 
-    const childReconciler = getReconciler(schemaType)(schema, params)(
+    const childTasks = getReconciler(schemaType)(schema, params)(
       originalObj,
       key,
       parents,
       parentKeys
     )(obj, meta);
 
-    const childTasks = childReconciler.getChildTasks();
+    console.log(schemaType);
+    console.log("---", childTasks.toArray());
 
     function sortFn(task1, task2) {
       const task1Order = task1.params && task1.params.order ? task1.params.order : 0;

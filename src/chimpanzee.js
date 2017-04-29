@@ -9,16 +9,11 @@ import type {
 } from "./types";
 
 import Schema from "./schema";
+import { parseWithSchema } from "./utils";
 
 export { traverse } from "./traverse";
 export { composite } from "./operators/composite";
-export {
-  capture,
-  captureIf,
-  captureAndTraverse,
-  literal,
-  take
-} from "./operators/capture";
+export { capture, captureIf, captureAndTraverse, literal, take } from "./operators/capture";
 export { any } from "./operators/any";
 export { map } from "./operators/map";
 export { optional } from "./operators/optional";
@@ -28,12 +23,7 @@ export { exists } from "./operators/exists";
 export { number, bool, string, object, func } from "./operators/types";
 export { regex } from "./operators/regex";
 
-export {
-  repeatingItem,
-  unorderedItem,
-  optionalItem,
-  array
-} from "./operators/array";
+export { repeatingItem, unorderedItem, optionalItem, array } from "./operators/array";
 
 export { Match, Empty, Skip, Fault } from "./results";
 
@@ -42,6 +32,5 @@ export { default as Schema } from "./schema";
 export { parseWithSchema } from "./utils";
 
 export function match(schema: Schema<any>, input: any) {
-  const fn = typeof schema === "function" ? schema : schema.fn;
-  return fn(input, "__INIT__", [], [])({});
+  return parseWithSchema(schema)(input, "__INIT__", [], [])({});
 }

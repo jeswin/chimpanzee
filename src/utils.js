@@ -32,19 +32,6 @@ export function getDefaultParams(rawParams?: string | RawSchemaParamsType): Sche
   return params;
 }
 
-function mergeChildResult(
-  finished: { result: Result, params: SchemaParamsType },
-  context: any
-) {
-  const { result, params } = finished;
-
-  return result instanceof Match
-    ? !(result instanceof Empty)
-        ? { context: { ...context, state: result.value } }
-        : { context }
-    : { nonMatch: result };
-}
-
 export function makeSchema(schema, params) {
   return typeof schema === "function"
     ? new Schema(schema, params || getDefaultParams())
@@ -57,8 +44,10 @@ export function parseWithSchema(_schema: Schema, meta) {
   return function(obj: any, key: string, parents: Array<any>, parentKeys: Array<string>) {
     const schema = makeSchema(_schema);
     const tasks = schema.fn(obj, key, parents, parentKeys);
+
+    console.log("+++", tasks.toArray ? tasks.toArray() : tasks);
     return context =>
-      reconcile(schema.params, tasks, mergeChildResult, meta)(obj, key, parents, parentKeys)(
+      reconcile(schema.params, tasks, meta)(obj, key, parents, parentKeys)(
         schema.params.reuseContext ? context : {}
       );
   };

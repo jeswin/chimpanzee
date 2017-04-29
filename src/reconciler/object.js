@@ -78,7 +78,7 @@ export default function(schema: Object, params: SchemaParamsType) {
 
             const childSchemaIsObject = getSchemaType(childSchema) === "object";
 
-            const schema = makeSchema(childSchema, {
+            const effectiveSchema = makeSchema(childSchema, {
               value: params.value,
               modifiers: {
                 property: params.modifiers.property,
@@ -88,7 +88,7 @@ export default function(schema: Object, params: SchemaParamsType) {
 
             return {
               task: context =>
-                parseWithSchema(schema)(
+                parseWithSchema(effectiveSchema)(
                   childItem,
                   childKey,
                   parents.concat(originalObj),
