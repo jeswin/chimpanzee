@@ -8,7 +8,7 @@ import type {
   ContextType,
   RawSchemaParamsType,
   SchemaParamsType,
-  ResultGeneratorType
+  TaskType
 } from "../types";
 
 export type TypesType = number | string | boolean | Object | Function;

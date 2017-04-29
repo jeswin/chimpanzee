@@ -9,7 +9,7 @@ import type {
   ContextType,
   RawSchemaParamsType,
   SchemaParamsType,
-  ResultGeneratorType
+  TaskType
 } from "../types";
 
 function getSchema(schema: Schema, paramSelector: string): Schema {

@@ -7,7 +7,7 @@ import { getDefaultParams, waitForSchema } from "../utils";
 import type {
   ContextType,
   RawSchemaParamsType,
-  ResultGeneratorType
+  TaskType
 } from "../types";
 
 type ArrayItemFnType<T> = (needle: number) => Schema<T>;

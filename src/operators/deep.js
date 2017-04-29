@@ -8,7 +8,7 @@ import type {
   ContextType,
   RawSchemaParamsType,
   SchemaParamsType,
-  ResultGeneratorType
+  TaskType
 } from "../types";
 
 export function deep<T>(

@@ -8,10 +8,10 @@ import { getSchemaType } from "./utils";
 
 import type {
   ContextType,
-  SchemaInvocationFnType,
+  InvokeType,
   RawSchemaParamsType,
   SchemaParamsType,
-  ResultGeneratorType,
+  TaskType,
   EnvType,
   MetaType
 } from "./types";

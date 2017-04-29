@@ -8,9 +8,7 @@ import Schema from "./schema";
 
 export type PredicateType = (obj: any) => boolean;
 
-export type ResultGeneratorType<T> =
-  | Result<T>
-  | ((context: ContextType<T>) => ResultGeneratorType<T>);
+export type TaskType<T> = Result<T> | (context: ContextType) => TaskType<T>
 
 export type ContextType<T> = { state?: T };
 
@@ -21,7 +19,7 @@ export type FuncSchemaType<T> = (
   key?: string,
   parents?: Array<Object>,
   parentKeys?: Array<string>
-) => (context: ContextType<T>) => ResultGeneratorType<T>;
+) => (context: ContextType<T>) => TaskType<T>;
 
 export type NativeTypeSchemaType = string | boolean | number;
 
@@ -52,14 +50,14 @@ export type SchemaParamsType<T> = {
   }
 };
 
-export type ResultTransformType<T> = (result: Result) => ResultGeneratorType<T>;
+export type ResultTransformType<T> = (result: Result) => TaskType<T>;
 
-export type SchemaInvocationFnType<T> = (
+export type InvokeType<T> = (
   obj: Object,
   key: string,
   parents: Array<Object>,
   parentKeys: Array<string>
-) => ResultGeneratorType<T>;
+) => TaskType<T>;
 
 export type EnvType = {
   obj: Object,
@@ -77,5 +75,3 @@ export type MetaType<T> = {
 export type MergeResultType<T> =
   | { context: ContextType<T> }
   | { nonMatch: Skip | Fault };
-
-export type TaskType<T> = (context: ContextType<T>) => Result;

@@ -8,7 +8,7 @@ import { getDefaultParams, waitForSchema } from "../utils";
 import type {
   ContextType,
   RawSchemaParamsType,
-  ResultGeneratorType
+  TaskType
 } from "../types";
 
 export function any(
@@ -23,7 +23,7 @@ export function any(
     key: string,
     parents: Array<any>,
     parentKeys: Array<string>
-  ): ResultGeneratorType<any> {
+  ): TaskType<any> {
     return (function run(
       schemas: Array<Schema<any>>,
       nonMatching: Array<Schema<any>>

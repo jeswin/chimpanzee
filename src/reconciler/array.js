@@ -9,7 +9,7 @@ import type {
   ArraySchemaType,
   RawSchemaParamsType,
   SchemaParamsType,
-  ResultGeneratorType,
+  TaskType,
   EnvType,
   MetaType
 } from "../types";

@@ -3,7 +3,7 @@ import type {
   ContextType,
   RawSchemaParamsType,
   SchemaParamsType,
-  ResultGeneratorType,
+  TaskType,
   EnvType,
   MetaType
 } from "./types";
@@ -41,7 +41,7 @@ export { default as Schema } from "./schema";
 
 export { waitForSchema } from "./utils";
 
-function _match(traverseResult: ResultGeneratorType) {
+function _match(traverseResult: TaskType) {
   const result = traverseResult;
   return typeof result === "function" ? _match(result()) : result;
 }

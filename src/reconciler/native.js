@@ -7,7 +7,7 @@ import type {
   NativeTypeSchemaType,
   RawSchemaParamsType,
   SchemaParamsType,
-  ResultGeneratorType,
+  TaskType,
   EnvType,
   MetaType
 } from "../types";

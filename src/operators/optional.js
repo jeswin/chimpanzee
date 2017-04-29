@@ -7,13 +7,13 @@ import type {
   ContextType,
   RawSchemaParamsType,
   SchemaParamsType,
-  ResultGeneratorType
+  TaskType
 } from "../types";
 
 export function optional<T>(
   schema: Schema<T>,
   rawParams: RawSchemaParamsType<T>
-): Schema<?T> {
+): Schema<T> {
   const meta = { type: "optional", schema, params: rawParams };
   const params = getDefaultParams(rawParams);
 

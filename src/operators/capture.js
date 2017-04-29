@@ -5,7 +5,7 @@ import { getDefaultParams, waitForSchema } from "../utils";
 
 import type {
   RawSchemaParamsType,
-  ResultGeneratorType,
+  TaskType,
   PredicateType,
   ContextType,
   NativeTypeSchemaType
@@ -48,7 +48,7 @@ export function captureAndTraverse(
 export function literal(
   what: NativeTypeSchemaType,
   params: RawSchemaParamsType
-): ResultGeneratorType {
+): TaskType {
   return take(x => x === what, undefined, params, {
     skipMessage: x => `Expected value to be ${what} but got ${x.toString()}.`
   });

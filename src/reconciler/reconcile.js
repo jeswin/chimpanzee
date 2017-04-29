@@ -7,11 +7,10 @@ import type {
   ContextType,
   RawSchemaParamsType,
   SchemaParamsType,
-  ResultGeneratorType,
+  TaskType,
   EnvType,
   MetaType,
   MergeResultType,
-  TaskType
 } from "../types";
 
 export default function(
@@ -83,7 +82,7 @@ export default function(
     }
 
     type TaskReduceResultType = {
-      pending: Array<ResultGeneratorType>,
+      pending: Array<TaskType>,
       result: MergeResultType
     };
 
