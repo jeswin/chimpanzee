@@ -16,10 +16,13 @@ function getSchema(schema: Schema, paramSelector: string): Schema {
     : schema instanceof Schema
         ? schemaSelector === paramSelector ? schema : undefined
         : typeof schema === "object"
-            ? Seq.of(Object.keys(schema)).reduce((acc, key) => {
-                const result = getSchema(schema[key], paramSelector);
-                return result !== undefined ? { ...acc, [key]: result } : acc;
-              }, {})
+            ? Seq.of(Object.keys(schema)).reduce(
+                (acc, key) => {
+                  const result = getSchema(schema[key], paramSelector);
+                  return result !== undefined ? { ...acc, [key]: result } : acc;
+                },
+                {}
+              )
             : paramSelector === "default" ? schema : undefined;
 }
 
@@ -44,8 +47,7 @@ export function composite<T>(
     : [getDefaultParams({})].concat(normalizedParams);
 
   const schemas = paramsList.map(params =>
-    traverse(getSchema(schema, (params && params.name) || "default"), params)
-  );
+    getSchema(schema, (params && params.name) || "default"));
 
   function fn(obj, key, parents, parentKeys) {
     return [
@@ -74,5 +76,5 @@ export function composite<T>(
     ];
   }
 
-  return new Schema(fn, ownParams);
+  return new Schema(fn, ownParams, { name: "composite" });
 }

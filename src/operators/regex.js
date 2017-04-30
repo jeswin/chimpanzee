@@ -20,9 +20,9 @@ export function regex(
           const result = parseWithSchema(
             captureIf(
               obj =>
-                (typeof regex === "string"
+                typeof regex === "string"
                   ? typeof obj === "string" && new RegExp(regex).test(obj)
-                  : typeof obj === "string" && regex.test(obj))
+                  : typeof obj === "string" && regex.test(obj)
             ),
             meta
           )(obj, key, parents, parentKeys)(context);
@@ -34,5 +34,5 @@ export function regex(
     ];
   }
 
-  return new Schema(fn, params);
+  return new Schema(fn, params, { name: "regex" });
 }

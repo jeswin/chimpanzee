@@ -28,5 +28,5 @@ export function map<T, TMapped>(
     ];
   }
 
-  return new Schema(fn, params);
+  return new Schema(fn, params, { name: "map" });
 }

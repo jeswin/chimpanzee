@@ -97,5 +97,5 @@ export function take<T, TOut>(
     ];
   }
 
-  return new Schema(fn, params);
+  return new Schema(fn, params, { name: "capture" });
 }

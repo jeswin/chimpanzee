@@ -44,13 +44,12 @@ export function parseWithSchema(schema: Schema, meta, defaultParams) {
     const params = schema instanceof Schema && schema.params
       ? schema.params
       : getDefaultParams(defaultParams);
+
     const obj = params.modifiers.object ? params.modifiers.object(originalObj) : originalObj;
-    const _tasks = reconciler.getTasks(schema, params)(
-      originalObj,
-      key,
-      parents,
-      parentKeys
-    )(obj, meta);
+    const _tasks = reconciler.getTasks(schema, params)(originalObj, key, parents, parentKeys)(
+      obj,
+      meta
+    );
 
     function sortFn(task1, task2) {
       const task1Order = task1.params && task1.params.order ? task1.params.order : 0;

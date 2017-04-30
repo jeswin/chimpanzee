@@ -46,5 +46,5 @@ export function any(
     ];
   }
 
-  return new Schema(fn, params);
+  return new Schema(fn, params, { name: "any" });
 }

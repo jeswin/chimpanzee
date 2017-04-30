@@ -28,5 +28,5 @@ export function exists(
     ];
   }
 
-  return new Schema(fn, undefined);
+  return new Schema(fn, undefined, { name: "exists"});
 }

@@ -22,5 +22,5 @@ export function optional<T>(schema: Schema<T>, rawParams: RawSchemaParamsType<T>
     ];
   }
 
-  return new Schema(fn, params);
+  return new Schema(fn, params, { name: "optional" });
 }

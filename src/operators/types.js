@@ -54,5 +54,5 @@ function checkType(type: string, rawParams: RawSchemaParamsType<TypesType>): Sch
     ];
   }
 
-  return new Schema(fn, params);
+  return new Schema(fn, params, { name: type });
 }

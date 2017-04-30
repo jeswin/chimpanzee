@@ -1,5 +1,5 @@
 /* @flow */
-import { getDefaultParams } from "../utils";
+import { getDefaultParams, parseWithSchema } from "../utils";
 import Schema from "../schema";
 
 import type {
@@ -19,13 +19,13 @@ export function traverse(schema: Schema, rawParams: RawSchemaParamsType) {
   function fn(obj, key, parents, parentKeys) {
     return [
       {
-        task: context =>
-          parseWithSchema(schema, meta, params)(obj, key, parents, parentKeys)(
-            context
-          )
+        task: context => {
+          console.log("SCHEMA", schema);
+          return parseWithSchema(schema, meta, params)(obj, key, parents, parentKeys)(context);
+        }
       }
     ];
   }
 
-  return new Schema(fn, params);
+  return new Schema(fn, params, { name: "traverse" });
 }

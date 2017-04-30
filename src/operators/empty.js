@@ -16,5 +16,5 @@ export function empty() {
     ];
   }
 
-  return new Schema(fn, undefined);
+  return new Schema(fn, undefined, { name: "empty" });
 }

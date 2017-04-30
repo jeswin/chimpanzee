@@ -56,5 +56,5 @@ export function deep<T>(schema: Schema<T>, rawParams: RawSchemaParamsType<T>): S
     ];
   }
 
-  return new Schema(fn, params);
+  return new Schema(fn, params, { name: "deep" });
 }
