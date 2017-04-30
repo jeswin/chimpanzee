@@ -21,14 +21,12 @@ export function getTasks(schema: Schema, params: SchemaParamsType) {
   ) {
     return function(obj: any, meta: MetaType) {
       const common = external(schema, params)(originalObj, key, parents, parentKeys)(obj, meta);
-
-      return [
-        {
-          task: context => schema.fn(obj, key, parents, parentKeys)(context),
-          merge: common.mergeChildResult,
-          params: schema.params
-        }
-      ];
+      const tasksList = schema.fn(obj, key, parents, parentKeys);
+      return tasksList.map(t => ({
+        task: context => t.task(context),
+        merge: t.merge || common.mergeChildResult,
+        params: schema.params
+      }));
     };
   };
 }

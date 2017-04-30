@@ -57,7 +57,7 @@ export function parseWithSchema(schema: Schema, meta, defaultParams) {
       return task1Order - task2Order;
     }
 
-    const tasks = _tasks.filter(sortFn);
+    const tasks = _tasks.sort(sortFn);
 
     return context => {
       return reconcile(schema.params, tasks, meta)(obj, key, parents, parentKeys)(
