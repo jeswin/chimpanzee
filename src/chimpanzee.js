@@ -11,7 +11,7 @@ import type {
 import Schema from "./schema";
 import { parseWithSchema } from "./utils";
 
-export { traverse } from "./traverse";
+export { traverse } from "./operators/traverse";
 export { composite } from "./operators/composite";
 export { capture, captureIf, captureAndTraverse, literal, take } from "./operators/capture";
 export { any } from "./operators/any";

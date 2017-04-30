@@ -1,6 +1,5 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { traverse } from "../traverse";
 import Schema from "../schema";
 import { Seq } from "lazily";
 import { getDefaultParams, parseWithSchema } from "../utils";

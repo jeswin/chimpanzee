@@ -2,7 +2,6 @@
 import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { Seq } from "lazily";
-import { traverse } from "../traverse";
 import { getDefaultParams, parseWithSchema } from "../utils";
 
 import type { ContextType, RawSchemaParamsType, TaskType } from "../types";

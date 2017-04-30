@@ -1,5 +1,4 @@
 /* @flow */
-import { traverse } from "./traverse";
 import { Match, Empty, Skip, Fault } from "./results";
 import Schema from "./schema";
 import reconcile from "./reconciler/reconcile";
@@ -33,7 +32,7 @@ export function getDefaultParams(rawParams?: string | RawSchemaParamsType): Sche
   return params;
 }
 
-export function parseWithSchema(schema: Schema, meta) {
+export function parseWithSchema(schema: Schema, meta, defaultParams) {
   return function(
     originalObj: any,
     key: string,
@@ -44,7 +43,7 @@ export function parseWithSchema(schema: Schema, meta) {
     const reconciler = getReconciler(schemaType);
     const params = schema instanceof Schema && schema.params
       ? schema.params
-      : getDefaultParams();
+      : getDefaultParams(defaultParams);
     const obj = params.modifiers.object ? params.modifiers.object(originalObj) : originalObj;
     const _tasks = reconciler.getTasks(schema, params)(
       originalObj,

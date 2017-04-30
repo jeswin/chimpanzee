@@ -1,5 +1,4 @@
 /* @flow */
-import { traverse } from "../traverse";
 import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { getDefaultParams, parseWithSchema } from "../utils";
