@@ -16,13 +16,10 @@ function getSchema(schema: Schema, paramSelector: string): Schema {
     : schema instanceof Schema
         ? schemaSelector === paramSelector ? schema : undefined
         : typeof schema === "object"
-            ? Seq.of(Object.keys(schema)).reduce(
-                (acc, key) => {
-                  const result = getSchema(schema[key], paramSelector);
-                  return result !== undefined ? { ...acc, [key]: result } : acc;
-                },
-                {}
-              )
+            ? Seq.of(Object.keys(schema)).reduce((acc, key) => {
+                const result = getSchema(schema[key], paramSelector);
+                return result !== undefined ? { ...acc, [key]: result } : acc;
+              }, {})
             : paramSelector === "default" ? schema : undefined;
 }
 
@@ -42,14 +39,15 @@ export function composite<T>(
 
   const normalizedParams = _paramsList.map(getDefaultParams);
 
-  const paramsList = normalizedParams.some(params => params.name === "default")
+  const paramsList = normalizedParams.some(params => !params.name || params.name === "default")
     ? normalizedParams
     : [getDefaultParams({})].concat(normalizedParams);
 
   const schemas = paramsList.map(params =>
-    getSchema(schema, (params && params.name) || "default"));
+    getSchema(schema, (params && params.name) || "default")
+  );
 
-  console.log("SCHEMMM", schemas);
+  console.log("SCHEMMM", JSON.stringify(schemas));
 
   function fn(obj, key, parents, parentKeys) {
     return [
