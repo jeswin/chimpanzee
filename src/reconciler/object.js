@@ -2,7 +2,7 @@
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
-import { makeSchema, parseWithSchema } from "../utils";
+import { parseWithSchema } from "../utils";
 
 import type {
   ContextType,
@@ -77,22 +77,17 @@ export function getTasks(schema: Object, params: SchemaParamsType) {
 
             const childSchemaIsObject = getSchemaType(childSchema) === "object";
 
-            const effectiveSchema = makeSchema(childSchema, {
-              value: params.value,
-              modifiers: {
-                property: params.modifiers.property,
-                value: params.modifiers.value
-              }
-            });
-
             return {
               task: context =>
-                parseWithSchema(effectiveSchema)(
-                  childItem,
-                  childKey,
-                  parents.concat(originalObj),
-                  parentKeys.concat(key)
-                )(context),
+                parseWithSchema(childSchema, meta, {
+                  value: params.value,
+                  modifiers: {
+                    property: params.modifiers.property,
+                    value: params.modifiers.value
+                  }
+                })(childItem, childKey, parents.concat(originalObj), parentKeys.concat(key))(
+                  context
+                ),
               merge: mergeChildResult,
               params: childSchema.params
                 ? {

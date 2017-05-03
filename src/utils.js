@@ -60,8 +60,8 @@ export function parseWithSchema(schema: Schema, meta, defaultParams) {
     const tasks = _tasks.sort(sortFn);
 
     return context => {
-      return reconcile(schema.params, tasks, meta)(obj, key, parents, parentKeys)(
-        schema.params.reuseContext ? context : {}
+      return reconcile(params, tasks, meta)(obj, key, parents, parentKeys)(
+        params.reuseContext ? context : {}
       );
     };
   };

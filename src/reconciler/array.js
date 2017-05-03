@@ -2,7 +2,7 @@
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
-import { makeSchema, parseWithSchema } from "../utils";
+import { parseWithSchema } from "../utils";
 
 import type {
   ContextType,
@@ -57,16 +57,15 @@ export function getTasks(schema: ArraySchemaType, params: SchemaParamsType) {
               ]
             : Seq.of(schema)
                 .map((rhs, i) => {
-                  const schema = makeSchema(rhs, {
-                    value: params.value,
-                    modifiers: {
-                      property: params.modifiers.property,
-                      value: params.modifiers.value
-                    }
-                  });
                   return {
                     task: context =>
-                      parseWithSchema(schema)(
+                      parseWithSchema(childSchema, meta, {
+                        value: params.value,
+                        modifiers: {
+                          property: params.modifiers.property,
+                          value: params.modifiers.value
+                        }
+                      })(
                         obj[i],
                         `${key}.${i}`,
                         parents.concat(originalObj),
