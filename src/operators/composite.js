@@ -49,6 +49,8 @@ export function composite<T>(
   const schemas = paramsList.map(params =>
     getSchema(schema, (params && params.name) || "default"));
 
+  console.log("SCHEMMM", schemas);
+
   function fn(obj, key, parents, parentKeys) {
     return [
       {
@@ -61,6 +63,7 @@ export function composite<T>(
 
           return schemas.length
             ? (function run(schemas, state) {
+                console.log("RESOBJ", obj);
                 const result = parseWithSchema(schemas[0], meta)(obj, key, parents, parentKeys)(
                   context
                 );
