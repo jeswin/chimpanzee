@@ -19,10 +19,8 @@ export function traverse(schema: Schema, rawParams: RawSchemaParamsType) {
   function fn(obj, key, parents, parentKeys) {
     return [
       {
-        task: context => {
-          console.log("SCHEMA", schema);
-          return parseWithSchema(schema, meta, params)(obj, key, parents, parentKeys)(context);
-        }
+        task: context =>
+          parseWithSchema(schema, meta, params)(obj, key, parents, parentKeys)(context)
       }
     ];
   }

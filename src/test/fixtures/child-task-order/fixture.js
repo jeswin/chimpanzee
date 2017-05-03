@@ -12,7 +12,7 @@ export const schema = traverse({
     prop1: number(),
     prop2: number({
       order: 10,
-      build: () => (state) => console.log("STTAAATEE", state) || state.prop1 + 100
+      build: () => (state) => state.prop1 + 100
     })
   }
 });
