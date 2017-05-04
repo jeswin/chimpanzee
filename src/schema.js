@@ -19,6 +19,9 @@ export class Schema {
 
 export class ValueSchema extends Schema {
   constructor(value, params, meta) {
+    if (!value) {
+      throw new Error()
+    }
     super(params, meta);
     this.value = value;
   }

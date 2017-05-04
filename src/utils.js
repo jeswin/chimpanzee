@@ -2,7 +2,6 @@
 import exception from "./exception";
 
 import { Match, Empty, Skip, Fault } from "./results";
-import { FunctionalSchema } from "./schema";
 import reconcile from "./reconcile";
 
 import * as functionParser from "./parsers/function";
@@ -11,7 +10,7 @@ import * as nativeParser from "./parsers/native";
 import * as objectParser from "./parsers/object";
 import * as functionalSchemaParser from "./parsers/schema";
 
-import * as Schema from "./schema";
+import { Schema, ValueSchema, FunctionalSchema } from "./schema";
 
 const valueSchemaParsers = {
   function: functionParser,
@@ -45,7 +44,7 @@ export function normalizeParams(rawParams) {
 }
 
 export function getSchema(source, params) {
-  return source instanceof Schema ? source : new ValueSchema(source, params);
+  return (source instanceof Schema) ? source : new ValueSchema(source, params);
 }
 
 export function parse(source) {

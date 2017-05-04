@@ -14,5 +14,5 @@ import type {
 
 export function traverse(source, params) {
   const meta = { type: "traverse", schema: source, params };
-  const schema = new ValueSchema(source, params, meta);
+  return new ValueSchema(source, params, meta);
 }

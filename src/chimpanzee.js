@@ -31,6 +31,6 @@ export { default as Schema } from "./schema";
 
 export { parse } from "./utils";
 
-export function match(schema: Schema<any>, input: any) {
+export function match(schema, input) {
   return parse(schema)(input, "__INIT__", [], [])({});
 }
