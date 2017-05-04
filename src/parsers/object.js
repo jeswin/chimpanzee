@@ -1,7 +1,7 @@
 /* @flow */
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
-import { ValueSchema, FunctionalSchema } from "../schema";
+import { Schema, ValueSchema, FunctionalSchema } from "../schema";
 import { parse } from "../utils";
 
 export function getTasks(valueSchema, params) {
@@ -10,6 +10,7 @@ export function getTasks(valueSchema, params) {
     return function(obj, meta) {
       function mergeChildResult(finished, context) {
         const { result, params } = finished;
+        console.log("RES", result.value, "...", params);
         return result instanceof Match
           ? !(result instanceof Empty)
               ? params.replace || params.isObject
@@ -54,7 +55,8 @@ export function getTasks(valueSchema, params) {
                       ? params.modifiers.property(obj, childKey)
                       : obj[childKey];
 
-            const childSchemaIsObject = typeof childSource === "object";
+            const childSchemaIsObject =
+              !(childSource instanceof Schema) && typeof childSource === "object";
 
             const childSchema = new ValueSchema(
               childSource,
