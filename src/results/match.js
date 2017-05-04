@@ -1,11 +1,8 @@
 /* @flow */
 import Result from "./result";
-import type { EnvType, MetaType } from "../types";
 
-export default class Match<T> extends Result {
-  value: T;
-
-  constructor(value: T, env: EnvType, meta: MetaType) {
+export default class Match extends Result {
+  constructor(value, env, meta) {
     super(env, meta);
     this.value = value;
 
@@ -15,7 +12,7 @@ export default class Match<T> extends Result {
     }
   }
 
-  updateEnv(args: Object) : Match<T> {
+  updateEnv(args) {
     return new Match(this.value, { ...this.env, ...args }, this.meta);
   }
 }

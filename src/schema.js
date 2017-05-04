@@ -1,13 +1,4 @@
 /* @flow */
-import type {
-  ContextType,
-  InvokeType,
-  SchemaParamsType,
-  TaskType,
-  EnvType,
-  MetaType
-} from "./types";
-
 import { normalizeParams } from "./utils";
 
 export class Schema {

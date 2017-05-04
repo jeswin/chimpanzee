@@ -1,9 +1,8 @@
 /* @flow */
 import Match from "./match";
-import type { EnvType, MetaType } from "../types";
 
 export default class Empty extends Match {
-  constructor(env: EnvType, meta: MetaType) {
+  constructor(env, meta) {
     super(undefined, env, meta);
 
     //Unit test support
@@ -12,7 +11,7 @@ export default class Empty extends Match {
     }
   }
 
-  updateEnv(args: Object) {
+  updateEnv(args) {
     return new Empty({ ...this.env, ...args }, this.meta);
   }
 }

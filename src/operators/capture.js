@@ -3,33 +3,15 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionalSchema } from "../schema";
 import { parse } from "../utils";
 
-import type {
-  RawSchemaParamsType,
-  TaskType,
-  PredicateType,
-  ContextType,
-  NativeTypeSchemaType
-} from "../types";
-
-export function capture<T>(params: RawSchemaParamsType<T>): Schema<T> {
+export function capture(params) {
   return captureIf(obj => typeof obj !== "undefined", params);
 }
 
-export function captureIf<T>(
-  predicate: PredicateType,
-  params: RawSchemaParamsType<T>
-): Schema<T> {
+export function captureIf(predicate, params) {
   return take(predicate, undefined, params);
 }
 
-export type TakeOptions = {
-  skipMessage?: (obj: any) => string
-};
-
-export function modify<T>(
-  comparand: NativeTypeSchemaType | PredicateType,
-  params: RawSchemaParamsType<T>
-): Schema<T> {
+export function modify(comparand, params) {
   return take(
     typeof comparand === "function" ? comparand : x => x === comparand,
     undefined,
@@ -38,11 +20,11 @@ export function modify<T>(
   );
 }
 
-export function captureAndTraverse(schema: Schema, params: RawSchemaParamsType) {
+export function captureAndTraverse(schema, params) {
   return take(obj => typeof obj !== "undefined", schema, params);
 }
 
-export function literal(what: NativeTypeSchemaType, params: RawSchemaParamsType): TaskType {
+export function literal(what, params) {
   return take(x => x === what, undefined, params, {
     skipMessage: x => `Expected value to be ${what} but got ${x.toString()}.`
   });
@@ -58,9 +40,7 @@ export function take(predicate, schema, params, options = {}) {
           (predicate(obj)
             ? typeof schema !== "undefined"
                 ? (() => {
-                    const result = parse(schema)(obj, key, parents, parentKeys)(
-                      context
-                    );
+                    const result = parse(schema)(obj, key, parents, parentKeys)(context);
 
                     return result instanceof Match
                       ? new Match(

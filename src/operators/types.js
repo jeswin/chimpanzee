@@ -4,27 +4,23 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionalSchema } from "../schema";
 import { parse } from "../utils";
 
-import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
-
-export type TypesType = number | string | boolean | Object | Function;
-
-export function number(params: RawSchemaParamsType<TypesType>) {
+export function number(params) {
   return checkType("number", params);
 }
 
-export function bool(params: RawSchemaParamsType<TypesType>) {
+export function bool(params) {
   return checkType("boolean", params);
 }
 
-export function string(params: RawSchemaParamsType<TypesType>) {
+export function string(params) {
   return checkType("string", params);
 }
 
-export function object(params: RawSchemaParamsType<TypesType>) {
+export function object(params) {
   return checkType("object", params);
 }
 
-export function func(params: RawSchemaParamsType<TypesType>) {
+export function func(params) {
   return checkType("function", params);
 }
 

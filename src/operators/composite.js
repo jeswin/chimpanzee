@@ -5,8 +5,6 @@ import { Seq } from "lazily";
 import { traverse } from "./traverse";
 import { parse } from "../utils";
 
-import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
-
 function getSchema(schema, paramSelector) {
   const schemaSelector = schema.params && schema.params.selector
     ? schema.params.selector

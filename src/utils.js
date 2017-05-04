@@ -8,7 +8,8 @@ import * as functionParser from "./parsers/function";
 import * as arrayParser from "./parsers/array";
 import * as nativeParser from "./parsers/native";
 import * as objectParser from "./parsers/object";
-import * as functionalSchemaParser from "./parsers/schema";
+import * as valueSchemaParser from "./parsers/value-schema";
+import * as functionalSchemaParser from "./parsers/functional-schema";
 
 import { Schema, ValueSchema, FunctionalSchema } from "./schema";
 
@@ -18,13 +19,6 @@ const valueSchemaParsers = {
   native: nativeParser,
   object: objectParser
 };
-
-import type {
-  ContextType,
-  RawSchemaParamsType,
-  SchemaParamsType,
-  ResultTransformerType
-} from "./types";
 
 export function getValueSchemaType(schema) {
   return ["string", "number", "boolean", "symbol"].includes(typeof schema)
@@ -44,13 +38,13 @@ export function normalizeParams(rawParams) {
 }
 
 export function getSchema(source, params) {
-  return (source instanceof Schema) ? source : new ValueSchema(source, params);
+  return source instanceof Schema ? source : new ValueSchema(source, params);
 }
 
 export function parse(source) {
   return function(originalObj, key, parents, parentKeys) {
     if (!originalObj) {
-      throw new Error()
+      throw new Error();
     }
     const schema = getSchema(source);
 

@@ -4,8 +4,6 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionalSchema } from "../schema";
 import { parse } from "../utils";
 
-import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
-
 export function regex(regex, params) {
   const meta = { type: "regex", regex, params };
 

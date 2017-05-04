@@ -3,14 +3,7 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionalSchema } from "../schema";
 import { parse } from "../utils";
 
-import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
-
-type PredicateType = (obj: any) => boolean;
-
-export function exists(
-  predicate: PredicateType,
-  schema: Schema<any>
-): Schema<typeof undefined> {
+export function exists(predicate, schema) {
   predicate = predicate || (x => typeof x !== "undefined");
 
   function fn(obj, key, parents, parentKeys) {

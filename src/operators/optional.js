@@ -3,8 +3,6 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionalSchema } from "../schema";
 import { parse } from "../utils";
 
-import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
-
 export function optional(schema, params) {
   const meta = { type: "optional", schema, params };
 

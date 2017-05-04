@@ -3,13 +3,8 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionalSchema } from "../schema";
 import { parse } from "../utils";
 
-import type { ContextType, RawSchemaParamsType, TaskType } from "../types";
-
-type ArrayItemFnType<T> = (needle: number) => Schema<T>;
-
-class ArrayItem<T> {
-  fn: ArrayItemFnType<T>;
-  constructor(fn: ArrayItemFnType<T>) {
+class ArrayItem {
+  constructor(fn) {
     this.fn = fn;
   }
 }
@@ -21,12 +16,7 @@ class ArrayItem<T> {
             ^needle
   returns [4, 4], with needle moved to 5.
 */
-type RepeatingItemOptsType = { min?: number, max?: number };
-
-export function repeatingItem<T>(
-  _schema: Schema<T>,
-  opts: RepeatingItemOptsType = {}
-): ArrayItem<T> {
+export function repeatingItem(_schema, opts = {}) {
   const meta = { type: "repeatingItem", schema: _schema };
 
   const min = opts.min || 0;
@@ -98,9 +88,7 @@ export function unorderedItem(_schema) {
         {
           task: context =>
             (function run(items, i) {
-              const { result } = parse(schema(i))(items, key, parents, parentKeys)(
-                context
-              );
+              const { result } = parse(schema(i))(items, key, parents, parentKeys)(context);
 
               return result instanceof Match || result instanceof Fault
                 ? { result, needle }
@@ -137,9 +125,7 @@ export function optionalItem(_schema) {
       (obj, key, parents, parentKeys) => [
         {
           task: context => {
-            const { result } = parse(schema(needle))(obj, key, parents, parentKeys)(
-              context
-            );
+            const { result } = parse(schema(needle))(obj, key, parents, parentKeys)(context);
 
             return result instanceof Match
               ? { result, needle: needle + 1 }

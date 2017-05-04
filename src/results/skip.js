@@ -1,11 +1,8 @@
 /* @flow */
 import Result from "./result";
-import type { EnvType, MetaType } from "../types";
 
 export default class Skip extends Result {
-  message: string;
-
-  constructor(message: string, env: EnvType, meta: MetaType) {
+  constructor(message, env, meta) {
     super(env, meta);
     this.message = message;
 
@@ -15,7 +12,7 @@ export default class Skip extends Result {
     }
   }
 
-  updateEnv(args: Object) {
+  updateEnv(args) {
     return new Skip(this.message, { ...this.env, ...args }, this.meta);
   }
 }

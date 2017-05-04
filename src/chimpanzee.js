@@ -1,12 +1,4 @@
 /* @flow */
-import type {
-  ContextType,
-  RawSchemaParamsType,
-  SchemaParamsType,
-  TaskType,
-  EnvType,
-  MetaType
-} from "./types";
 
 import { FunctionalSchema } from "./schema";
 import { parse } from "./utils";
