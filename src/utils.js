@@ -49,6 +49,9 @@ export function getSchema(source, params) {
 
 export function parse(source) {
   return function(originalObj, key, parents, parentKeys) {
+    if (!originalObj) {
+      throw new Error()
+    }
     const schema = getSchema(source);
 
     const modifiers = schema.params.modifiers;
@@ -76,6 +79,7 @@ export function parse(source) {
     const tasks = _tasks.sort(sortFn);
 
     return context => {
+      console.log("OBJ::", obj);
       return reconcile(schema.params, tasks, schema.meta)(obj, key, parents, parentKeys)(
         schema.params.reuseContext ? context : {}
       );
