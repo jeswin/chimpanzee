@@ -1,6 +1,6 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionalSchema } from "../schema";
+import { Schema, ValueSchema, FunctionalSchema } from "../schema";
 import { Seq } from "lazily";
 import { traverse } from "./traverse";
 import { parse } from "../utils";
