@@ -45,7 +45,7 @@ export function normalizeParams(rawParams) {
 }
 
 export function getSchema(source, params) {
-  return schema instanceof Schema ? schema : new ValueSchema(source, params);
+  return source instanceof Schema ? source : new ValueSchema(source, params);
 }
 
 export function parse(source) {
