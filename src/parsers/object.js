@@ -68,7 +68,6 @@ export function getTasks(valueSchema, params) {
               meta
             );
             console.log("CITEM", childKey, "...", obj, "----", childItem);
-            throw new Error();
             return {
               task: context =>
                 parse(childSchema)(
