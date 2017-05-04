@@ -2,6 +2,7 @@
 import { Match, Empty, Skip, Fault } from "../results";
 import Schema from "../schema";
 import { Seq } from "lazily";
+import { traverse } from "./traverse";
 import { getDefaultParams, parseWithSchema } from "../utils";
 
 import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
@@ -43,11 +44,10 @@ export function composite<T>(
     ? normalizedParams
     : [getDefaultParams({})].concat(normalizedParams);
 
-  const schemas = paramsList.map(params =>
-    getSchema(schema, (params && params.name) || "default")
-  );
-
-  console.log("SCHEMMM", JSON.stringify(schemas));
+  const schemas = paramsList.map(params => ({
+    schema: getSchema(schema, (params && params.name) || "default"),
+    params
+  }));
 
   function fn(obj, key, parents, parentKeys) {
     return [
@@ -61,10 +61,13 @@ export function composite<T>(
 
           return schemas.length
             ? (function run(schemas, state) {
-                console.log("RESOBJ", obj);
-                const result = parseWithSchema(schemas[0], meta)(obj, key, parents, parentKeys)(
-                  context
-                );
+                const { schema, params } = schemas[0];
+                const result = parseWithSchema(schema, meta, params)(
+                  obj,
+                  key,
+                  parents,
+                  parentKeys
+                )(context);
                 return result instanceof Match
                   ? schemas.length > 1
                       ? run(schemas.slice(1), merge(state, result))

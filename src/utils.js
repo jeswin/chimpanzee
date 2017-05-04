@@ -46,6 +46,10 @@ export function parseWithSchema(schema: Schema, meta, defaultParams) {
       : getDefaultParams(defaultParams);
 
     const obj = params.modifiers && params.modifiers.object ? params.modifiers.object(originalObj) : originalObj;
+    if (params.modifiers && params.modifiers.object) {
+      debugger;
+    }
+
     const _tasks = reconciler.getTasks(schema, params)(originalObj, key, parents, parentKeys)(
       obj,
       meta

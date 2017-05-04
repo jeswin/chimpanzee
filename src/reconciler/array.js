@@ -59,7 +59,7 @@ export function getTasks(schema: ArraySchemaType, params: SchemaParamsType) {
                 .map((rhs, i) => {
                   return {
                     task: context =>
-                      parseWithSchema(childSchema, meta, {
+                      parseWithSchema(rhs, meta, {
                         value: params.value,
                         modifiers: {
                           property: params.modifiers.property,
