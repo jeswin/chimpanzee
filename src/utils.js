@@ -8,7 +8,7 @@ import * as functionParser from "./parsers/function";
 import * as arrayParser from "./parsers/array";
 import * as nativeParser from "./parsers/native";
 import * as objectParser from "./parsers/object";
-import * as valueSchemaParser from "./parsers/value-schema";
+import * as schemaParser from "./parsers/schema";
 import * as functionalSchemaParser from "./parsers/functional-schema";
 
 import { Schema, ValueSchema, FunctionalSchema } from "./schema";
@@ -17,7 +17,8 @@ const valueSchemaParsers = {
   function: functionParser,
   array: arrayParser,
   native: nativeParser,
-  object: objectParser
+  object: objectParser,
+  schema: schemaParser
 };
 
 export function getValueSchemaType(schema) {
@@ -27,7 +28,9 @@ export function getValueSchemaType(schema) {
         ? "function"
         : Array.isArray(schema)
             ? "array"
-            : typeof schema === "object" ? "object" : typeof schema;
+            : schema instanceof Schema
+                ? "schema"
+                : typeof schema === "object" ? "object" : typeof schema;
 }
 
 export function normalizeParams(rawParams) {
@@ -73,7 +76,6 @@ export function parse(source) {
     const tasks = _tasks.sort(sortFn);
 
     return context => {
-      console.log("OBJ::", obj);
       return reconcile(schema.params, tasks, schema.meta)(obj, key, parents, parentKeys)(
         schema.params.reuseContext ? context : {}
       );
