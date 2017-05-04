@@ -1,8 +1,8 @@
 /* @flow */
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "../results";
-import Schema from "../schema";
-import { getDefaultParams, parseWithSchema } from "../utils";
+import { FunctionalSchema } from "../schema";
+import { parse } from "../utils";
 
 import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
 
@@ -28,15 +28,14 @@ export function func(params: RawSchemaParamsType<TypesType>) {
   return checkType("function", params);
 }
 
-function checkType(type: string, rawParams: RawSchemaParamsType<TypesType>): Schema<TypesType> {
-  const meta = { type, params: rawParams };
-  const params = getDefaultParams(rawParams);
+function checkType(type, params) {
+  const meta = { type, params };
 
   function fn(obj, key, parents, parentKeys) {
     return [
       {
         task: context => {
-          const result = parseWithSchema(captureIf(obj => typeof obj === type), meta)(
+          const result = parse(captureIf(obj => typeof obj === type))(
             obj,
             key,
             parents,
@@ -54,5 +53,5 @@ function checkType(type: string, rawParams: RawSchemaParamsType<TypesType>): Sch
     ];
   }
 
-  return new Schema(fn, params, { name: type });
+  return new FunctionalSchema(fn, params, meta);
 }

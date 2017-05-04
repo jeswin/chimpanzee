@@ -1,25 +1,18 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import Schema from "../schema";
-import { getDefaultParams, parseWithSchema } from "../utils";
+import { FunctionalSchema } from "../schema";
+import { parse } from "../utils";
 
 import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
 
-type MapperType<T, TMapped> = (a: T) => TMapped;
-
-export function map<T, TMapped>(
-  schema: Schema<T>,
-  mapper: MapperType<T, TMapped>,
-  rawParams: RawSchemaParamsType<T>
-) {
-  const meta = { type: "map", schema, mapper, params: rawParams };
-  const params = getDefaultParams(rawParams);
+export function map(schema, mapper, params) {
+  const meta = { type: "map", schema, mapper, params };
 
   function fn(obj, key, parents, parentKeys) {
     return [
       {
         task: context => {
-          const result = parseWithSchema(schema, meta)(obj, key, parents, parentKeys)(context);
+          const result = parse(schema)(obj, key, parents, parentKeys)(context);
           return result instanceof Match
             ? new Match(mapper(result.value), { obj, key, parents, parentKeys }, meta)
             : result;
@@ -28,5 +21,5 @@ export function map<T, TMapped>(
     ];
   }
 
-  return new Schema(fn, params, { name: "map" });
+  return new FunctionalSchema(fn, params, meta);
 }

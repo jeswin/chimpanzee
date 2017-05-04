@@ -1,14 +1,13 @@
 /* @flow */
 import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "../results";
-import Schema from "../schema";
-import { getDefaultParams, parseWithSchema } from "../utils";
+import { FunctionalSchema } from "../schema";
+import { parse } from "../utils";
 
 import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
 
-export function deep<T>(schema: Schema<T>, rawParams: RawSchemaParamsType<T>): Schema<T> {
-  const meta = { type: "deep", schema, params: rawParams };
-  const params = getDefaultParams(rawParams);
+export function deep(schema, params) {
+  const meta = { type: "deep", schema, params };
 
   function fn(obj, key, parents, parentKeys) {
     return [
@@ -17,7 +16,7 @@ export function deep<T>(schema: Schema<T>, rawParams: RawSchemaParamsType<T>): S
           function traverseObject(keys) {
             return keys.length
               ? (() => {
-                  const result = parseWithSchema(deep(schema), meta)(
+                  const result = parse(deep(schema))(
                     obj[keys[0]],
                     key,
                     parents.concat(obj),
@@ -31,7 +30,7 @@ export function deep<T>(schema: Schema<T>, rawParams: RawSchemaParamsType<T>): S
           function traverseArray(items) {
             return items.length
               ? (() => {
-                  const result = parseWithSchema(deep(schema, params), meta)(
+                  const result = parse(deep(schema, params))(
                     items[0],
                     key,
                     parents,
@@ -42,7 +41,7 @@ export function deep<T>(schema: Schema<T>, rawParams: RawSchemaParamsType<T>): S
               : new Skip("Not found in deep.", { obj, key, parents, parentKeys }, meta);
           }
 
-          const result = parseWithSchema(schema, meta)(obj, key, parents, parentKeys)(context);
+          const result = parse(schema)(obj, key, parents, parentKeys)(context);
 
           return !(result instanceof Skip)
             ? result
@@ -56,5 +55,5 @@ export function deep<T>(schema: Schema<T>, rawParams: RawSchemaParamsType<T>): S
     ];
   }
 
-  return new Schema(fn, params, { name: "deep" });
+  return new FunctionalSchema(fn, params, meta);
 }

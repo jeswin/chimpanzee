@@ -1,30 +1,25 @@
 /* @flow */
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "../results";
-import Schema from "../schema";
-import { getDefaultParams, parseWithSchema } from "../utils";
+import { FunctionalSchema } from "../schema";
+import { parse } from "../utils";
 
 import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
 
-export function regex(
-  regex: string | RegExp,
-  rawParams: RawSchemaParamsType<string>
-): Schema<string> {
-  const meta = { type: "regex", regex, params: rawParams };
-  const params = getDefaultParams(rawParams);
+export function regex(regex, params) {
+  const meta = { type: "regex", regex, params };
 
   function fn(obj, key, parents, parentKeys) {
     return [
       {
         task: context => {
-          const result = parseWithSchema(
+          const result = parse(
             captureIf(
               obj =>
-                typeof regex === "string"
+                (typeof regex === "string"
                   ? typeof obj === "string" && new RegExp(regex).test(obj)
-                  : typeof obj === "string" && regex.test(obj)
-            ),
-            meta
+                  : typeof obj === "string" && regex.test(obj))
+            )
           )(obj, key, parents, parentKeys)(context);
           return result instanceof Skip
             ? new Skip(`Did not match regex.`, { obj, key, parents, parentKeys }, meta)
@@ -34,5 +29,5 @@ export function regex(
     ];
   }
 
-  return new Schema(fn, params, { name: "regex" });
+  return new FunctionalSchema(fn, params, { name: "regex" });
 }

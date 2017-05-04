@@ -1,7 +1,7 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import Schema from "../schema";
-import { getDefaultParams, parseWithSchema } from "../utils";
+import { FunctionalSchema } from "../schema";
+import { parse } from "../utils";
 
 import type {
   RawSchemaParamsType,
@@ -48,14 +48,8 @@ export function literal(what: NativeTypeSchemaType, params: RawSchemaParamsType)
   });
 }
 
-export function take<T, TOut>(
-  predicate: PredicateType,
-  schema: Schema,
-  rawParams: RawSchemaParamsType,
-  options: TakeOptions = {}
-) {
-  const meta = { type: "take", schema, params: rawParams, predicate, options };
-  const params = getDefaultParams(rawParams);
+export function take(predicate, schema, params, options = {}) {
+  const meta = { type: "take", schema, params, predicate, options };
 
   function fn(obj, key, parents, parentKeys) {
     return [
@@ -64,7 +58,7 @@ export function take<T, TOut>(
           (predicate(obj)
             ? typeof schema !== "undefined"
                 ? (() => {
-                    const result = parseWithSchema(schema, meta)(obj, key, parents, parentKeys)(
+                    const result = parse(schema)(obj, key, parents, parentKeys)(
                       context
                     );
 
@@ -97,5 +91,5 @@ export function take<T, TOut>(
     ];
   }
 
-  return new Schema(fn, params, { name: "capture" });
+  return new FunctionalSchema(fn, params, { name: "capture" });
 }

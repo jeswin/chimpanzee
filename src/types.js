@@ -4,7 +4,7 @@
 import { Result, Match, Empty, Skip, Fault } from "./results/index";
 
 //Schema<T>
-import Schema from "./schema";
+import { FunctionalSchema } from "./schema";
 
 export type PredicateType = (obj: any) => boolean;
 

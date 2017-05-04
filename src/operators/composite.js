@@ -1,13 +1,13 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import Schema from "../schema";
+import { FunctionalSchema } from "../schema";
 import { Seq } from "lazily";
 import { traverse } from "./traverse";
-import { getDefaultParams, parseWithSchema } from "../utils";
+import { parse } from "../utils";
 
 import type { ContextType, RawSchemaParamsType, SchemaParamsType, TaskType } from "../types";
 
-function getSchema(schema: Schema, paramSelector: string): Schema {
+function getSchema(schema, paramSelector) {
   const schemaSelector = schema.params && schema.params.selector
     ? schema.params.selector
     : "default";
@@ -24,11 +24,7 @@ function getSchema(schema: Schema, paramSelector: string): Schema {
             : paramSelector === "default" ? schema : undefined;
 }
 
-export function composite<T>(
-  schema: Object,
-  _paramsList: Array<RawSchemaParamsType<any>>,
-  ownParams: RawSchemaParamsType<T>
-): Schema<T> {
+export function composite(schema, _paramsList, ownParams) {
   const meta = {
     type: "composite",
     schema,
@@ -36,18 +32,13 @@ export function composite<T>(
     ownParams
   };
 
-  ownParams = getDefaultParams(ownParams);
+  const paramsList = _paramsList.some(params => !params.name || params.name === "default")
+    ? _paramsList
+    : [undefined].concat(normalizedParams);
 
-  const normalizedParams = _paramsList.map(getDefaultParams);
-
-  const paramsList = normalizedParams.some(params => !params.name || params.name === "default")
-    ? normalizedParams
-    : [getDefaultParams({})].concat(normalizedParams);
-
-  const schemas = paramsList.map(params => ({
-    schema: getSchema(schema, (params && params.name) || "default"),
-    params
-  }));
+  const schemas = paramsList.map(
+    params => new ValueSchema(getSchema(schema, (params && params.name) || "default"), params)
+  );
 
   function fn(obj, key, parents, parentKeys) {
     return [
@@ -62,12 +53,7 @@ export function composite<T>(
           return schemas.length
             ? (function run(schemas, state) {
                 const { schema, params } = schemas[0];
-                const result = parseWithSchema(schema, meta, params)(
-                  obj,
-                  key,
-                  parents,
-                  parentKeys
-                )(context);
+                const result = parse(schema)(obj, key, parents, parentKeys)(context);
                 return result instanceof Match
                   ? schemas.length > 1
                       ? run(schemas.slice(1), merge(state, result))
@@ -80,5 +66,5 @@ export function composite<T>(
     ];
   }
 
-  return new Schema(fn, ownParams, { name: "composite" });
+  return new FunctionalSchema(fn, ownParams, meta);
 }

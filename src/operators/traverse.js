@@ -1,6 +1,6 @@
 /* @flow */
-import { getDefaultParams, parseWithSchema } from "../utils";
-import Schema from "../schema";
+import { parse } from "../utils";
+import { ValueSchema } from "../schema";
 
 import type {
   ContextType,
@@ -12,18 +12,7 @@ import type {
   MetaType
 } from "./types";
 
-export function traverse(schema: Schema, rawParams: RawSchemaParamsType) {
-  const meta = { type: "traverse", schema, params: rawParams };
-  const params = { ...getDefaultParams(rawParams) };
-
-  function fn(obj, key, parents, parentKeys) {
-    return [
-      {
-        task: context =>
-          parseWithSchema(schema, meta, params)(obj, key, parents, parentKeys)(context)
-      }
-    ];
-  }
-
-  return new Schema(fn, params, { name: "traverse" });
+export function traverse(source, params) {
+  const meta = { type: "traverse", schema: source, params };
+  const schema = new ValueSchema(source, params, meta);
 }

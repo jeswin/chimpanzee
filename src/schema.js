@@ -8,13 +8,25 @@ import type {
   MetaType
 } from "./types";
 
-export default class Schema<T> {
-  fn: InvokeType<T>;
-  params: SchemaParamsType<T>;
+import { normalizeParams } from "./utils";
 
-  constructor(fn: InvokeType<T>, params: SchemaParamsType<T>, meta) {
-    this.fn = fn;
-    this.params = params;
+export class Schema {
+  constructor(params, meta) {
+    this.params = normalizeParams(params);
     this.meta = meta;
+  }
+}
+
+export class ValueSchema extends Schema {
+  constructor(value, params, meta) {
+    super(params, meta);
+    this.value = value;
+  }
+}
+
+export class FunctionalSchema extends Schema {
+  constructor(fn, params, meta) {
+    super(params, meta);
+    this.fn = fn;
   }
 }

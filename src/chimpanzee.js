@@ -8,8 +8,8 @@ import type {
   MetaType
 } from "./types";
 
-import Schema from "./schema";
-import { parseWithSchema } from "./utils";
+import { FunctionalSchema } from "./schema";
+import { parse } from "./utils";
 
 export { traverse } from "./operators/traverse";
 export { composite } from "./operators/composite";
@@ -29,8 +29,8 @@ export { Match, Empty, Skip, Fault } from "./results";
 
 export { default as Schema } from "./schema";
 
-export { parseWithSchema } from "./utils";
+export { parse } from "./utils";
 
 export function match(schema: Schema<any>, input: any) {
-  return parseWithSchema(schema)(input, "__INIT__", [], [])({});
+  return parse(schema)(input, "__INIT__", [], [])({});
 }

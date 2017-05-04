@@ -1,8 +1,24 @@
 /* @flow */
+import exception from "./exception";
+
 import { Match, Empty, Skip, Fault } from "./results";
-import Schema from "./schema";
-import reconcile from "./reconciler/reconcile";
-import getReconciler from "./reconciler/get-reconciler";
+import { FunctionalSchema } from "./schema";
+import reconcile from "./reconcile";
+
+import * as functionParser from "./parsers/function";
+import * as arrayParser from "./parsers/array";
+import * as nativeParser from "./parsers/native";
+import * as objectParser from "./parsers/object";
+import * as functionalSchemaParser from "./parsers/schema";
+
+import * as Schema from "./schema";
+
+const valueSchemaParsers = {
+  function: functionParser,
+  array: arrayParser,
+  native: nativeParser,
+  object: objectParser
+};
 
 import type {
   ContextType,
@@ -11,49 +27,46 @@ import type {
   ResultTransformerType
 } from "./types";
 
-export function getSchemaType(schema: Schema): string {
+export function getValueSchemaType(schema) {
   return ["string", "number", "boolean", "symbol"].includes(typeof schema)
     ? "native"
     : typeof schema === "function"
         ? "function"
-        : schema instanceof Schema
-            ? "schema"
-            : Array.isArray(schema)
-                ? "array"
-                : typeof schema === "object" ? "object" : typeof schema;
+        : Array.isArray(schema)
+            ? "array"
+            : typeof schema === "object" ? "object" : typeof schema;
 }
 
-export function getDefaultParams(rawParams?: string | RawSchemaParamsType): SchemaParamsType {
-  const params: SchemaParamsType = typeof rawParams === "string"
-    ? { key: rawParams }
-    : rawParams || {};
+export function normalizeParams(rawParams) {
+  const params = typeof rawParams === "string" ? { key: rawParams } : rawParams || {};
   params.build = params.build || (() => context => context.state);
   params.modifiers = params.modifiers || {};
   return params;
 }
 
-export function parseWithSchema(schema: Schema, meta, defaultParams) {
-  return function(
-    originalObj: any,
-    key: string,
-    parents: Array<any>,
-    parentKeys: Array<string>
-  ) {
-    const schemaType = getSchemaType(schema);
-    const reconciler = getReconciler(schemaType);
-    const params = schema instanceof Schema && schema.params
-      ? schema.params
-      : getDefaultParams(defaultParams);
+export function getSchema(source, params) {
+  return schema instanceof Schema ? schema : new ValueSchema(source, params);
+}
 
-    const obj = params.modifiers && params.modifiers.object ? params.modifiers.object(originalObj) : originalObj;
-    if (params.modifiers && params.modifiers.object) {
-      debugger;
-    }
+export function parse(source) {
+  return function(originalObj, key, parents, parentKeys) {
+    const schema = getSchema(source);
 
-    const _tasks = reconciler.getTasks(schema, params)(originalObj, key, parents, parentKeys)(
-      obj,
-      meta
-    );
+    const modifiers = schema.params.modifiers;
+    const obj = modifiers && modifiers.object ? modifiers.object(originalObj) : originalObj;
+
+    const parser = schema instanceof ValueSchema
+      ? valueSchemaParsers[getValueSchemaType(schema.value)]
+      : schema instanceof FunctionalSchema
+          ? functionalSchemaParser
+          : exception(`Unknown schema type ${typeof schema}`);
+
+    const _tasks = parser.getTasks(schema, schema.params)(
+      originalObj,
+      key,
+      parents,
+      parentKeys
+    )(obj, schema.meta);
 
     function sortFn(task1, task2) {
       const task1Order = task1.params && task1.params.order ? task1.params.order : 0;
@@ -64,8 +77,8 @@ export function parseWithSchema(schema: Schema, meta, defaultParams) {
     const tasks = _tasks.sort(sortFn);
 
     return context => {
-      return reconcile(params, tasks, meta)(obj, key, parents, parentKeys)(
-        params.reuseContext ? context : {}
+      return reconcile(schema.params, tasks, schema.meta)(obj, key, parents, parentKeys)(
+        schema.params.reuseContext ? context : {}
       );
     };
   };

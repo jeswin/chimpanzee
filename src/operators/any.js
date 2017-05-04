@@ -1,31 +1,20 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import Schema from "../schema";
+import { FunctionalSchema } from "../schema";
 import { Seq } from "lazily";
-import { getDefaultParams, parseWithSchema } from "../utils";
+import { parse } from "../utils";
 
 import type { ContextType, RawSchemaParamsType, TaskType } from "../types";
 
-export function any(
-  schemas: Array<Schema<any>>,
-  rawParams: RawSchemaParamsType<any> = {}
-): Schema<any> {
-  const meta = { type: "any", schemas, params: rawParams };
-  const params = getDefaultParams(rawParams);
+export function any(schemas, params) {
+  const meta = { type: "any", schemas, params };
 
-  function fn(
-    obj: any,
-    key: string,
-    parents: Array<any>,
-    parentKeys: Array<string>
-  ): TaskType<any> {
+  function fn(obj, key, parents, parentKeys) {
     return [
       {
         task: context =>
           (function run(schemas: Array<Schema<any>>, nonMatching: Array<Schema<any>>) {
-            const result = parseWithSchema(schemas[0], meta)(obj, key, parents, parentKeys)(
-              context
-            );
+            const result = parse(schemas[0])(obj, key, parents, parentKeys)(context);
             return result instanceof Match || result instanceof Fault
               ? result
               : schemas.length > 1
@@ -46,5 +35,5 @@ export function any(
     ];
   }
 
-  return new Schema(fn, params, { name: "any" });
+  return new FunctionalSchema(fn, params, meta);
 }
