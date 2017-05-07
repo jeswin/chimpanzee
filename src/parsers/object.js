@@ -10,7 +10,6 @@ export function getTasks(valueSchema, params) {
     return function(obj, meta) {
       function mergeChildResult(finished, context) {
         const { result, params } = finished;
-        console.log("RES", result.value, "...", params);
         return result instanceof Match
           ? !(result instanceof Empty)
               ? params.replace || params.isObject
@@ -69,6 +68,9 @@ export function getTasks(valueSchema, params) {
               },
               meta
             );
+            if (!childItem) {
+              console.log("NEXX", childKey, "....", childSchema);
+            }
             return {
               task: context =>
                 parse(childSchema)(
