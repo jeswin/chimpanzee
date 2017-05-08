@@ -1,7 +1,4 @@
 /* @flow */
-import external from "./external";
-import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionalSchema } from "../schema";
 import { parse } from "../utils";
 
 export function getTasks(valueSchema, params) {

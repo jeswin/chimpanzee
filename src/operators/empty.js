@@ -16,5 +16,5 @@ export function empty() {
     ];
   }
 
-  return new FunctionalSchema(fn, undefined, { name: "empty" });
+  return new FunctionalSchema(fn, undefined, meta);
 }

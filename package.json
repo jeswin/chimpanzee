@@ -8,7 +8,7 @@
   },
   "main": "dist/chimpanzee.js",
   "dependencies": {
-    "lazily": "0.0.17"
+    "lazily": "1.1.1"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

@@ -49,12 +49,11 @@ export function composite(schema, _paramsList, ownParams) {
           }
 
           return schemas.length
-            ? (function run(schemas, state) {
-                const { schema, params } = schemas[0];
+            ? (function run([schema, ...rest], state) {
                 const result = parse(schema)(obj, key, parents, parentKeys)(context);
                 return result instanceof Match
-                  ? schemas.length > 1
-                      ? run(schemas.slice(1), merge(state, result))
+                  ? rest.length
+                      ? run(rest, merge(state, result))
                       : new Match(merge(state, result), env, meta)
                   : result;
               })(schemas, {})

@@ -45,20 +45,17 @@ export function getSchema(source, params) {
 }
 
 export function parse(source) {
+  const schema = getSchema(source);
+  const modifiers = schema.params.modifiers;
+
+  const parser = schema instanceof ValueSchema
+    ? valueSchemaParsers[getValueSchemaType(schema.value)]
+    : schema instanceof FunctionalSchema
+        ? functionalSchemaParser
+        : exception(`Unknown schema type ${typeof schema}`);
+
   return function(originalObj, key, parents, parentKeys) {
-    if (!originalObj) {
-      throw new Error();
-    }
-    const schema = getSchema(source);
-
-    const modifiers = schema.params.modifiers;
     const obj = modifiers && modifiers.object ? modifiers.object(originalObj) : originalObj;
-
-    const parser = schema instanceof ValueSchema
-      ? valueSchemaParsers[getValueSchemaType(schema.value)]
-      : schema instanceof FunctionalSchema
-          ? functionalSchemaParser
-          : exception(`Unknown schema type ${typeof schema}`);
 
     const _tasks = parser.getTasks(schema, schema.params)(
       originalObj,
@@ -73,7 +70,9 @@ export function parse(source) {
       return task1Order - task2Order;
     }
 
+    console.log("TASK TWO!", _tasks);
     const tasks = _tasks.sort(sortFn);
+    console.log("TASK!", tasks);
 
     return context => {
       return reconcile(schema.params, tasks, schema.meta)(obj, key, parents, parentKeys)(

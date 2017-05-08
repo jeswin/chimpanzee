@@ -12,7 +12,6 @@ export const schema = traverse({
     { prop1: capture() },
     {
       build: () => ({ state }) => {
-        debugger;
         return { ...state, counter: counter++ };
       }
     }
@@ -21,7 +20,6 @@ export const schema = traverse({
     { prop2: capture() },
     {
       build: () => ({ state }) => {
-        debugger;
         return { ...state, counter: counter++ };
       }
     }

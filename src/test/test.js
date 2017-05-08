@@ -15,7 +15,7 @@ describe("chimpanzee", () => {
       global.__chimpanzeeTestContext = [];
       const fixture = require(`./fixtures/${dir}/fixture`);
       const actual = match(fixture.schema, fixture.input);
-      console.log(actual);
+      //console.log(actual);
       const expected = require(`./fixtures/${dir}/expected`);
       if (resultType === "match") {
         actual.should.be.an.instanceOf(Match);

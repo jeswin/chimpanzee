@@ -4,6 +4,8 @@ import { FunctionalSchema } from "../schema";
 import { parse } from "../utils";
 
 export function exists(predicate, schema) {
+  const meta = { type: "exists", schema, predicate };
+
   predicate = predicate || (x => typeof x !== "undefined");
 
   function fn(obj, key, parents, parentKeys) {
