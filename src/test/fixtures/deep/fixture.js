@@ -24,11 +24,11 @@ export const input = {
 export const schema = traverse({
   level1: {
     level2a: deep(
-      traverse({
+      {
         level5a: {
           prop3: capture()
         }
-      }),
+      },
       "prop1"
     )
   }

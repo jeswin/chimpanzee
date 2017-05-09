@@ -10,11 +10,11 @@ export const input = {
   }
 };
 
-export const schema = traverse({
+export const schema = {
   level1: captureAndTraverse(
     traverse({
       prop1: "hello",
       other1: capture("otherRenamed1")
     })
   )
-});
+};

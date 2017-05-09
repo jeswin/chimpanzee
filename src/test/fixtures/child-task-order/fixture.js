@@ -1,4 +1,4 @@
-import { traverse, number } from "../../../chimpanzee";
+import { number } from "../../../chimpanzee";
 
 export const input = {
   level1: {
@@ -7,12 +7,12 @@ export const input = {
   }
 };
 
-export const schema = traverse({
+export const schema = {
   level1: {
-    prop1: number(),
-    prop2: number({
-      order: 10,
-      build: () => (state) => state.prop1 + 100
-    })
+    prop1: number({
+      order: 2,
+      build: () => ({ state }) => console.log("+++++++", state) || state.prop2 + 100
+    }),
+    prop2: number({ order: 1 }),
   }
-});
+};

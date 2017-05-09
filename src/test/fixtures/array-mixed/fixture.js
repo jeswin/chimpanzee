@@ -1,5 +1,4 @@
 import {
-  traverse,
   capture,
   literal,
   unorderedItem,
@@ -14,10 +13,10 @@ export const input = {
   level1: ["HELLO", "HELLO", true, 100]
 };
 
-export const schema = traverse({
+export const schema = {
   level1: array([
     repeatingItem(literal("HELLO")),
     unorderedItem(number()),
     unorderedItem(bool())
   ])
-});
+};

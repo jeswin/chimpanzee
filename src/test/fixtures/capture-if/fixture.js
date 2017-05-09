@@ -1,9 +1,9 @@
-import { traverse, captureIf } from "../../../chimpanzee";
+import {  captureIf } from "../../../chimpanzee";
 
 export const input = {
   hello: "world"
 };
 
-export const schema = traverse({
+export const schema = {
   hello: captureIf(x => x === "world")
-});
+};

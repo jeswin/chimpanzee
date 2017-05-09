@@ -1,9 +1,9 @@
-import { traverse, Match } from "../../../chimpanzee";
+import { Match } from "../../../chimpanzee";
 
 export const input = {
   hello: "world"
 };
 
-export const schema = traverse({
+export const schema = {
   hello: item => context => new Match(`${item}!!!`)
-});
+};

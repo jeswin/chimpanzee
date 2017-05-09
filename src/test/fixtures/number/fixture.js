@@ -1,9 +1,9 @@
-import { traverse, number } from "../../../chimpanzee";
+import { number } from "../../../chimpanzee";
 
 export const input = {
   hello: 9
 };
 
-export const schema = traverse({
+export const schema = {
   hello: number()
-});
+};

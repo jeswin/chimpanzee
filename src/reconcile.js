@@ -2,27 +2,28 @@
 import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "./results";
 
+function mergeChildResult(finished, context) {
+  const { result, params } = finished;
+  console.log("\nYOYO", "....", result);
+  return result instanceof Match
+    ? !(result instanceof Empty)
+        ? { context: { ...context, state: result.value } }
+        : { context }
+    : { nonMatch: result };
+}
+
+function defaultMerge(finished, context) {
+  const { result, params } = finished;
+
+  return result instanceof Match
+    ? !(result instanceof Empty)
+        ? { context: { ...context, state: result.value } }
+        : { context }
+    : { nonMatch: result };
+}
+
 export default function(params, tasks, meta) {
   return function(obj, key, parents, parentKeys) {
-    function mergeResult(finished, context) {
-      const { result, params } = finished;
-      return result instanceof Match
-        ? !(result instanceof Empty)
-            ? { context: { ...context, state: result.value } }
-            : { context }
-        : { nonMatch: result };
-    }
-
-    function defaultMerge(finished, context) {
-      const { result, params } = finished;
-
-      return result instanceof Match
-        ? !(result instanceof Empty)
-            ? { context: { ...context, state: result.value } }
-            : { context }
-        : { nonMatch: result };
-    }
-
     function getTask() {
       function task(context) {
         const predicates = !params.predicates
@@ -100,7 +101,7 @@ export default function(params, tasks, meta) {
               Seq.of([
                 {
                   task: getTask(),
-                  merge: mergeResult
+                  merge: mergeChildResult
                 }
               ])
             );

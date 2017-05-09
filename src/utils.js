@@ -70,9 +70,7 @@ export function parse(source) {
       return task1Order - task2Order;
     }
 
-    console.log("TASK TWO!", _tasks);
     const tasks = _tasks.sort(sortFn);
-    console.log("TASK!", tasks);
 
     return context => {
       return reconcile(schema.params, tasks, schema.meta)(obj, key, parents, parentKeys)(

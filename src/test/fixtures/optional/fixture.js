@@ -1,4 +1,4 @@
-import { traverse, optional, capture } from "../../../chimpanzee";
+import { optional, capture } from "../../../chimpanzee";
 
 export const input = {
   level1: {
@@ -10,9 +10,9 @@ export const input = {
   }
 };
 
-export const schema = traverse({
+export const schema = {
   level1: {
     prop1: capture(),
     prop2: optional(capture())
   }
-});
+};

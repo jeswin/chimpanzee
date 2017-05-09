@@ -1,9 +1,9 @@
-import { traverse, any } from "../../../chimpanzee";
+import { any } from "../../../chimpanzee";
 
 export const input = {
   operator: "<"
 };
 
-export const schema = traverse({
+export const schema = {
   operator: any(["<", ">", ">=", "<="])
-});
+};

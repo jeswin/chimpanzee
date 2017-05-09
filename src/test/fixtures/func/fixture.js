@@ -1,4 +1,4 @@
-import { traverse, func } from "../../../chimpanzee";
+import { func } from "../../../chimpanzee";
 
 export function testFunc() {}
 
@@ -6,6 +6,6 @@ export const input = {
   hello: testFunc
 };
 
-export const schema = traverse({
+export const schema = {
   hello: func()
-});
+};

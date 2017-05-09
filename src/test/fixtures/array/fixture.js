@@ -1,5 +1,4 @@
 import {
-  traverse,
   capture,
   array,
   bool,
@@ -11,6 +10,6 @@ export const input = {
   level1: [true, "two", 3]
 };
 
-export const schema = traverse({
+export const schema = {
   level1: array([bool(), string(), number()])
-});
+};

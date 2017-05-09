@@ -1,9 +1,9 @@
-import { traverse, bool } from "../../../chimpanzee";
+import { bool } from "../../../chimpanzee";
 
 export const input = {
   hello: true
 };
 
-export const schema = traverse({
+export const schema = {
   hello: bool()
-});
+};

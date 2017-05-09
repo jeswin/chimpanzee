@@ -1,4 +1,4 @@
-import { traverse, capture } from "../../../chimpanzee";
+import { capture } from "../../../chimpanzee";
 
 export const input = {
   level2a: {
@@ -12,10 +12,10 @@ export const input = {
   }
 };
 
-export const schema = traverse({
+export const schema = {
   level2a: {
     level5a: {
       prop3: capture()
     }
   }
-});
+};

@@ -1,1 +1,1 @@
-export const result = "Cannot traverse undefined.";
+export const result = "Cannot parse undefined.";

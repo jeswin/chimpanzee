@@ -1,9 +1,9 @@
-import { traverse, regex } from "../../../chimpanzee";
+import { regex } from "../../../chimpanzee";
 
 export const input = {
   hello: "world"
 };
 
-export const schema = traverse({
+export const schema ={
   hello: regex(/^world$/)
-});
+};

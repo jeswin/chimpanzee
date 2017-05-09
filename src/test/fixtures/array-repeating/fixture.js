@@ -1,5 +1,4 @@
 import {
-  traverse,
   capture,
   array,
   repeatingItem,
@@ -10,6 +9,6 @@ export const input = {
   level1: ["one", "two", "three"]
 };
 
-export const schema = traverse({
+export const schema = {
   level1: array([repeatingItem(string())])
-});
+};

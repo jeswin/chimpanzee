@@ -1,4 +1,4 @@
-import { traverse, deep, Fault } from "../../../chimpanzee";
+import { deep, Fault } from "../../../chimpanzee";
 
 export const input = {
   level1: {
@@ -21,15 +21,15 @@ export const input = {
   }
 };
 
-export const schema = traverse({
+export const schema = {
   level1: {
     level2a: deep(
-      traverse({
+      {
         level5a: {
           prop3: obj => context => new Fault("SCHEMA has a fault.")
         }
-      }),
+      },
       "prop1"
     )
   }
-});
+};

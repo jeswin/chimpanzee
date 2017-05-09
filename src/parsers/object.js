@@ -9,6 +9,7 @@ export function getTasks(valueSchema, params) {
 
   function merge(finished, context) {
     const { result, params } = finished;
+    console.log("RESULT", result, "...", params);
     return result instanceof Match
       ? !(result instanceof Empty)
           ? params.replace || params.isObject
@@ -94,7 +95,7 @@ export function getTasks(valueSchema, params) {
       : [
           {
             task: context =>
-              new Skip(`Cannot traverse undefined.`, { obj, key, parents, parentKeys }, meta)
+              new Skip(`Cannot parse undefined.`, { obj, key, parents, parentKeys }, meta)
           }
         ];
 }

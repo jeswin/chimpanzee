@@ -2,7 +2,6 @@
 import { Match, Empty, Skip, Fault } from "../results";
 import { Schema, ValueSchema, FunctionalSchema } from "../schema";
 import { Seq } from "lazily";
-import { traverse } from "./traverse";
 import { parse } from "../utils";
 
 function getSchema(schema, paramSelector) {

@@ -8,9 +8,9 @@ export const input = {
   }
 };
 
-export const schema = traverse({
+export const schema = {
   level1: {
     hello: capture(),
     level2: traverse([capture(), "two"], { key: "arrayItem" })
   }
-});
+};

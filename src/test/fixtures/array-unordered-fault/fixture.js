@@ -1,5 +1,4 @@
 import {
-  traverse,
   capture,
   unorderedItem,
   array,
@@ -14,10 +13,10 @@ export const input = {
   level1: ["one", true, "two"]
 };
 
-export const schema = traverse({
+export const schema = {
   level1: array([
     unorderedItem(string()),
     unorderedItem((obj, key, parents, parentKeys) => context =>
       (obj !== "two" ? new Skip() : new Fault("TWO can't happen.")))
   ])
-});
+};
