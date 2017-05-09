@@ -4,12 +4,9 @@ import { Result, Match, Empty, Skip, Fault } from "../results";
 import { Schema, ValueSchema, FunctionalSchema } from "../schema";
 import { parse } from "../utils";
 
-export function getTasks(valueSchema, params) {
-  const schema = valueSchema.value;
-
+export default function(schema, params) {
   function merge(finished, context) {
     const { result, params } = finished;
-    console.log("RESULT", result, "...", params);
     return result instanceof Match
       ? !(result instanceof Empty)
           ? params.replace || params.isObject
@@ -32,7 +29,7 @@ export function getTasks(valueSchema, params) {
       : { nonMatch: result };
   }
 
-  return (originalObj, key, parents, parentKeys) => (obj, meta) =>
+  return (originalObj, key, parents, parentKeys) => (obj, meta) => context =>
     typeof obj !== "undefined"
       ? Seq.of(Object.keys(schema)).map(childKey => {
           const childSource = schema[childKey];
@@ -70,10 +67,6 @@ export function getTasks(valueSchema, params) {
             meta
           );
 
-          if (!childItem) {
-            debugger;
-          }
-
           return {
             task: context =>
               parse(childSchema)(
@@ -92,10 +85,5 @@ export function getTasks(valueSchema, params) {
               : { key: childKey, isObject: childSchemaIsObject }
           };
         })
-      : [
-          {
-            task: context =>
-              new Skip(`Cannot parse undefined.`, { obj, key, parents, parentKeys }, meta)
-          }
-        ];
+      : new Skip(`Cannot parse undefined.`, { obj, key, parents, parentKeys }, meta);
 }

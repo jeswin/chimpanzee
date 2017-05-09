@@ -34,42 +34,38 @@ export function take(predicate, schema, params, options = {}) {
   const meta = { type: "take", schema, params, predicate, options };
 
   function fn(obj, key, parents, parentKeys) {
-    return [
-      {
-        task: context =>
-          (predicate(obj)
-            ? typeof schema !== "undefined"
-                ? (() => {
-                    const result = parse(schema)(obj, key, parents, parentKeys)(context);
+    return context =>
+      predicate(obj)
+        ? typeof schema !== "undefined"
+            ? (() => {
+                const result = parse(schema)(obj, key, parents, parentKeys)(context);
 
-                    return result instanceof Match
-                      ? new Match(
-                          {
-                            ...obj,
-                            ...result.value
-                          },
+                return result instanceof Match
+                  ? new Match(
+                      {
+                        ...obj,
+                        ...result.value
+                      },
+                      { obj, key, parents, parentKeys },
+                      meta
+                    )
+                  : result instanceof Skip
+                      ? new Skip(
+                          "Capture failed in inner schema.",
                           { obj, key, parents, parentKeys },
                           meta
                         )
-                      : result instanceof Skip
-                          ? new Skip(
-                              "Capture failed in inner schema.",
-                              { obj, key, parents, parentKeys },
-                              meta
-                            )
-                          : result; //Fault
-                  })()
-                : new Match(obj, { obj, key, parents, parentKeys }, meta)
-            : new Skip(
-                options.skipMessage
-                  ? options.skipMessage(obj)
-                  : `Predicate returned false. Predicate was ${predicate.toString()}`,
-                { obj, key, parents, parentKeys },
-                meta
-              ))
-      }
-    ];
+                      : result; //Fault
+              })()
+            : new Match(obj, { obj, key, parents, parentKeys }, meta)
+        : new Skip(
+            options.skipMessage
+              ? options.skipMessage(obj)
+              : `Predicate returned false. Predicate was ${predicate.toString()}`,
+            { obj, key, parents, parentKeys },
+            meta
+          );
   }
 
-  return new FunctionalSchema(fn, params, { name: "capture" });
+  return new FunctionalSchema(fn, params, meta);
 }

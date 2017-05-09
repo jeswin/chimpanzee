@@ -4,12 +4,12 @@ import exception from "./exception";
 import { Match, Empty, Skip, Fault } from "./results";
 import reconcile from "./reconcile";
 
-import * as functionParser from "./parsers/function";
-import * as arrayParser from "./parsers/array";
-import * as nativeParser from "./parsers/native";
-import * as objectParser from "./parsers/object";
-import * as schemaParser from "./parsers/schema";
-import * as functionalSchemaParser from "./parsers/functional-schema";
+import functionParser from "./parsers/function";
+import arrayParser from "./parsers/array";
+import nativeParser from "./parsers/native";
+import objectParser from "./parsers/object";
+import schemaParser from "./parsers/schema";
+import functionalSchemaParser from "./parsers/functional-schema";
 
 import { Schema, ValueSchema, FunctionalSchema } from "./schema";
 
@@ -54,28 +54,11 @@ export function parse(source) {
         ? functionalSchemaParser
         : exception(`Unknown schema type ${typeof schema}`);
 
-  return function(originalObj, key, parents, parentKeys) {
+  return (originalObj, key, parents, parentKeys) => context => {
     const obj = modifiers && modifiers.object ? modifiers.object(originalObj) : originalObj;
-
-    const _tasks = parser.getTasks(schema, schema.params)(
-      originalObj,
-      key,
-      parents,
-      parentKeys
-    )(obj, schema.meta);
-
-    function sortFn(task1, task2) {
-      const task1Order = task1.params && task1.params.order ? task1.params.order : 0;
-      const task2Order = task2.params && task2.params.order ? task2.params.order : 0;
-      return task1Order - task2Order;
-    }
-
-    const tasks = _tasks.sort(sortFn);
-
-    return context => {
-      return reconcile(schema.params, tasks, schema.meta)(obj, key, parents, parentKeys)(
-        schema.params.reuseContext ? context : {}
-      );
-    };
+    return parser(schema, schema.params)(originalObj, key, parents, parentKeys)(
+      obj,
+      schema.meta
+    )(context);
   };
 }

@@ -38,28 +38,24 @@ export function composite(schema, _paramsList, ownParams) {
   );
 
   function fn(obj, key, parents, parentKeys) {
-    return [
-      {
-        task: context => {
-          const env = { obj, key, parents, parentKeys };
+    return context => {
+      const env = { obj, key, parents, parentKeys };
 
-          function merge(state, result) {
-            return { ...state, ...result.value };
-          }
-
-          return schemas.length
-            ? (function run([schema, ...rest], state) {
-                const result = parse(schema)(obj, key, parents, parentKeys)(context);
-                return result instanceof Match
-                  ? rest.length
-                      ? run(rest, merge(state, result))
-                      : new Match(merge(state, result), env, meta)
-                  : result;
-              })(schemas, {})
-            : new Empty(env, meta);
-        }
+      function merge(state, result) {
+        return { ...state, ...result.value };
       }
-    ];
+
+      return schemas.length
+        ? (function run([schema, ...rest], state) {
+            const result = parse(schema)(obj, key, parents, parentKeys)(context);
+            return result instanceof Match
+              ? rest.length
+                  ? run(rest, merge(state, result))
+                  : new Match(merge(state, result), env, meta)
+              : result;
+          })(schemas, {})
+        : new Empty(env, meta);
+    };
   }
 
   return new FunctionalSchema(fn, ownParams, meta);

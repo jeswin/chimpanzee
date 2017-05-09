@@ -28,25 +28,21 @@ function checkType(type, params) {
   const meta = { type, params };
 
   function fn(obj, key, parents, parentKeys) {
-    return [
-      {
-        task: context => {
-          const result = parse(captureIf(obj => typeof obj === type))(
-            obj,
-            key,
-            parents,
-            parentKeys
-          )(context);
-          return result instanceof Skip
-            ? new Skip(
-                `Expected ${type} but got ${typeof obj}.`,
-                { obj, key, parents, parentKeys },
-                meta
-              )
-            : result;
-        }
-      }
-    ];
+    return context => {
+      const result = parse(captureIf(obj => typeof obj === type))(
+        obj,
+        key,
+        parents,
+        parentKeys
+      )(context);
+      return result instanceof Skip
+        ? new Skip(
+            `Expected ${type} but got ${typeof obj}.`,
+            { obj, key, parents, parentKeys },
+            meta
+          )
+        : result;
+    };
   }
 
   return new FunctionalSchema(fn, params, meta);

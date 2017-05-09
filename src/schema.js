@@ -10,9 +10,6 @@ export class Schema {
 
 export class ValueSchema extends Schema {
   constructor(value, params, meta) {
-    if (!value) {
-      debugger;
-    }
     super(params, meta);
     this.value = value;
   }

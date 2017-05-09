@@ -4,7 +4,6 @@ import { Match, Empty, Skip, Fault } from "./results";
 
 function mergeChildResult(finished, context) {
   const { result, params } = finished;
-  console.log("\nYOYO", "....", result);
   return result instanceof Match
     ? !(result instanceof Empty)
         ? { context: { ...context, state: result.value } }
@@ -14,7 +13,6 @@ function mergeChildResult(finished, context) {
 
 function defaultMerge(finished, context) {
   const { result, params } = finished;
-
   return result instanceof Match
     ? !(result instanceof Empty)
         ? { context: { ...context, state: result.value } }
