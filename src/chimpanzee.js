@@ -1,6 +1,6 @@
 /* @flow */
 
-import { FunctionalSchema } from "./schema";
+import { OperatorSchema } from "./schema";
 import { parse } from "./utils";
 
 export { traverse } from "./operators/traverse";

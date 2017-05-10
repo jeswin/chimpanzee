@@ -1,7 +1,7 @@
 /* @flow */
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionalSchema } from "../schema";
+import { OperatorSchema } from "../schema";
 import { parse } from "../utils";
 
 export function regex(regex, params) {
@@ -22,5 +22,5 @@ export function regex(regex, params) {
         : result;
     };
   }
-  return new FunctionalSchema(fn, params, { name: "regex" });
+  return new OperatorSchema(fn, params, { name: "regex" });
 }

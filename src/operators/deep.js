@@ -1,7 +1,7 @@
 /* @flow */
 import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionalSchema } from "../schema";
+import { OperatorSchema } from "../schema";
 import { parse } from "../utils";
 
 export function deep(schema, params) {
@@ -46,5 +46,5 @@ export function deep(schema, params) {
     };
   }
 
-  return new FunctionalSchema(fn, params, meta);
+  return new OperatorSchema(fn, params, meta);
 }

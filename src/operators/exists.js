@@ -1,6 +1,6 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionalSchema } from "../schema";
+import { OperatorSchema } from "../schema";
 import { parse } from "../utils";
 
 export function exists(predicate, schema) {
@@ -17,5 +17,5 @@ export function exists(predicate, schema) {
         : new Skip("Does not exist.", { obj, key, parents, parentKeys }, meta);
   }
 
-  return new FunctionalSchema(fn, undefined, meta);
+  return new OperatorSchema(fn, undefined, meta);
 }

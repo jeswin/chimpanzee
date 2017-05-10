@@ -1,6 +1,6 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionalSchema } from "../schema";
+import { OperatorSchema } from "../schema";
 import { parse } from "../utils";
 
 export function capture(params) {
@@ -67,5 +67,5 @@ export function take(predicate, schema, params, options = {}) {
           );
   }
 
-  return new FunctionalSchema(fn, params, meta);
+  return new OperatorSchema(fn, params, meta);
 }

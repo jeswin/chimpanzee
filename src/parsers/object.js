@@ -1,89 +1,85 @@
 /* @flow */
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
-import { Schema, ValueSchema, FunctionalSchema } from "../schema";
+import { Schema, ValueSchema, OperatorSchema } from "../schema";
 import { parse } from "../utils";
 
-export default function(schema, params) {
-  function merge(finished, context) {
-    const { result, params } = finished;
-    return result instanceof Match
-      ? !(result instanceof Empty)
-          ? params.replace || params.isObject
-              ? {
-                  context: {
-                    ...context,
-                    state: { ...(context.state || {}), ...result.value }
-                  }
-                }
-              : {
-                  context: {
-                    ...context,
-                    state: {
-                      ...(context.state || {}),
-                      [params.key]: result.value
-                    }
-                  }
-                }
-          : { context }
-      : { nonMatch: result };
-  }
+function sortFn(schema1, schema2) {
+  const schema1Order = schema1.params && schema1.params.order ? schema1.params.order : 0;
+  const schema2Order = schema2.params && schema2.params.order ? schema2.params.order : 0;
+  return schema1Order - schema2Order;
+}
 
-  return (originalObj, key, parents, parentKeys) => (obj, meta) => context =>
+export default function(schema: ObjectSchema): Result {
+  return (originalObj, key, parents, parentKeys) => obj => context => {
     typeof obj !== "undefined"
-      ? Seq.of(Object.keys(schema)).map(childKey => {
-          const childSource = schema[childKey];
-          const childUnmodified = (childSource.params && childSource.params.unmodified) || {
-            object: false,
-            property: false
-          };
+      ? (() => {
+          const contextOrFail = Seq.of(Object.keys(schema))
+            .sort((a, b) => sortFn(schema[a], schema[b]))
+            .reduce(
+              (context, childKey) => {
+                const childSource = schema[childKey];
 
-          const childItem = childUnmodified.object
-            ? childUnmodified.property
-                ? originalObj[childKey]
-                : params.modifiers.propertyOnUnmodified
-                    ? params.modifiers.propertyOnUnmodified(originalObj, childKey)
-                    : params.modifiers.property
-                        ? params.modifiers.property(originalObj, childKey)
-                        : originalObj[childKey]
-            : childUnmodified.property
-                ? obj[childKey]
-                : params.modifiers.property
-                    ? params.modifiers.property(obj, childKey)
-                    : obj[childKey];
+                const childUnmodified = (childSource.params &&
+                  childSource.params.unmodified) || {
+                  object: false,
+                  property: false
+                };
 
-          const childSchemaIsObject =
-            !(childSource instanceof Schema) && typeof childSource === "object";
+                const modifyValue = targetObj =>
+                  !childUnmodified.property && schema.params.modifiers.property
+                    ? schema.params.modifiers.property(targetObj, childKey)
+                    : targetObj[childKey];
 
-          const childSchema = new ValueSchema(
-            childSource,
-            {
-              value: params.value,
-              modifiers: {
-                property: params.modifiers.property,
-                value: params.modifiers.value
-              }
-            },
-            meta
-          );
+                const childItem = modifyValue(childUnmodified.object ? originalObj : obj);
 
-          return {
-            task: context =>
-              parse(childSchema)(
-                childItem,
-                childKey,
-                parents.concat(originalObj),
-                parentKeys.concat(key)
-              )(context),
-            merge,
-            params: childSource.params
-              ? {
-                  ...childSource.params,
-                  key: childSource.params.key || childKey,
-                  isObject: childSchemaIsObject
-                }
-              : { key: childKey, isObject: childSchemaIsObject }
-          };
-        })
-      : new Skip(`Cannot parse undefined.`, { obj, key, parents, parentKeys }, meta);
+                const isChildSchemaObjectSchema =
+                  childSource instanceof ObjectSchema ||
+                  (typeof childSource === "object" && !(childSource instanceof Schema));
+
+                //modifiers pass through if isChildSchemaObjectSchema.
+                const childSchema = isChildSchemaObjectSchema
+                  ? new ObjectSchema(childSource.value, {
+                      ...childSource.params,
+                      modifiers: {
+                        ...childSource.params.modifiers,
+                        property: schema.params.property
+                      }
+                    })
+                  : childSource;
+
+                const result = parse(childSchema)(
+                  childItem,
+                  childKey,
+                  parents.concat(originalObj),
+                  parentKeys.concat(key)
+                )(context);
+
+                return result instanceof Match
+                  ? !(result instanceof Empty)
+                      ? params.replace || isChildSchemaObjectSchema
+                          ? {
+                              ...context,
+                              state: { ...(context.state || {}), ...result.value }
+                            }
+                          : {
+                              ...context,
+                              state: {
+                                ...(context.state || {}),
+                                [params.key]: result.value
+                              }
+                            }
+                      : context
+                  : result;
+              },
+              context,
+              (acc, item) => !(item instanceof Match)
+            );
+
+          return contextOrFail instanceof Match
+            ? new Match(contextOrFail.value, { obj, key, parents, parentKeys }, meta)
+            : contextOrFail;
+        })()
+      : new Skip(`Cannot parse undefined.`, { obj, key, parents, parentKeys });
+  };
 }

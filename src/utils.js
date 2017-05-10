@@ -9,9 +9,9 @@ import arrayParser from "./parsers/array";
 import nativeParser from "./parsers/native";
 import objectParser from "./parsers/object";
 import schemaParser from "./parsers/schema";
-import functionalSchemaParser from "./parsers/functional-schema";
+import OperatorSchemaParser from "./parsers/functional-schema";
 
-import { Schema, ValueSchema, FunctionalSchema } from "./schema";
+import { Schema, ValueSchema, OperatorSchema } from "./schema";
 
 const valueSchemaParsers = {
   function: functionParser,
@@ -50,9 +50,11 @@ export function parse(source) {
 
   const parser = schema instanceof ValueSchema
     ? valueSchemaParsers[getValueSchemaType(schema.value)]
-    : schema instanceof FunctionalSchema
-        ? functionalSchemaParser
+    : schema instanceof OperatorSchema
+        ? OperatorSchemaParser
         : exception(`Unknown schema type ${typeof schema}`);
+
+  const effectiveSchema = schema instanceof ValueSchema ? schema.value : schema;
 
   return (originalObj, key, parents, parentKeys) => context => {
     const obj = modifiers && modifiers.object ? modifiers.object(originalObj) : originalObj;

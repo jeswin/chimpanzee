@@ -1,6 +1,6 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionalSchema } from "../schema";
+import { OperatorSchema } from "../schema";
 
 export function empty() {
   const meta = { type: "empty" };
@@ -12,5 +12,5 @@ export function empty() {
         : new Skip("Not empty.", { obj, key, parents, parentKeys }, meta);
   }
 
-  return new FunctionalSchema(fn, undefined, meta);
+  return new OperatorSchema(fn, undefined, meta);
 }

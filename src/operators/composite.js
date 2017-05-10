@@ -1,6 +1,6 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { Schema, ValueSchema, FunctionalSchema } from "../schema";
+import { Schema, ValueSchema, OperatorSchema } from "../schema";
 import { Seq } from "lazily";
 import { parse } from "../utils";
 
@@ -58,5 +58,5 @@ export function composite(schema, _paramsList, ownParams) {
     };
   }
 
-  return new FunctionalSchema(fn, ownParams, meta);
+  return new OperatorSchema(fn, ownParams, meta);
 }

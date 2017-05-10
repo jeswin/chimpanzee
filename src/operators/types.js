@@ -1,7 +1,7 @@
 /* @flow */
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionalSchema } from "../schema";
+import { OperatorSchema } from "../schema";
 import { parse } from "../utils";
 
 export function number(params) {
@@ -45,5 +45,5 @@ function checkType(type, params) {
     };
   }
 
-  return new FunctionalSchema(fn, params, meta);
+  return new OperatorSchema(fn, params, meta);
 }

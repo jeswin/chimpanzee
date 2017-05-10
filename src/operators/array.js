@@ -1,6 +1,6 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionalSchema } from "../schema";
+import { OperatorSchema } from "../schema";
 import { parse } from "../utils";
 
 class ArrayItem {
@@ -26,7 +26,7 @@ export function repeatingItem(_schema, opts = {}) {
 
   return new ArrayItem(
     needle =>
-      new FunctionalSchema(
+      new OperatorSchema(
         (obj, key, parents, parentKeys) => context =>
           (function run(items, results, needle) {
             const completed = (result, needle) =>
@@ -79,7 +79,7 @@ export function unorderedItem(_schema) {
 
   const schema = toNeedledSchema(_schema);
   return new ArrayItem(needle => {
-    return new FunctionalSchema(
+    return new OperatorSchema(
       (obj, key, parents, parentKeys) => context =>
         (function run(items, i) {
           const { result } = parse(schema(i))(items, key, parents, parentKeys)(context);
@@ -113,7 +113,7 @@ export function optionalItem(_schema) {
   const schema = toNeedledSchema(_schema);
 
   return new ArrayItem(needle => {
-    return new FunctionalSchema(
+    return new OperatorSchema(
       (obj, key, parents, parentKeys) => context => {
         const { result } = parse(schema(needle))(obj, key, parents, parentKeys)(context);
 
@@ -139,7 +139,7 @@ function regularItem(schema) {
   const meta = { type: "regularItem", schema };
 
   return needle =>
-    new FunctionalSchema(
+    new OperatorSchema(
       (obj, key, parents, parentKeys) => context => {
         const result = parse(schema)(
           obj[needle],
@@ -194,5 +194,5 @@ export function array(schemas, params) {
             meta
           );
   }
-  return new FunctionalSchema(fn, params, { name: "array" });
+  return new OperatorSchema(fn, params, { name: "array" });
 }

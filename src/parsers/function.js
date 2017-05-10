@@ -1,9 +1,10 @@
 /* @flow */
 import { Result, Match, Empty, Skip, Fault } from "../results";
-import { FunctionalSchema } from "../schema";
+import { OperatorSchema } from "../schema";
 
-export default function(schema, params) {
-  return (originalObj, key, parents, parentKeys) => (obj, meta) => context => {
-    return schema(obj, key, parents, parentKeys);
+export default function(schema: FunctionSchema) : Result {
+  return (originalObj, key, parents, parentKeys) => obj => context => {
+    const effectiveObj = params.modifiers.value ? params.modifiers.value(obj) : obj;
+    return schema(effectiveObj, key, parents, parentKeys)(context);
   };
 }

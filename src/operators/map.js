@@ -1,6 +1,6 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionalSchema } from "../schema";
+import { OperatorSchema } from "../schema";
 import { parse } from "../utils";
 
 export function map(schema, mapper, params) {
@@ -15,5 +15,5 @@ export function map(schema, mapper, params) {
     };
   }
 
-  return new FunctionalSchema(fn, params, meta);
+  return new OperatorSchema(fn, params, meta);
 }
