@@ -4,11 +4,13 @@ import FunctionSchema from "../schemas/function";
 import { Seq } from "lazily";
 import parse from "../parse";
 
-export function any(schemas, params) {
+import type { Context } from "../types";
+
+export function any(schemas: Array<Schema<any>>, params) {
   const meta = { type: "any", schemas, params };
 
-  function fn(obj, key, parents, parentKeys) {
-    return context =>
+  function fn(obj: any, key: string, parents: Array<any>, parentKeys: Array<string>) {
+    return (context: Context) =>
       (function run(schemas: Array<Schema<any>>, nonMatching: Array<Schema<any>>) {
         const result = parse(schemas[0])(obj, key, parents, parentKeys)(context);
         return result instanceof Match || result instanceof Fault

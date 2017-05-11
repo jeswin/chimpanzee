@@ -4,8 +4,8 @@ import Schema from "./schema";
 import type { Primitive } from "../types";
 
 export type PrimitiveSchemaParams = {
-  modifiers: {
-    value: (input: mixed) => Primitive
+  modifiers?: {
+    value?: (input: mixed) => Primitive
   }
 };
 

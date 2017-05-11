@@ -39,7 +39,7 @@ export default function(schema): Result {
 
                 //modifiers pass through if isChildSchemaObjectSchema.
                 const childSchema = isChildLiteralObject
-                  ? new ObjectSchema(childSource.value, {
+                  ? new ObjectSchema(childSource, {
                       modifiers: {
                         value: schema.params.value,
                         property: schema.params.property
@@ -65,7 +65,7 @@ export default function(schema): Result {
                               ...context,
                               state: {
                                 ...(context.state || {}),
-                                [params.key]: result.value
+                                [childSchema.params.key || childKey]: result.value
                               }
                             }
                       : context
@@ -75,9 +75,9 @@ export default function(schema): Result {
               (acc, item) => !(item instanceof Match)
             );
 
-          return contextOrFail instanceof Match
-            ? new Match(contextOrFail.value, { obj, key, parents, parentKeys }, meta)
-            : contextOrFail;
+          return contextOrFail instanceof Skip || contextOrFail instanceof Fault
+            ? contextOrFail
+            : new Match(contextOrFail.state, { obj, key, parents, parentKeys });
         })()
       : new Skip(`Cannot parse undefined.`, { obj, key, parents, parentKeys });
   };
