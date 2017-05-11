@@ -9,13 +9,12 @@ export type FunctionSchemaParams = {
   }
 };
 
-export default class FunctionSchema<T> extends Schema {
-  fn: EvalFunction<T>;
+export default class FunctionSchema<TObject> extends Schema<mixed> {
+  fn: EvalFunction<TObject>;
   params: FunctionSchemaParams;
 
-  constructor(fn: EvalFunction<T>, params: FunctionSchemaParams, meta: mixed) {
-    super(meta);
+  constructor(fn: EvalFunction<TObject>, params: FunctionSchemaParams, meta: mixed) {
+    super(params, meta);
     this.fn = fn;
-    this.params = params;
   }
 }

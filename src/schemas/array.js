@@ -8,13 +8,12 @@ export type ArraySchemaParams = {
   }
 };
 
-export default class ArraySchema extends Schema {
+export default class ArraySchema extends Schema<Array<mixed>> {
   params: ArraySchemaParams;
   value: Array<mixed>;
 
   constructor(value: Array<mixed>, params: ArraySchemaParams, meta: mixed) {
-    super(meta);
+    super(params, meta);
     this.value = value;
-    this.params = params;
   }
 }
