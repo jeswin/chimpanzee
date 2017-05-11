@@ -1,7 +1,7 @@
 /* @flow */
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
-import { parse } from "../parse";
+import parse from "../parse";
 import ArraySchema from "../schemas/array";
 
 export default function(schema: ArraySchema): Result {

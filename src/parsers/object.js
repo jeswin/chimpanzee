@@ -1,7 +1,7 @@
 /* @flow */
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
-import { parse } from "../parse";
+import parse from "../parse";
 import ObjectSchema from "../schemas/object";
 
 function sortFn(schema1, schema2) {

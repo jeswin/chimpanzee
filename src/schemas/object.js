@@ -2,7 +2,7 @@
 import Schema from "./schema";
 
 export type ObjectSchemaParams = {
-  value: (input: any) => any
+  value: (input: mixed) => mixed
 };
 
 export default class ObjectSchema extends Schema {

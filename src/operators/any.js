@@ -1,8 +1,8 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { OperatorSchema } from "../schema";
+import FunctionSchema from "../schemas/function";
 import { Seq } from "lazily";
-import { parse } from "../parse";
+import parse from "../parse";
 
 export function any(schemas, params) {
   const meta = { type: "any", schemas, params };

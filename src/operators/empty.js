@@ -1,6 +1,6 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { OperatorSchema } from "../schema";
+import FunctionSchema from "../schemas/function";
 
 export function empty() {
   const meta = { type: "empty" };

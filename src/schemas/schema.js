@@ -5,13 +5,13 @@
 */
 export type SchemaParams = {
   modifiers: {
-    value: (input: any) => any
+    value: (input: mixed) => mixed
   }
 };
 
 export default class Schema {
   params: SchemaParams;
-  meta: any;
+  meta: mixed;
 
   constructor(params, meta) {
     this.params = params;

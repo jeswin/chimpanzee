@@ -1,7 +1,7 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { OperatorSchema } from "../schema";
-import { parse } from "../parse";
+import FunctionSchema from "../schemas/function";
+import parse from "../parse";
 
 export function capture(params) {
   return captureIf(obj => typeof obj !== "undefined", params);
@@ -20,7 +20,7 @@ export function modify(comparand, params) {
   );
 }
 
-export function captureAndTraverse(schema, params) {
+export function captureAndParse(schema, params) {
   return take(obj => typeof obj !== "undefined", schema, params);
 }
 

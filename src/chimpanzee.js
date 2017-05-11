@@ -1,27 +1,22 @@
 /* @flow */
 
-import { OperatorSchema } from "./schema";
-import { parse } from "./utils";
+import parse from "./parse";
 
-export { traverse } from "./operators/traverse";
-export { composite } from "./operators/composite";
-export { capture, captureIf, captureAndTraverse, literal, take } from "./operators/capture";
 export { any } from "./operators/any";
-export { map } from "./operators/map";
-export { optional } from "./operators/optional";
+export { capture, captureIf, captureAndParse, literal, take } from "./operators/capture";
+export { composite } from "./operators/composite";
 export { deep } from "./operators/deep";
 export { empty } from "./operators/empty";
 export { exists } from "./operators/exists";
+export { map } from "./operators/map";
 export { number, bool, string, object, func } from "./operators/types";
+export { optional } from "./operators/optional";
 export { regex } from "./operators/regex";
-
 export { repeatingItem, unorderedItem, optionalItem, array } from "./operators/array";
 
 export { Match, Empty, Skip, Fault } from "./results";
 
 export { default as Schema } from "./schema";
-
-export { parse } from "./utils";
 
 export function match(schema, input) {
   return parse(schema)(input, "__INIT__", [], [])({});

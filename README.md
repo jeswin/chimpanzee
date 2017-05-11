@@ -299,7 +299,7 @@ const input = {
 }
 
 const schema = traverse({
-  level1: captureAndTraverse(traverse({
+  level1: captureAndParse(traverse({
     level2: capture("prop2")
   }), "prop1")
 })

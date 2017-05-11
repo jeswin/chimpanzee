@@ -1,8 +1,8 @@
 /* @flow */
 import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "../results";
-import { OperatorSchema } from "../schema";
-import { parse } from "../parse";
+import FunctionSchema from "../schemas/function";
+import parse from "../parse";
 
 export function deep(schema, params) {
   const meta = { type: "deep", schema, params };

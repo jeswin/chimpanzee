@@ -4,15 +4,15 @@ import Schema from "./schema";
 
 export type ArraySchemaParams = {
   modifiers: {
-    value: (input: any) => Array<any>
+    value: (input: mixed) => Array<mixed>
   }
 };
 
 export default class ArraySchema extends Schema {
   params: ArraySchemaParams;
-  value: Array<any>;
+  value: Array<mixed>;
 
-  constructor(value: Array<any>, params: ArraySchemaParams, meta: any) {
+  constructor(value: Array<mixed>, params: ArraySchemaParams, meta: mixed) {
     super(meta);
     this.value = value;
     this.params = params;

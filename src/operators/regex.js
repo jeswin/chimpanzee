@@ -1,8 +1,8 @@
 /* @flow */
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "../results";
-import { OperatorSchema } from "../schema";
-import { parse } from "../parse";
+import FunctionSchema from "../schemas/function";
+import parse from "../parse";
 
 export function regex(regex, params) {
   const meta = { type: "regex", regex, params };
