@@ -58,5 +58,5 @@ export function composite(schema, _paramsList, ownParams) {
     };
   }
 
-  return new OperatorSchema(fn, ownParams, meta);
+  return new FunctionSchema(fn, ownParams, meta);
 }

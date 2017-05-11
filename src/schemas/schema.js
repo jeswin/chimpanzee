@@ -1,9 +1,10 @@
 /* @flow */
-import { normalizeParams } from "./utils";
 
+/*
+  This is the base class for all schemas.
+*/
 export class Schema {
-  constructor(params, meta) {
-    this.params = normalizeParams(params);
+  constructor(meta) {
     this.meta = meta;
   }
 }

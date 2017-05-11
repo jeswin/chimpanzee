@@ -15,5 +15,5 @@ export function map(schema, mapper, params) {
     };
   }
 
-  return new OperatorSchema(fn, params, meta);
+  return new FunctionSchema(fn, params, meta);
 }

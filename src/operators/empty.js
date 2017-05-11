@@ -12,5 +12,5 @@ export function empty() {
         : new Skip("Not empty.", { obj, key, parents, parentKeys }, meta);
   }
 
-  return new OperatorSchema(fn, undefined, meta);
+  return new FunctionSchema(fn, undefined, meta);
 }

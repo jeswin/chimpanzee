@@ -46,5 +46,5 @@ export function deep(schema, params) {
     };
   }
 
-  return new OperatorSchema(fn, params, meta);
+  return new FunctionSchema(fn, params, meta);
 }

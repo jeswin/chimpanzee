@@ -22,5 +22,5 @@ export function regex(regex, params) {
         : result;
     };
   }
-  return new OperatorSchema(fn, params, { name: "regex" });
+  return new FunctionSchema(fn, params, { name: "regex" });
 }

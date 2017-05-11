@@ -29,5 +29,5 @@ export function any(schemas, params) {
       })(schemas, []);
   }
 
-  return new OperatorSchema(fn, params, meta);
+  return new FunctionSchema(fn, params, meta);
 }

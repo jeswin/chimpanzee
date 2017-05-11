@@ -33,16 +33,14 @@ export default function(schema: ObjectSchema): Result {
 
                 const childItem = modifyValue(childUnmodified.object ? originalObj : obj);
 
-                const isChildSchemaObjectSchema =
-                  childSource instanceof ObjectSchema ||
-                  (typeof childSource === "object" && !(childSource instanceof Schema));
+                const isChildLiteralObject =
+                  typeof childSource === "object" && childSource.constructor === Object;
 
                 //modifiers pass through if isChildSchemaObjectSchema.
-                const childSchema = isChildSchemaObjectSchema
+                const childSchema = isChildLiteralObject
                   ? new ObjectSchema(childSource.value, {
-                      ...childSource.params,
                       modifiers: {
-                        ...childSource.params.modifiers,
+                        value: schema.params.value,
                         property: schema.params.property
                       }
                     })
@@ -57,7 +55,7 @@ export default function(schema: ObjectSchema): Result {
 
                 return result instanceof Match
                   ? !(result instanceof Empty)
-                      ? params.replace || isChildSchemaObjectSchema
+                      ? schema.params.replace || isChildLiteralObject
                           ? {
                               ...context,
                               state: { ...(context.state || {}), ...result.value }

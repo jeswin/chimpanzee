@@ -45,5 +45,5 @@ function checkType(type, params) {
     };
   }
 
-  return new OperatorSchema(fn, params, meta);
+  return new FunctionSchema(fn, params, meta);
 }

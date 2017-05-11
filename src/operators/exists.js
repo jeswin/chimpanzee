@@ -17,5 +17,5 @@ export function exists(predicate, schema) {
         : new Skip("Does not exist.", { obj, key, parents, parentKeys }, meta);
   }
 
-  return new OperatorSchema(fn, undefined, meta);
+  return new FunctionSchema(fn, undefined, meta);
 }

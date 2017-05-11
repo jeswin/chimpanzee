@@ -67,5 +67,5 @@ export function take(predicate, schema, params, options = {}) {
           );
   }
 
-  return new OperatorSchema(fn, params, meta);
+  return new FunctionSchema(fn, params, meta);
 }

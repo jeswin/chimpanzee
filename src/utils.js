@@ -4,24 +4,42 @@ import exception from "./exception";
 import { Match, Empty, Skip, Fault } from "./results";
 import reconcile from "./reconcile";
 
-import functionParser from "./parsers/function";
 import arrayParser from "./parsers/array";
+import functionParser from "./parsers/function";
 import nativeParser from "./parsers/native";
 import objectParser from "./parsers/object";
 import schemaParser from "./parsers/schema";
-import OperatorSchemaParser from "./parsers/functional-schema";
 
-import { Schema, ValueSchema, OperatorSchema } from "./schema";
+import ArraySchema from "./schemas/array";
+import FunctionSchema from "./schemas/function";
+import NativeSchema from "./schemas/native";
+import ObjectSchema from "./schemas/object";
+import Schema from "./schemas/schema";
 
-const valueSchemaParsers = {
-  function: functionParser,
-  array: arrayParser,
-  native: nativeParser,
-  object: objectParser,
-  schema: schemaParser
+const schemaHandlers = {
+  array: {
+    parse: arrayParser,
+    Class: ArraySchema
+  },
+  function: {
+    parse: functionParser,
+    Class: FunctionSchema
+  },
+  native: {
+    parse: nativeParser,
+    Class: NativeSchema
+  },
+  object: {
+    parse: objectParser,
+    Class: ObjectSchema
+  },
+  schema: {
+    parse: schemaParser,
+    Class: Schema
+  }
 };
 
-export function getValueSchemaType(schema) {
+export function getSchemaType(schema) {
   return ["string", "number", "boolean", "symbol"].includes(typeof schema)
     ? "native"
     : typeof schema === "function"
@@ -30,14 +48,9 @@ export function getValueSchemaType(schema) {
             ? "array"
             : schema instanceof Schema
                 ? "schema"
-                : typeof schema === "object" ? "object" : typeof schema;
-}
-
-export function normalizeParams(rawParams) {
-  const params = typeof rawParams === "string" ? { key: rawParams } : rawParams || {};
-  params.build = params.build || (() => context => context.state);
-  params.modifiers = params.modifiers || {};
-  return params;
+                : typeof schema === "object"
+                    ? "object"
+                    : exception(`Invalid schema type ${typeof schema}.`);
 }
 
 export function getSchema(source, params) {
@@ -45,22 +58,11 @@ export function getSchema(source, params) {
 }
 
 export function parse(source) {
-  const schema = getSchema(source);
-  const modifiers = schema.params.modifiers;
+  const schemaType = getSchemaType(source);
+  const { parse: schemaParse, Class: SchemaClass } = schemaHandlers[schemaType];
+  const schema = SchemaClass.normalize(source);
 
-  const parser = schema instanceof ValueSchema
-    ? valueSchemaParsers[getValueSchemaType(schema.value)]
-    : schema instanceof OperatorSchema
-        ? OperatorSchemaParser
-        : exception(`Unknown schema type ${typeof schema}`);
-
-  const effectiveSchema = schema instanceof ValueSchema ? schema.value : schema;
-
-  return (originalObj, key, parents, parentKeys) => context => {
-    const obj = modifiers && modifiers.object ? modifiers.object(originalObj) : originalObj;
-    return parser(schema, schema.params)(originalObj, key, parents, parentKeys)(
-      obj,
-      schema.meta
-    )(context);
+  return (obj, key, parents, parentKeys) => context =>
+    schemaParse(schema)(obj, key, parents, parentKeys)(context);
   };
 }
