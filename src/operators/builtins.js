@@ -5,13 +5,13 @@ import ArraySchema from "../schemas/array";
 import type { FunctionSchemaParams } from "../schemas/function";
 import FunctionSchema from "../schemas/function";
 
-import type { NativeSchemaParams } from "../schemas/native";
-import NativeSchema from "../schemas/native";
+import type { PrimitiveSchemaParams } from "../schemas/primitive";
+import PrimitiveSchema from "../schemas/primitive";
 
 import type { ObjectSchemaParams } from "../schemas/object";
-import ObjectSchema from "../schemas/native";
+import ObjectSchema from "../schemas/primitive";
 
-import type { Native, EvalFunction } from "../types";
+import type { Primitive, EvalFunction } from "../types";
 
 export function arr(literal: Array, params?: ArraySchemaParams) : ArraySchema {
   const meta = { type: "obj", literal, params };
@@ -23,9 +23,9 @@ export function func<T>(literal: EvalFunction<T>, params?: FunctionSchemaParams)
   return new FunctionSchema(literal, params, meta);
 }
 
-export function native(literal: Native, params?: NativeSchemaParams) : NativeSchema {
+export function val(literal: Primitive, params?: PrimitiveSchemaParams) : PrimitiveSchema {
   const meta = { type: "obj", literal, params };
-  return new NativeSchema(literal, params, meta);
+  return new PrimitiveSchema(literal, params, meta);
 }
 
 export function obj(literal: Object, params?: ObjectSchemaParams) : ObjectSchema {

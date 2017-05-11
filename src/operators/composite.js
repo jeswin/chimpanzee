@@ -1,7 +1,8 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { Schema, ValueSchema, OperatorSchema } from "../schema";
 import { Seq } from "lazily";
+import { ObjectSchema } from "../schemas/object";
+import { FunctionSchema } from "../schemas/function";
 import parse from "../parse";
 
 function getSchema(schema, paramSelector) {
@@ -34,7 +35,7 @@ export function composite(schema, _paramsList, ownParams) {
     : [undefined].concat(normalizedParams);
 
   const schemas = paramsList.map(
-    params => new ValueSchema(getSchema(schema, (params && params.name) || "default"), params)
+    params => new ObjectSchema(getSchema(schema, (params && params.name) || "default"), params)
   );
 
   function fn(obj, key, parents, parentKeys) {

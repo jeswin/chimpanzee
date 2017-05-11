@@ -1,8 +1,8 @@
 /* @flow */
 import { Result, Match, Empty, Skip, Fault } from "../results";
-import NativeSchema from "../schemas/native";
+import PrimitiveSchema from "../schemas/primitive";
 
-export default function(schema: NativeSchema): Result {
+export default function(schema: PrimitiveSchema): Result {
   return (obj, key, parents, parentKeys) => context =>
     schema === obj
       ? new Empty({ obj, key, parents, parentKeys }, meta)

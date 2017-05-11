@@ -16,9 +16,8 @@ export { repeatingItem, unorderedItem, optionalItem, array } from "./operators/a
 
 export { Match, Empty, Skip, Fault } from "./results";
 
-export { default as Schema } from "./schema";
-
-export builtins from "./operators/builtins";
+import * as builtins from "./operators/builtins";
+export { builtins };
 
 export function match(schema, input) {
   return parse(schema)(input, "__INIT__", [], [])({});

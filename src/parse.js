@@ -2,16 +2,15 @@
 import exception from "./exception";
 
 import { Match, Empty, Skip, Fault } from "./results";
-import reconcile from "./reconcile";
 
 import arrayParser from "./parsers/array";
 import functionParser from "./parsers/function";
-import nativeParser from "./parsers/native";
+import primitiveParser from "./parsers/primitive";
 import objectParser from "./parsers/object";
 
 import ArraySchema from "./schemas/array";
 import FunctionSchema from "./schemas/function";
-import NativeSchema from "./schemas/native";
+import PrimitiveSchema from "./schemas/primitive";
 import ObjectSchema from "./schemas/object";
 import Schema from "./schemas/schema";
 
@@ -21,9 +20,9 @@ function getSchemaAndParser<TSchema>(source: mixed): TSchema {
   const normalize = (src, SchemaClass, params = {}) =>
     src instanceof SchemaClass ? src : new SchemaClass(src, params);
 
-  return source instanceof NativeSchema ||
+  return source instanceof PrimitiveSchema ||
     ["string", "number", "boolean", "symbol"].includes(typeof source)
-    ? { schema: normalize(source, NativeSchema), parse: nativeParser }
+    ? { schema: normalize(source, PrimitiveSchema), parse: primitiveParser }
     : source instanceof FunctionSchema || source instanceof Function
         ? { schema: normalize(source, FunctionSchema), parse: functionParser }
         : source instanceof ArraySchema || source instanceof Array

@@ -50,7 +50,7 @@ describe("chimpanzee", () => {
   }
 
   const tests = [
-    // ["any", "any", "match"],
+    ["any", "any", "match"],
     // ["any-fault", "any-fault", "fault"],
     // ["any-native-types", "any-native-types", "empty"],
     // ["any-negative", "any-negative", "skip"],
@@ -115,7 +115,7 @@ describe("chimpanzee", () => {
     // ["property-modifier-skip", "property-modifier-skip", "match"],
     // ["regex", "regex", "match"],
     // ["regex-negative", "regex-negative", "skip"],
-    ["string", "string", "match"],
+    // ["string", "string", "match"],
     // ["string-negative", "string-negative", "skip"],
     // ["traverse-traverse-traverse", "traverse-traverse-traverse", "match"],
     // ["traverse-wrapper", "traverse-wrapper", "match"],

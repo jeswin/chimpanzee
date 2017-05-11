@@ -1,4 +1,4 @@
-export type Native = string | number | boolean | Symbol | Function;
+export type Primitive = string | number | boolean | Symbol | Function;
 
 export type Context = {
   state: any
