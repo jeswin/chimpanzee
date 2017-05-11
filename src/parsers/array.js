@@ -30,11 +30,20 @@ export default function(schema: ArraySchema): Result {
 
               return !(results.last() instanceof Match)
                 ? results.last()
-                : new Match(
-                    results.filter(r => !(r instanceof Empty)).map(r => r.value),
-                    { obj, key, parents, parentKeys },
-                    meta
-                  );
+                : (() => {
+                    const resultArr = results
+                      .filter(r => !(r instanceof Empty))
+                      .map(r => r.value);
+                    const modifyResult = schema.params.build;
+                    return modifyResult
+                      ? (() => {
+                          const output = modifyResult(resultArr);
+                          return output instanceof Result
+                            ? output
+                            : new Match(output, { obj, key, parents, parentKeys }, meta);
+                        })()
+                      : new Match(resultArr, { obj, key, parents, parentKeys }, meta);
+                  })();
             })()
       : new Skip(
           `Schema is an array but property is a non-array.`,

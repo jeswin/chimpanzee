@@ -18,6 +18,8 @@ export { Match, Empty, Skip, Fault } from "./results";
 
 export { default as Schema } from "./schema";
 
+export builtins from "./operators/builtins";
+
 export function match(schema, input) {
   return parse(schema)(input, "__INIT__", [], [])({});
 }
