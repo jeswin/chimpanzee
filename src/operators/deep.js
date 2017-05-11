@@ -2,7 +2,7 @@
 import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "../results";
 import { OperatorSchema } from "../schema";
-import { parse } from "../utils";
+import { parse } from "../parse";
 
 export function deep(schema, params) {
   const meta = { type: "deep", schema, params };

@@ -1,20 +1,19 @@
 /* @flow */
+import Schema from "./schema";
 
-type FunctionSchemaParams = {
-  value: (input: any) => out: any
-}
+export type FunctionSchemaParams = {
+  modifiers: {
+    value: (input: any) => any
+  }
+};
 
-export class FunctionSchema extends Schema {
-  value: EvalFunction;
+export default class FunctionSchema extends Schema {
+  fn: EvalFunction<any>;
   params: FunctionSchemaParams;
 
-  static normalize(source) {
-    return source instanceof FunctionSchema ? source : new FunctionSchema(source, {});
-  }
-
-  constructor(value: EvalFunction, params: FunctionSchemaParams, meta) {
+  constructor(fn: EvalFunction<any>, params: FunctionSchemaParams, meta: any) {
     super(meta);
-    this.value = value;
+    this.fn = fn;
     this.params = params;
   }
 }

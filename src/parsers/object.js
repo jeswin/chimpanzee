@@ -1,8 +1,8 @@
 /* @flow */
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
-import { Schema, ValueSchema, OperatorSchema } from "../schema";
-import { parse } from "../utils";
+import { parse } from "../parse";
+import ObjectSchema from "../schemas/object";
 
 function sortFn(schema1, schema2) {
   const schema1Order = schema1.params && schema1.params.order ? schema1.params.order : 0;
@@ -11,8 +11,8 @@ function sortFn(schema1, schema2) {
 }
 
 export default function(schema: ObjectSchema): Result {
-  return (originalObj, key, parents, parentKeys) => obj => context => {
-    typeof obj !== "undefined"
+  return (obj, key, parents, parentKeys) => context => {
+    return typeof obj !== "undefined"
       ? (() => {
           const contextOrFail = Seq.of(Object.keys(schema))
             .sort((a, b) => sortFn(schema[a], schema[b]))

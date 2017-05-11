@@ -1,18 +1,18 @@
-/* @flow */
+
+  /* @flow */
+import Schema from "./schema";
 
 export type ArraySchemaParams = {
-  value: (input: any) => any
+  modifiers: {
+    value: (input: any) => Array<any>
+  }
 };
 
-export class ArraySchema extends Schema {
+export default class ArraySchema extends Schema {
   params: ArraySchemaParams;
   value: Array<any>;
 
-  static normalize(source) {
-    return source instanceof ArraySchema ? source : new ArraySchema(source, {});
-  }
-
-  constructor(value: Array<any>, params: ArraySchemaParams, meta) {
+  constructor(value: Array<any>, params: ArraySchemaParams, meta: any) {
     super(meta);
     this.value = value;
     this.params = params;

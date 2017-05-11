@@ -1,5 +1,5 @@
 /* @flow */
-import { parse } from "../utils";
+import { parse } from "../parse";
 import { ValueSchema } from "../schema";
 
 export function traverse(source, params) {

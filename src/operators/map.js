@@ -1,7 +1,7 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
 import { OperatorSchema } from "../schema";
-import { parse } from "../utils";
+import { parse } from "../parse";
 
 export function map(schema, mapper, params) {
   const meta = { type: "map", schema, mapper, params };

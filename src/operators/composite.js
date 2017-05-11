@@ -2,7 +2,7 @@
 import { Match, Empty, Skip, Fault } from "../results";
 import { Schema, ValueSchema, OperatorSchema } from "../schema";
 import { Seq } from "lazily";
-import { parse } from "../utils";
+import { parse } from "../parse";
 
 function getSchema(schema, paramSelector) {
   const schemaSelector = schema.params && schema.params.selector

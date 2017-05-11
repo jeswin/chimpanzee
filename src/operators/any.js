@@ -2,7 +2,7 @@
 import { Match, Empty, Skip, Fault } from "../results";
 import { OperatorSchema } from "../schema";
 import { Seq } from "lazily";
-import { parse } from "../utils";
+import { parse } from "../parse";
 
 export function any(schemas, params) {
   const meta = { type: "any", schemas, params };

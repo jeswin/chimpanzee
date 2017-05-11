@@ -1,18 +1,19 @@
 /* @flow */
+import Schema from "./schema";
+
+import type { Native } from "../types";
 
 export type NativeSchemaParams = {
-  value: (input: any) => any
+  modifiers: {
+    value: (input: any) => string | number | boolean | Symbol | Function
+  }
 };
 
-export class NativeSchema extends Schema {
+export default class NativeSchema extends Schema {
   params: NativeSchemaParams;
   value: Native;
 
-  static normalize(source) {
-    return source instanceof NativeSchema ? source : new NativeSchema(source, {});
-  }
-
-  constructor(value: Native, params: NativeSchemaParams, meta) {
+  constructor(value: Native, params: NativeSchemaParams, meta: any) {
     super(meta);
     this.value = value;
     this.params = params;

@@ -1,11 +1,11 @@
 /* @flow */
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
-import { ValueSchema } from "../schemas";
-import { parse } from "../utils";
+import { parse } from "../parse";
+import ArraySchema from "../schemas/array";
 
-export default function(schema: ArraySchema) : Result {
-  return (originalObj, key, parents, parentKeys) => obj => context =>
+export default function(schema: ArraySchema): Result {
+  return (obj, key, parents, parentKeys) => context =>
     Array.isArray(obj)
       ? schema.length !== obj.length
           ? new Skip(
@@ -16,11 +16,8 @@ export default function(schema: ArraySchema) : Result {
           : (() => {
               const results = Seq.of(schema).reduce(
                 (acc, rhs, i) => {
-                  const effectiveObj = params.modifiers.value
-                    ? params.modifiers.value(obj[i])
-                    : obj[i];
                   const result = parse(childSchema)(
-                    effectiveObj,
+                    obj,
                     `${key}.${i}`,
                     parents.concat(originalObj),
                     parentKeys.concat(key)
