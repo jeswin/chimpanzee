@@ -11,6 +11,6 @@ export const input = {
 export const schema = {
   level1: {
     hello: capture(),
-    level2: ["one", "two", "three"]
+    level2: ["one", capture(), "three"]
   }
 };

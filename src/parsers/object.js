@@ -57,8 +57,6 @@ export default function(schema): Result {
                   parentKeys.concat(key)
                 )(context);
 
-                console.log(result);
-
                 return result instanceof Match
                   ? !(result instanceof Empty)
                       ? (childSchema.params && childSchema.params.replace) ||

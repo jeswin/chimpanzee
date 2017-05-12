@@ -43,23 +43,25 @@ export default function(schema: ArraySchema): Result {
                           : rhs;
                       })();
 
-                  console.log("childSchema", childSchema);
-
                   const result = parse(childSchema)(
                     obj[i],
                     `${key}.${i}`,
                     parents.concat(obj),
                     parentKeys.concat(key)
                   )(context);
-                  return acc.concat(result);
+
+                  return result instanceof Skip || result instanceof Fault
+                    ? result
+                    : !(result instanceof Empty) ? acc.concat(result) : acc;
                 },
                 [],
-                (acc, item) => !(item instanceof Match)
+                (acc, item) => acc instanceof Skip || acc instanceof Fault
               );
 
-              console.log("RES", results);
-              return !(results[-1] instanceof Match)
-                ? results[-1]
+              const last = results.slice(-1)[0];
+
+              return !(last instanceof Match)
+                ? last
                 : (() => {
                     const resultArr = results
                       .filter(r => !(r instanceof Empty))
