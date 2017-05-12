@@ -2,7 +2,6 @@
 import Schema from "./schema";
 
 export type ObjectSchemaParams = {
-  key?: string,
   modifiers?: {
     value?: (input: mixed) => mixed
   }

@@ -4,8 +4,10 @@
   This is the base class for all schemas.
 */
 export type SchemaParams<TValueModifier> = {
-  modifiers: {
-    value: (input: mixed) => TValueModifier
+  key?: string,
+  selector?: string,
+  modifiers?: {
+    value?: (input: mixed) => TValueModifier
   }
 };
 

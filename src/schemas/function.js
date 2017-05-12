@@ -4,7 +4,6 @@ import Schema from "./schema";
 import type { EvalFunction } from "../types";
 
 export type FunctionSchemaParams = {
-  key?: string,
   modifiers?: {
     value?: (input: mixed) => mixed
   }
