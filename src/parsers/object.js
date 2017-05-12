@@ -11,14 +11,17 @@ function sortFn(schema1, schema2) {
 }
 
 export default function(schema): Result {
-  return (obj, key, parents, parentKeys) => context => {
+  return (_obj, key, parents, parentKeys) => context => {
+    const obj = schema.params && schema.params.modifiers && schema.params.modifiers.object
+      ? schema.params.modifiers.object(_obj)
+      : _obj;
+
     return typeof obj !== "undefined"
       ? (() => {
           const contextOrFail = Seq.of(Object.keys(schema.value))
             .sort((a, b) => sortFn(schema.value[a], schema.value[b]))
             .reduce(
               (context, childKey) => {
-                console.log("KEY", childKey);
                 const childSource = schema.value[childKey];
 
                 const childUnmodified = (childSource.params &&
@@ -33,10 +36,11 @@ export default function(schema): Result {
                   ? schema.params.modifiers.property(obj, childKey)
                   : obj[childKey];
 
+                // child is { ... }
                 const isChildLiteralObject =
                   typeof childSource === "object" && childSource.constructor === Object;
 
-                //modifiers pass through if isChildSchemaObjectSchema.
+                // Value and property modifiers pass through literal containers ({} and []).
                 const childSchema = isChildLiteralObject
                   ? new ObjectSchema(childSource, {
                       modifiers: {
@@ -53,10 +57,9 @@ export default function(schema): Result {
                   parentKeys.concat(key)
                 )(context);
 
-                console.log("RES", result);
                 return result instanceof Match
                   ? !(result instanceof Empty)
-                      ? schema.params.replace || isChildLiteralObject
+                      ? childSchema.params.replace || isChildLiteralObject
                           ? {
                               ...context,
                               state: { ...(context.state || {}), ...result.value }
@@ -78,8 +81,8 @@ export default function(schema): Result {
           return contextOrFail instanceof Skip || contextOrFail instanceof Fault
             ? contextOrFail
             : typeof contextOrFail.state !== "undefined"
-              ? new Match(contextOrFail.state, { obj, key, parents, parentKeys })
-              : new Empty({ obj, key, parents, parentKeys })
+                ? new Match(contextOrFail.state, { obj, key, parents, parentKeys })
+                : new Empty({ obj, key, parents, parentKeys });
         })()
       : new Skip(`Cannot parse undefined.`, { obj, key, parents, parentKeys });
   };

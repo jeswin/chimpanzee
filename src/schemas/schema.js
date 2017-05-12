@@ -4,6 +4,7 @@
   This is the base class for all schemas.
 */
 export type SchemaParams<TValueModifier> = {
+  name?: string,
   key?: string,
   selector?: string,
   modifiers?: {

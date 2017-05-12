@@ -37,8 +37,6 @@ export function composite(schema, _paramsList, ownParams) {
     params => new ObjectSchema(getSchema(schema, (params && params.name) || "default"), params)
   );
 
-  console.log(schemas);
-
   function fn(obj, key, parents, parentKeys) {
     return context => {
       const env = { obj, key, parents, parentKeys };

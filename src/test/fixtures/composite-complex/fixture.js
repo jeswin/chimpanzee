@@ -1,4 +1,4 @@
-import { traverse, composite, capture } from "../../../chimpanzee";
+import { builtins as $, traverse, composite, capture } from "../../../chimpanzee";
 
 export const input = {
   node: {
@@ -19,7 +19,7 @@ export const schema = composite(
     something: "else",
     hello: capture({ key: "first" }),
     prop: capture({ key: "second", selector: "alt" }),
-    heal: traverse(
+    heal: $.obj(
       {
         what: capture()
       },

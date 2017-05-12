@@ -9,7 +9,7 @@ import type { PrimitiveSchemaParams } from "../schemas/primitive";
 import PrimitiveSchema from "../schemas/primitive";
 
 import type { ObjectSchemaParams } from "../schemas/object";
-import ObjectSchema from "../schemas/primitive";
+import ObjectSchema from "../schemas/object";
 
 import type { Primitive, EvalFunction } from "../types";
 

@@ -5,8 +5,8 @@ import parse from "../parse";
 import ArraySchema from "../schemas/array";
 
 export default function(schema: ArraySchema): Result {
-  return (obj, key, parents, parentKeys) => context =>
-    Array.isArray(obj)
+  return (obj, key, parents, parentKeys) => context => {
+    return Array.isArray(obj)
       ? schema.length !== obj.length
           ? new Skip(
               `Expected array of length ${schema.length} but got ${obj.length}.`,
@@ -16,8 +16,34 @@ export default function(schema: ArraySchema): Result {
           : (() => {
               const results = Seq.of(schema).reduce(
                 (acc, rhs, i) => {
+                  const isChildLiteralArray = Array.isArray(rhs);
+
+                  // Value and property modifiers pass through literal containers ({} and []).
+                  // child is [ ... ]
+                  const childSchema = isChildLiteralArray
+                    ? new ArraySchema(rhs, {
+                        modifiers: {
+                          value: schema.params.value,
+                          property: schema.params.property
+                        }
+                      })
+                    : (() => {
+                      // child is { ... }
+                      const isChildLiteralObject =
+                          typeof childSource === "object" && childSource.constructor === Object;
+
+                        return isChildLiteralObject
+                          ? new new ObjectSchema(rhs, {
+                              modifiers: {
+                                value: schema.params.value,
+                                property: schema.params.property
+                              }
+                            })()
+                          : rhs;
+                      })();
+
                   const result = parse(childSchema)(
-                    obj,
+                    obj[i],
                     `${key}.${i}`,
                     parents.concat(originalObj),
                     parentKeys.concat(key)
@@ -50,4 +76,5 @@ export default function(schema: ArraySchema): Result {
           { obj, key, parents, parentKeys },
           meta
         );
+  };
 }
