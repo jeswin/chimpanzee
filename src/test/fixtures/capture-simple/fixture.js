@@ -4,6 +4,6 @@ export const input = {
   hello: "world"
 };
 
-export const schema = traverse({
+export const schema = {
   hello: capture()
-});
+};

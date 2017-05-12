@@ -1,7 +1,7 @@
 /* @flow */
 import exception from "./exception";
 
-import { Match, Empty, Skip, Fault } from "./results";
+import { Result, Match, Empty, Skip, Fault } from "./results";
 
 import arrayParser from "./parsers/array";
 import functionParser from "./parsers/function";
@@ -34,11 +34,18 @@ function getSchemaAndParser<TSchema>(source: mixed): TSchema {
 
 export default function(source: mixed): EvalFunction {
   const { schema, parse: schemaParse } = getSchemaAndParser(source);
-
   return (originalObj, key, parents, parentKeys) => context => {
     const obj = schema.params && schema.params.modifier && schema.params.modifier.value
       ? schema.params.modifier.value(originalObj)
       : originalObj;
-    return schemaParse(schema)(obj, key, parents, parentKeys)(context);
+    const result = schemaParse(schema)(obj, key, parents, parentKeys)(context);
+    return schema.params && schema.params.build
+      ? (() => {
+          const output = schema.params.build(result)(context);
+          return output instanceof Result
+            ? output
+            : new Match(output, { obj, key, parents, parentKeys });
+        })()
+      : result;
   };
 }

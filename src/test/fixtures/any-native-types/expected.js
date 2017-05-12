@@ -1,3 +1,1 @@
-export const result = {
-  hello: "world"
-};
+export const result = {};

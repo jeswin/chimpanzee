@@ -1,8 +1,7 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
 import { Seq } from "lazily";
-import { ObjectSchema } from "../schemas/object";
-import { FunctionSchema } from "../schemas/function";
+import { Schema, ObjectSchema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 
 function getSchema(schema, paramSelector) {

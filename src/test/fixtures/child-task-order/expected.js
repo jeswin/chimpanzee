@@ -1,4 +1,4 @@
 export const result = {
-  myProp1: "hello",
-  myProp2: "world"
+  prop2: 20,
+  prop1: 31
 };

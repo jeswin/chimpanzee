@@ -4,7 +4,7 @@ import PrimitiveSchema from "../schemas/primitive";
 
 export default function(schema: PrimitiveSchema): Result {
   return (obj, key, parents, parentKeys) => context =>
-    schema === obj
-      ? new Empty({ obj, key, parents, parentKeys }, meta)
-      : new Skip(`Expected ${schema} but got ${comparand}.`, { obj, key, parents, parentKeys });
+    schema.value === obj
+      ? new Empty({ obj, key, parents, parentKeys })
+      : new Skip(`Expected ${schema.value} but got ${obj}.`, { obj, key, parents, parentKeys });
 }

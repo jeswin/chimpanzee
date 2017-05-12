@@ -4,9 +4,7 @@ import { Result, Match, Empty, Skip, Fault } from "../results";
 import parse from "../parse";
 import ObjectSchema from "../schemas/object";
 
-function sortFn(objSchema1, objSchema2) {
-  const schema1 = objSchema1.value;
-  const schema2 = objSchema2.value;
+function sortFn(schema1, schema2) {
   const schema1Order = schema1.params && schema1.params.order ? schema1.params.order : 0;
   const schema2Order = schema2.params && schema2.params.order ? schema2.params.order : 0;
   return schema1Order - schema2Order;
@@ -17,9 +15,10 @@ export default function(schema): Result {
     return typeof obj !== "undefined"
       ? (() => {
           const contextOrFail = Seq.of(Object.keys(schema.value))
-            .sort((a, b) => sortFn(schema[a], schema[b]))
+            .sort((a, b) => sortFn(schema.value[a], schema.value[b]))
             .reduce(
               (context, childKey) => {
+                console.log("KEY", childKey);
                 const childSource = schema.value[childKey];
 
                 const childUnmodified = (childSource.params &&
@@ -54,6 +53,7 @@ export default function(schema): Result {
                   parentKeys.concat(key)
                 )(context);
 
+                console.log("RES", result);
                 return result instanceof Match
                   ? !(result instanceof Empty)
                       ? schema.params.replace || isChildLiteralObject
@@ -72,12 +72,14 @@ export default function(schema): Result {
                   : result;
               },
               context,
-              (acc, item) => !(item instanceof Match)
+              (acc, item) => item instanceof Skip || item instanceof Fault
             );
 
           return contextOrFail instanceof Skip || contextOrFail instanceof Fault
             ? contextOrFail
-            : new Match(contextOrFail.state, { obj, key, parents, parentKeys });
+            : typeof contextOrFail.state !== "undefined"
+              ? new Match(contextOrFail.state, { obj, key, parents, parentKeys })
+              : new Empty({ obj, key, parents, parentKeys })
         })()
       : new Skip(`Cannot parse undefined.`, { obj, key, parents, parentKeys });
   };

@@ -15,7 +15,7 @@ describe("chimpanzee", () => {
       global.__chimpanzeeTestContext = [];
       const fixture = require(`./fixtures/${dir}/fixture`);
       const actual = match(fixture.schema, fixture.input);
-      //console.log(actual);
+      console.log("ACT", actual);
       const expected = require(`./fixtures/${dir}/expected`);
       if (resultType === "match") {
         actual.should.be.an.instanceOf(Match);
@@ -50,8 +50,8 @@ describe("chimpanzee", () => {
   }
 
   const tests = [
-    ["any", "any", "match"],
-    ["any-fault", "any-fault", "fault"],
+    // ["any", "any", "match"],
+    // ["any-fault", "any-fault", "fault"],
     // ["any-native-types", "any-native-types", "empty"],
     // ["any-negative", "any-negative", "skip"],
     // ["array", "array", "match"],
@@ -64,17 +64,17 @@ describe("chimpanzee", () => {
     // ["array-mixed", "array-mixed", "match"],
     // ["bool", "bool", "match"],
     // ["bool-negative", "bool-negative", "skip"],
-    // ["builder-assert", "builder-assert", "fault"],
-    // ["builder-get-fault", "builder-get-fault", "fault"],
-    // ["builder-get-match", "builder-get-match", "match"],
-    // ["builder-get-skip", "builder-get-skip", "skip"],
-    // ["builder-predicate", "builder-predicate", "skip"],
+    // // ["builder-assert", "builder-assert", "fault"],
+    // // ["builder-get-fault", "builder-get-fault", "fault"],
+    // // ["builder-get-match", "builder-get-match", "match"],
+    // // ["builder-get-skip", "builder-get-skip", "skip"],
+    // // ["builder-predicate", "builder-predicate", "skip"],
     // ["capture-if", "capture-if", "match"],
     // ["capture-if-negative", "capture-if-negative", "skip"],
     // ["capture-parent-child", "capture-parent-child", "match"],
     // ["capture-simple", "capture-simple", "match"],
     // ["child-task-order", "child-task-order", "match"],
-    // ["composite", "composite", "match"],
+    ["composite", "composite", "match"],
     // ["composite-complex", "composite-complex", "match"],
     // ["composite-own-params", "composite-own-params", "match"],
     // ["composite-skip", "composite-skip", "skip"],
