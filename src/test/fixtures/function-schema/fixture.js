@@ -5,5 +5,5 @@ export const input = {
 };
 
 export const schema = {
-  hello: item => context => new Match(`${item}!!!`)
+  hello: obj => context => new Match(`${obj}!!!`) 
 };

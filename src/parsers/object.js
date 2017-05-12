@@ -57,9 +57,12 @@ export default function(schema): Result {
                   parentKeys.concat(key)
                 )(context);
 
+                console.log(result);
+
                 return result instanceof Match
                   ? !(result instanceof Empty)
-                      ? childSchema.params.replace || isChildLiteralObject
+                      ? (childSchema.params && childSchema.params.replace) ||
+                          isChildLiteralObject
                           ? {
                               ...context,
                               state: { ...(context.state || {}), ...result.value }
@@ -68,14 +71,15 @@ export default function(schema): Result {
                               ...context,
                               state: {
                                 ...(context.state || {}),
-                                [childSchema.params.key || childKey]: result.value
+                                [(childSchema.params && childSchema.params.key) ||
+                                  childKey]: result.value
                               }
                             }
                       : context
                   : result;
               },
               context,
-              (acc, item) => item instanceof Skip || item instanceof Fault
+              (acc, item) => acc instanceof Skip || acc instanceof Fault
             );
 
           return contextOrFail instanceof Skip || contextOrFail instanceof Fault

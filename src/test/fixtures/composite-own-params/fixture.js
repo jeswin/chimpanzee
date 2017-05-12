@@ -1,4 +1,4 @@
-import { composite, capture } from "../../../chimpanzee";
+import { Match, composite, capture } from "../../../chimpanzee";
 
 export const input = {
   node: {
@@ -16,5 +16,5 @@ export const schema = composite(
     prop: capture({ key: "second", selector: "alt" })
   },
   [{ name: "default", modifiers: { object: x => x.node } }, { name: "alt" }],
-  { build: () => context => ({ ...context.state, third: "yaaay" }) }
+  { build: result => context => result instanceof Match ? new Match({ third: "yaaay", ...result.value }) : result }
 );
