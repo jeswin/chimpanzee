@@ -4,7 +4,7 @@ import parse from "./parse";
 
 export { default as parse } from "./parse";
 export { any } from "./operators/any";
-export { capture, captureIf, captureAndParse, literal, take } from "./operators/capture";
+export { capture, captureIf, captureAndParse, literal, modify, take } from "./operators/capture";
 export { composite } from "./operators/composite";
 export { deep } from "./operators/deep";
 export { empty } from "./operators/empty";

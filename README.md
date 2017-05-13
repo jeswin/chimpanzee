@@ -14,15 +14,15 @@ npm install chimpanzee
 Getting Started
 ---------------
 ```
-import { match, traverse, capture } from "chimpanzee";
+import { match, types, capture } from "chimpanzee";
 
 const input = {
   hello: "world"
 }
 
-const schema = traverse({
+const schema = {
   hello: capture()
-})
+}
 
 const result = match(schema, input);
 //result is Match { value: { hello: "world" } }
@@ -41,15 +41,15 @@ The result of a match is one of four types.
 
 ### Simple evaluation
 ```
-import { traverse, Match } from "chimpanzee";
+import { Match } from "chimpanzee";
 
 const input = {
   hello: "world"
 }
 
-const schema = traverse({
-  hello: item => Match(`${item}!!!`)
-})
+const schema = {
+  hello: item => context => new Match(`${item}!!!`)
+}
 
 const result = match(schema, input);
 //result is Match { value: { hello: "world!!!" } }
@@ -63,9 +63,9 @@ const input = {
   hello: "world"
 }
 
-const schema = traverse({
+const schema = {
   hello: capture()
-})
+}
 
 const result = match(schema, input);
 //result is Match { value: { hello: "world" } }
@@ -78,9 +78,9 @@ const input = {
   hello: "world"
 }
 
-const schema = traverse({
+const schema = {
   hello: capture("prop1")
-})
+}
 
 const result = match(schema, input);
 //result is Match { value: { prop1: "world" } }
@@ -93,12 +93,12 @@ const input = {
   hello: "world"
 }
 
-const schema = traverse({
+const schema = {
   hello: modify(
     x => x === "world",
     x => `${x}!!!`
   )
-})
+}
 
 const result = match(schema, input);
 //result is Match { value: { prop1: "world!!!" } }
@@ -110,10 +110,10 @@ const input = {
   hello: "world"
 }
 
-const schema = traverse({
+const schema = {
   something: "else",
   hello: capture()
-})
+}
 
 const result = match(schema, input);
 //result is Skip { message: "Expected something to be defined." }
@@ -125,9 +125,9 @@ const input = {
   hello: "world"
 }
 
-const schema = traverse({
+const schema = {
   hello: captureIf(x => x === "world")
-})
+}
 
 const result = match(schema, input);
 //result is Match { value: { hello: "world" } }
@@ -143,13 +143,13 @@ const input = {
   getCoordinates: () => "BLR"
 }
 
-const schema = traverse({
+const schema = {
   name: string(),
   isHuman: bool(),
   age: number(),
   meta: object(),
   getCoordinates: func()
-})
+}
 ```
 
 ### Capture a Literal
@@ -158,9 +158,9 @@ const input = {
   name: "JPK",
 }
 
-const schema = traverse({
+const schema = {
   name: literal("JPK"),
-})
+}
 ```
 
 ### Matching Arrays
@@ -169,7 +169,7 @@ const input = {
   myArray: [1, 2, 3]
 }
 
-const schema = traverse({ myArray: [number(), number(), number()] });
+const schema = { myArray: [number(), number(), number()] };
 ```
 
 ### Array with repeating nodes
@@ -182,11 +182,11 @@ const input = {
   ]
 }
 
-const schema = traverse({
+const schema = {
   level1: array([
     repeatingItem(string())
   ])
-});
+};
 ```
 
 
@@ -200,12 +200,12 @@ const input = {
   ]
 }
 
-const schema = traverse({
+const schema = {
   level1: array([
     unorderedItem(string()),
     unorderedItem(bool())
   ])
-});
+};
 ```
 
 
@@ -220,13 +220,13 @@ const input = {
   ]
 }
 
-const schema = traverse({
+const schema = {
   level1: array([
     optionalItem(number()),
     string(),
     bool()
   ])
-});
+};
 
 ```
 
@@ -239,12 +239,12 @@ const input = {
   }
 }
 
-const schema = traverse({
+const schema = {
   level1: {
     prop1: capture(),
     prop2: optional(capture())
   }
-});
+};
 ```
 
 ### Nested
@@ -255,12 +255,12 @@ const input = {
   }
 }
 
-const schema = traverse({
+const schema = {
   prop1: "HELLO"
-  inner1: traverse({
+  inner1: {
     hello: capture()
-   })
-})
+   }
+}
 
 const result = match(schema, input);
 //result is Match { value: { inner1: { hello: "world" } } }
@@ -275,13 +275,11 @@ const input = {
   }
 }
 
-const schema = traverse(
+const schema = types.obj(
   {
-    inner1: traverse(
-      {
-        hello: capture()
-       }
-    )
+    inner1: {
+      hello: capture()
+     }
   },
   { replace: true }
 )
@@ -298,11 +296,14 @@ const input = {
   }
 }
 
-const schema = traverse({
-  level1: captureAndParse(traverse({
-    level2: capture("prop2")
-  }), "prop1")
-})
+const schema = {
+  level1: captureAndParse(
+    {
+      level2: capture("prop2")
+    },
+    "prop1"
+  )
+}
 
 const result = match(schema, input);
 //result is Match { prop1: { level2: 'hello world', prop2: 'hello world' } }
@@ -316,15 +317,15 @@ const input = {
   }
 }
 
-schema1 = traverse({
+schema1 = {
   level4: capture("hello")
-})
+}
 
-schema2 = traverse({
+schema2 = {
   level1: {
     level2: capture("hello")
   }
-});
+};
 
 const schema = any([schema1, schema2]);
 ```
@@ -352,15 +353,18 @@ const input = {
   }
 }
 
-const schema = traverse({
+const schema = {
   level1: {
-    level2a: deep(traverse({
-      level5a: {
-        prop3: capture()
-      }
-    }), "prop1")
+    level2a: deep(
+      {
+        level5a: {
+          prop3: capture()
+        }
+      },
+      "prop1"
+    )
   }
-})
+}
 
 const result = match(schema, input);
 //result is Match { prop1: { prop3: 'world' } }
@@ -373,13 +377,13 @@ const input = {
   prop2: undefined
 }
 
-const schema = traverse({
+const schema = {
   prop1: capture(),
   prop2: empty()
-})
+}
 
 const result = match(schema, input);
-//result is Match export const result = { prop1: "hello" }
+//result is Match({ prop1: "hello" })
 ```
 
 ### Matching the existence of a node: exists()
@@ -389,10 +393,10 @@ export const input = {
   prop1: "val1"
 }
 
-export const schema = traverse({
+export const schema = {
   hello: exists(),
   prop1: capture()
-})
+}
 
 //This makes sure that hello exists. Or it returns a Skip.
 ```
@@ -403,9 +407,9 @@ const input = {
   hello: "world"
 }
 
-const schema = traverse({
+const schema = {
   hello: regex(/^world$/)
-})
+}
 ```
 
 ### Composite Schemas: composite(schema, traversalParams, [ownParams])
@@ -449,54 +453,33 @@ const input = {
   }
 }
 
-const schema = traverse({
-  hello: capture()
-}, { modifiers: { property: (obj, key) => obj.getItem(key) } })
-
-```
-
-### Builders
-Advanced features which let you:
-- modify the result of the capture (builder.get)
-
-### Builder Asserts
-Generates a Fault which will stop the matching on the tree.
-```
-export const input = {
-  prop1: "hello"
-}
-
-export const schema = traverse(
+const schema = types.obj(
   {
-    prop1: capture(),
+    hello: capture()
   },
-  {
-    asserts: [{ predicate: (obj, context) => context.state.prop1 !== "hello", error: "prop1 cannot be hello" }],
-    build: context => ({ prop1: context.state.prop1 + " world" })
-  }
+  { modifiers: { property: (obj, key) => obj.getItem(key) } }
 )
 
-const result = match(schema, input);
-//This returns a Fault { message: "prop1 cannot be hello" }
 ```
 
-### Builder Predicates
-Similar to Asserts, but returns a Skip instead of Fault.
+### Build
+The build option lets you modify the result of a parse.
 ```
+import { builtins as $, capture, Match } from "../../../chimpanzee";
+
 export const input = {
-  prop1: "hello"
-}
+  hello: "world"
+};
 
-export const schema = traverse(
+export const schema = $.obj(
   {
-    prop1: capture(),
+    hello: capture()
   },
   {
-    predicates: [{ predicate: (obj, context) => context.state.prop1 !== "hello", message: "prop1 cannot be hello" }],
-    build: context => ({ prop1: context.state.prop1 + " world" })
+    build: result => context =>
+      result instanceof Match ? new Match({ hello: `${result.value.hello}!!!` }) : result
   }
-)
+);
 
-const result = match(schema, input);
-//This returns a Skip { message: "prop1 cannot be hello" }
+//The result is Match({ hello: "world!!!" })
 ```

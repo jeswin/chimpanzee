@@ -11,12 +11,12 @@ export function captureIf(predicate, params) {
   return take(predicate, undefined, params);
 }
 
-export function modify(comparand, params) {
+export function modify(comparand, modifier, params) {
   return take(
     typeof comparand === "function" ? comparand : x => x === comparand,
     undefined,
     params,
-    {}
+    { modifier }
   );
 }
 
@@ -57,7 +57,11 @@ export function take(predicate, schema, params, options = {}) {
                         )
                       : result; //Fault
               })()
-            : new Match(obj, { obj, key, parents, parentKeys }, meta)
+            : new Match(
+                options.modifier ? options.modifier(obj) : obj,
+                { obj, key, parents, parentKeys },
+                meta
+              )
         : new Skip(
             options.skipMessage
               ? options.skipMessage(obj)
