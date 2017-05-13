@@ -1,4 +1,4 @@
-import { traverse, capture } from "../../../chimpanzee";
+import { capture } from "../../../chimpanzee";
 
 export const input = {
   level1: {

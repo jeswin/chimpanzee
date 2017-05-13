@@ -63,6 +63,8 @@ describe("chimpanzee", () => {
     ["array-mixed", "array-mixed", "match"],
     ["bool", "bool", "match"],
     ["bool-negative", "bool-negative", "skip"],
+    ["build", "build", "match"],
+    ["build-must-wrap-non-result", "build-must-wrap-non-result", "match"],
     ["capture-if", "capture-if", "match"],
     ["capture-if-negative", "capture-if-negative", "skip"],
     ["capture-parent-child", "capture-parent-child", "match"],

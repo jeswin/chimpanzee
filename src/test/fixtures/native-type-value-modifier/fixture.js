@@ -1,4 +1,4 @@
-import { traverse, literal, capture } from "../../../chimpanzee";
+import { literal, capture } from "../../../chimpanzee";
 
 export const input = {
   hello: {
