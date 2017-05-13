@@ -1,4 +1,3 @@
 export const result = {
-  hello: "world",
-  arrayItem: ["one"]
+  level2: ["one"]
 };

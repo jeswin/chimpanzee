@@ -1,4 +1,4 @@
-import { traverse, capture } from "../../../chimpanzee";
+import { builtins as $, capture } from "../../../chimpanzee";
 
 export const input = {
   node: {
@@ -6,7 +6,7 @@ export const input = {
   }
 };
 
-export const schema = traverse(
+export const schema = $.obj(
   {
     prop1: capture()
   },

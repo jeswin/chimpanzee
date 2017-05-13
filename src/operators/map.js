@@ -1,6 +1,6 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import FunctionSchema from "../schemas/function";
+import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
 export function map(schema, mapper, params) {

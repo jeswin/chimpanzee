@@ -4,8 +4,9 @@ import PrimitiveSchema from "../schemas/primitive";
 
 export default function(schema: PrimitiveSchema): Result {
   return (_obj, key, parents, parentKeys) => context => {
-    const obj = schema.params && schema.params.modifier && schema.params.modifier.value
-      ? schema.params.modifier.value(_obj)
+    console.log("P>>>", schema.params);
+    const obj = schema.params && schema.params.modifiers && schema.params.modifiers.value
+      ? schema.params.modifiers.value(_obj)
       : _obj;
 
     return schema.value === obj

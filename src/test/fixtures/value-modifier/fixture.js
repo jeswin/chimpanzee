@@ -1,11 +1,11 @@
-import { traverse, capture } from "../../../chimpanzee";
+import { builtins as $, capture } from "../../../chimpanzee";
 
 export const input = {
   hello: "world",
   something: "else"
 };
 
-export const schema = traverse(
+export const schema = $.obj(
   {
     hello: "world!!!",
     something: capture()

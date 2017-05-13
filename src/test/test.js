@@ -37,9 +37,7 @@ describe("chimpanzee", () => {
             actualResult.message.should.equal(expectedResult.message);
           }
           if (expectedResult.env && expectedResult.env.parentKeys) {
-            actualResult.env.parentKeys.should.deepEqual(
-              expectedResult.env.parentKeys
-            );
+            actualResult.env.parentKeys.should.deepEqual(expectedResult.env.parentKeys);
           }
           if (expectedResult.meta && expectedResult.meta.type) {
             actualResult.meta.type.should.equal(expectedResult.meta.type);
@@ -64,11 +62,6 @@ describe("chimpanzee", () => {
     ["array-mixed", "array-mixed", "match"],
     ["bool", "bool", "match"],
     ["bool-negative", "bool-negative", "skip"],
-    // ["builder-assert", "builder-assert", "fault"],
-    // ["builder-get-fault", "builder-get-fault", "fault"],
-    // ["builder-get-match", "builder-get-match", "match"],
-    // ["builder-get-skip", "builder-get-skip", "skip"],
-    // ["builder-predicate", "builder-predicate", "skip"],
     ["capture-if", "capture-if", "match"],
     ["capture-if-negative", "capture-if-negative", "skip"],
     ["capture-parent-child", "capture-parent-child", "match"],
@@ -94,32 +87,26 @@ describe("chimpanzee", () => {
     ["match-negative", "match-negative", "skip"],
     ["named-capture", "named-capture", "match"],
     ["native-array-simple", "native-array-simple", "match"],
-    // ["nested-any", "nested-any", "match"],
-    // ["nested-native-array-simple", "nested-native-array-simple", "match"],
-    // [
-    //   "nested-native-array-simple-capture",
-    //   "nested-native-array-simple-capture",
-    //   "match"
-    // ],
-    // ["nested-capture", "nested-capture", "match"],
-    // ["nested-named-capture", "nested-named-capture", "match"],
-    // ["number", "number", "match"],
-    // ["number-negative", "number-negative", "skip"],
-    // ["object", "object", "match"],
-    // ["object-modifier", "object-modifier", "match"],
-    // ["object-modifier-skip", "object-modifier-skip", "match"],
-    // ["object-negative", "object-negative", "skip"],
-    // ["optional", "optional", "match"],
-    // ["optional-fault", "optional-fault", "fault"],
-    // ["property-modifier", "property-modifier", "match"],
-    // ["property-modifier-skip", "property-modifier-skip", "match"],
-    // ["regex", "regex", "match"],
-    // ["regex-negative", "regex-negative", "skip"],
-    // ["string", "string", "match"],
-    // ["string-negative", "string-negative", "skip"],
-    // ["traverse-traverse-traverse", "traverse-traverse-traverse", "match"],
-    // ["traverse-wrapper", "traverse-wrapper", "match"],
-    // ["value-modifier", "value-modifier", "match"]
+    ["nested-any", "nested-any", "match"],
+    ["nested-native-array-simple", "nested-native-array-simple", "match"],
+    ["nested-native-array-simple-capture", "nested-native-array-simple-capture", "match"],
+    ["nested-capture", "nested-capture", "match"],
+    ["nested-named-capture", "nested-named-capture", "match"],
+    ["number", "number", "match"],
+    ["number-negative", "number-negative", "skip"],
+    ["object", "object", "match"],
+    ["object-modifier", "object-modifier", "match"],
+    ["object-modifier-skip", "object-modifier-skip", "match"],
+    ["object-negative", "object-negative", "skip"],
+    ["optional", "optional", "match"],
+    ["optional-fault", "optional-fault", "fault"],
+    ["property-modifier", "property-modifier", "match"],
+    ["property-modifier-skip", "property-modifier-skip", "match"],
+    ["regex", "regex", "match"],
+    ["regex-negative", "regex-negative", "skip"],
+    ["string", "string", "match"],
+    ["string-negative", "string-negative", "skip"],
+    ["value-modifier", "value-modifier", "match"]
   ];
 
   for (const test of tests) {

@@ -8,11 +8,7 @@ import functionParser from "./parsers/function";
 import primitiveParser from "./parsers/primitive";
 import objectParser from "./parsers/object";
 
-import ArraySchema from "./schemas/array";
-import FunctionSchema from "./schemas/function";
-import PrimitiveSchema from "./schemas/primitive";
-import ObjectSchema from "./schemas/object";
-import Schema from "./schemas/schema";
+import { ArraySchema, FunctionSchema, PrimitiveSchema, ObjectSchema, Schema } from "./schemas";
 
 import type { Context, EvalFunction } from "./types";
 
@@ -35,12 +31,12 @@ function getSchemaAndParser<TSchema>(source: mixed): TSchema {
 export default function(source: mixed): EvalFunction {
   const { schema, parse: schemaParse } = getSchemaAndParser(source);
 
-  return (originalObj, key, parents, parentKeys) => _context => {
+  return (obj, key, parents, parentKeys) => _context => {
     const context = schema.params.newContext ? {} : _context;
 
-    const obj = schema.params && schema.params.modifier && schema.params.modifier.value
-      ? schema.params.modifier.value(originalObj)
-      : originalObj;
+    // const obj = schema.params && schema.params.modifier && schema.params.modifier.value
+    //   ? schema.params.modifier.value(originalObj)
+    //   : originalObj;
 
     const result = schemaParse(schema)(obj, key, parents, parentKeys)(context);
 

@@ -3,7 +3,7 @@ import type { ArraySchemaParams } from "../schemas/array";
 import ArraySchema from "../schemas/array";
 
 import type { FunctionSchemaParams } from "../schemas/function";
-import FunctionSchema from "../schemas/function";
+import { FunctionSchema } from "../schemas";
 
 import type { PrimitiveSchemaParams } from "../schemas/primitive";
 import PrimitiveSchema from "../schemas/primitive";

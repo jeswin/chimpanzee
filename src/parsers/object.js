@@ -2,7 +2,7 @@
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import parse from "../parse";
-import ObjectSchema from "../schemas/object";
+import { ObjectSchema, ArraySchema, PrimitiveSchema } from "../schemas";
 
 function sortFn(schema1, schema2) {
   const schema1Order = schema1.params && schema1.params.order ? schema1.params.order : 0;
@@ -22,6 +22,7 @@ export default function(schema): Result {
             .sort((a, b) => sortFn(schema.value[a], schema.value[b]))
             .reduce(
               (context, childKey) => {
+                console.log("CTX", context);
                 const childSource = schema.value[childKey];
 
                 const childUnmodified = (childSource.params &&
@@ -30,25 +31,38 @@ export default function(schema): Result {
                   property: false
                 };
 
-                const childItem = !childUnmodified.property &&
-                  schema.params.modifiers &&
-                  schema.params.modifiers.property
-                  ? schema.params.modifiers.property(obj, childKey)
-                  : obj[childKey];
+                const effectiveContainerObj = childUnmodified.object ? _obj : obj;
+                const propModifier =
+                  schema.params.modifiers && schema.params.modifiers.property;
+
+                const childItem = !childUnmodified.property && propModifier
+                  ? propModifier(effectiveContainerObj, childKey)
+                  : effectiveContainerObj[childKey];
 
                 // child is { ... }
                 const isChildLiteralObject =
                   typeof childSource === "object" && childSource.constructor === Object;
 
                 // Value and property modifiers pass through literal containers ({} and []).
-                const childSchema = isChildLiteralObject
-                  ? new ObjectSchema(childSource, {
+                const modifiersForLiteralChildren = schema.params && schema.params.modifiers
+                  ? {
                       modifiers: {
-                        value: schema.params.value,
-                        property: schema.params.property
+                        value: schema.params.modifiers.value,
+                        property: schema.params.modifiers.property
                       }
-                    })
-                  : childSource;
+                    }
+                  : { modifiers: {} };
+
+                const childSchema = isChildLiteralObject
+                  ? new ObjectSchema(childSource, modifiersForLiteralChildren)
+                  : Array.isArray(childSource)
+                      ? new ArraySchema(childSource, modifiersForLiteralChildren)
+                      : typeof childSource === "string" ||
+                          typeof childSource === "number" ||
+                          typeof childSource === "boolean" ||
+                          typeof childSource === "symbol"
+                          ? new PrimitiveSchema(childSource, modifiersForLiteralChildren)
+                          : childSource;
 
                 const result = parse(childSchema)(
                   childItem,
@@ -56,6 +70,8 @@ export default function(schema): Result {
                   parents.concat(obj),
                   parentKeys.concat(key)
                 )(context);
+
+                console.log("SCH", childSchema, result);
 
                 return result instanceof Match
                   ? !(result instanceof Empty)
@@ -79,6 +95,8 @@ export default function(schema): Result {
               context,
               (acc, item) => acc instanceof Skip || acc instanceof Fault
             );
+
+          console.log("contextOrFail", contextOrFail);
 
           return contextOrFail instanceof Skip || contextOrFail instanceof Fault
             ? contextOrFail

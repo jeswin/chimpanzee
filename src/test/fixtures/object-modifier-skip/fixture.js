@@ -1,4 +1,4 @@
-import { traverse, captureIf } from "../../../chimpanzee";
+import { builtins as $, captureIf } from "../../../chimpanzee";
 
 export const input = {
   prop1: "world",
@@ -7,7 +7,7 @@ export const input = {
   }
 };
 
-export const schema = traverse(
+export const schema = $.obj(
   {
     prop1: captureIf(x => true, { unmodified: { object: true } })
   },

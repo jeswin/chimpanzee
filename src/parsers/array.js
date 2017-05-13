@@ -52,11 +52,13 @@ export default function(schema: ArraySchema): Result {
 
                   return result instanceof Skip || result instanceof Fault
                     ? result
-                    : !(result instanceof Empty) ? acc.concat(result) : acc;
+                    : acc.concat(result);
                 },
                 [],
                 (acc, item) => acc instanceof Skip || acc instanceof Fault
               );
+
+              console.log("RES", schema.value, results);
 
               const last = results.slice(-1)[0];
 
@@ -74,7 +76,9 @@ export default function(schema: ArraySchema): Result {
                             ? output
                             : new Match(output, { obj, key, parents, parentKeys });
                         })()
-                      : new Match(resultArr, { obj, key, parents, parentKeys });
+                      : resultArr.length
+                          ? new Match(resultArr, { obj, key, parents, parentKeys })
+                          : new Empty({ obj, key, parents, parentKeys });
                   })();
             })()
       : new Skip(`Schema is an array but property is a non-array.`, {

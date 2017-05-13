@@ -11,10 +11,8 @@ export const input = {
 };
 
 export const schema = {
-  level1: captureAndParse(
-    traverse({
-      prop1: "hello",
-      other1: capture("otherRenamed1")
-    })
-  )
+  level1: captureAndParse({
+    prop1: "hello",
+    other1: capture("otherRenamed1")
+  })
 };

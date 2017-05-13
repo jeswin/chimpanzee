@@ -1,10 +1,10 @@
-import { traverse, captureIf } from "../../../chimpanzee";
+import { builtins as $, captureIf } from "../../../chimpanzee";
 
 export const input = {
   hello: "world"
 };
 
-export const schema = traverse(
+export const schema = $.obj(
   {
     hello: captureIf(x => true, { unmodified: { property: true } })
   },
