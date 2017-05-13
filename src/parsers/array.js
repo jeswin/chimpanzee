@@ -2,7 +2,8 @@
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import parse from "../parse";
-import ArraySchema from "../schemas/array";
+import { ArraySchema } from "../schemas";
+import { getSchemaForLiteralChild } from "./literals";
 
 export default function(schema: ArraySchema): Result {
   return (obj, key, parents, parentKeys) => context => {
@@ -16,32 +17,8 @@ export default function(schema: ArraySchema): Result {
             })
           : (() => {
               const results = Seq.of(schema.value).reduce(
-                (acc, rhs, i) => {
-                  const isChildLiteralArray = Array.isArray(rhs);
-
-                  // Value and property modifiers pass through literal containers ({} and []).
-                  // child is [ ... ]
-                  const childSchema = isChildLiteralArray
-                    ? new ArraySchema(rhs, {
-                        modifiers: {
-                          value: schema.params.value,
-                          property: schema.params.property
-                        }
-                      })
-                    : (() => {
-                        // child is { ... }
-                        const isChildLiteralObject =
-                          typeof childSource === "object" && childSource.constructor === Object;
-
-                        return isChildLiteralObject
-                          ? new new ObjectSchema(rhs, {
-                              modifiers: {
-                                value: schema.params.value,
-                                property: schema.params.property
-                              }
-                            })()
-                          : rhs;
-                      })();
+                (acc, childSource, i) => {
+                  const childSchema = getSchemaForLiteralChild(schema, childSource);
 
                   const result = parse(childSchema)(
                     obj[i],
@@ -57,8 +34,6 @@ export default function(schema: ArraySchema): Result {
                 [],
                 (acc, item) => acc instanceof Skip || acc instanceof Fault
               );
-
-              console.log("RES", schema.value, results);
 
               const last = results.slice(-1)[0];
 
