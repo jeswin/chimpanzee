@@ -2,6 +2,7 @@
 
 import parse from "./parse";
 
+export { default as parse } from "./parse";
 export { any } from "./operators/any";
 export { capture, captureIf, captureAndParse, literal, take } from "./operators/capture";
 export { composite } from "./operators/composite";
@@ -20,5 +21,5 @@ import * as builtins from "./operators/builtins";
 export { builtins };
 
 export function match(schema, input) {
-  return parse(schema)(input, "__INIT__", [], [])({});
+  return parse(schema)(input)();
 }

@@ -31,15 +31,9 @@ function getSchemaAndParser<TSchema>(source: mixed): TSchema {
 export default function(source: mixed): EvalFunction {
   const { schema, parse: schemaParse } = getSchemaAndParser(source);
 
-  return (obj, key, parents, parentKeys) => _context => {
+  return (obj, key = "__INIT__", parents = [], parentKeys = []) => (_context = {}) => {
     const context = schema.params.newContext ? {} : _context;
-
-    // const obj = schema.params && schema.params.modifier && schema.params.modifier.value
-    //   ? schema.params.modifier.value(originalObj)
-    //   : originalObj;
-
     const result = schemaParse(schema)(obj, key, parents, parentKeys)(context);
-
     return schema.params && schema.params.build
       ? (() => {
           const output = schema.params.build(result)(context);
