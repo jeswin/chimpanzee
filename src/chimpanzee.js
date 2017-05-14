@@ -20,6 +20,8 @@ export { Match, Empty, Skip, Fault } from "./results";
 import * as builtins from "./operators/builtins";
 export { builtins };
 
-export function match(schema, input) {
+import type { Result } from "./results";
+
+export function match<TSchema>(schema: TSchema, input: any) : Result {
   return parse(schema)(input)();
 }

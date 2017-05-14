@@ -58,15 +58,12 @@ export default function(schema: ObjectSchema): Result {
                           isChildLiteralObject
                           ? {
                               ...context,
-                              state: { ...(context.state || {}), ...result.value }
+                              ...result.value
                             }
                           : {
                               ...context,
-                              state: {
-                                ...(context.state || {}),
-                                [(childSchema.params && childSchema.params.key) ||
-                                  childKey]: result.value
-                              }
+                              [(childSchema.params && childSchema.params.key) ||
+                                childKey]: result.value
                             }
                       : context
                   : result;
@@ -77,8 +74,8 @@ export default function(schema: ObjectSchema): Result {
 
           return contextOrFail instanceof Skip || contextOrFail instanceof Fault
             ? contextOrFail
-            : typeof contextOrFail.state !== "undefined"
-                ? new Match(contextOrFail.state, { obj, key, parents, parentKeys })
+            : typeof contextOrFail !== "undefined" && contextOrFail !== context
+                ? new Match(contextOrFail, { obj, key, parents, parentKeys })
                 : new Empty({ obj, key, parents, parentKeys });
         })()
       : new Skip(`Cannot parse undefined.`, { obj, key, parents, parentKeys });

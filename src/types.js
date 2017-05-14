@@ -1,3 +1,8 @@
+/* @flow */
+import { Result } from "./results";
+
+export type SchemaType = string | number | boolean | Symbol | Function | Object | Array<any> | Result;
+
 export type Primitive = string | number | boolean | Symbol | Function;
 
 export type Context = {

@@ -1,3 +1,4 @@
+/* @flow */
 import { ObjectSchema, ArraySchema, PrimitiveSchema } from "../schemas";
 
 export function getSchemaForLiteralChild(schema, childSource) {

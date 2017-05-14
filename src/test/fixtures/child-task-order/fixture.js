@@ -12,7 +12,7 @@ export const schema = {
     prop1: number({
       order: 2,
       build: result => context =>
-        result instanceof Match ? (result.value + context.state.prop2) : result
+        result instanceof Match ? (result.value + context.prop2) : result
     }),
     prop2: number({ order: 1 })
   }
