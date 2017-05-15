@@ -5,7 +5,7 @@ import parse from "../parse";
 
 import type { SchemaParams } from "../schemas/schema";
 
-export function optional(schema, params) {
+export function optional(schema, params = {}) {
   const meta = { type: "optional", schema, params };
 
   function fn(obj, key, parents, parentKeys) {

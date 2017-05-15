@@ -6,7 +6,7 @@ import parse from "../parse";
 
 import type { SchemaParams } from "../schemas/schema";
 
-export function deep(schema, params) {
+export function deep(schema, params = {}) {
   const meta = { type: "deep", schema, params };
 
   function fn(obj, key, parents, parentKeys) {

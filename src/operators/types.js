@@ -26,7 +26,7 @@ export function func(params: SchemaParams) : FunctionSchema {
   return checkType("function", params);
 }
 
-function checkType(type: string, params: SchemaParams) : FunctionSchema {
+function checkType(type: string, params: SchemaParams = {}) : FunctionSchema {
   const meta = { type, params };
 
   function fn(obj, key, parents, parentKeys) {

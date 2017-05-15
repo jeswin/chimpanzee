@@ -6,7 +6,7 @@ import parse from "../parse";
 
 import type { SchemaParams } from "../schemas/schema";
 
-export function regex(regex, params) {
+export function regex(regex, params = {}) {
   const meta = { type: "regex", regex, params };
 
   function fn(obj, key, parents, parentKeys) {

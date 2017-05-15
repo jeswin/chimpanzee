@@ -32,7 +32,7 @@ export default function(source: mixed): EvalFunction {
   const { schema, parse: schemaParse } = getSchemaAndParser(source);
 
   return (obj, key = "__INIT__", parents = [], parentKeys = []) => (_context = {}) => {
-    const context = schema.params.newContext ? {} : _context;
+    const context = schema.params && schema.params.newContext ? {} : _context;
     const result = schemaParse(schema)(obj, key, parents, parentKeys)(context);
     return schema.params && schema.params.build
       ? (() => {

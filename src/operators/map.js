@@ -5,7 +5,7 @@ import parse from "../parse";
 
 import type { SchemaParams } from "../schemas/schema";
 
-export function map(schema, mapper, params) {
+export function map(schema, mapper, params = {}) {
   const meta = { type: "map", schema, mapper, params };
 
   function fn(obj, key, parents, parentKeys) {

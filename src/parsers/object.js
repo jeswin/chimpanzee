@@ -35,7 +35,7 @@ export default function(schema: ObjectSchema): EvalFunction<Object, any> {
 
                 const effectiveContainerObj = childUnmodified.object ? _obj : obj;
                 const propModifier =
-                  schema.params.modifiers && schema.params.modifiers.property;
+                  schema.params && schema.params.modifiers && schema.params.modifiers.property;
 
                 const childItem = !childUnmodified.property && propModifier
                   ? propModifier(effectiveContainerObj, childKey)

@@ -24,7 +24,7 @@ function getSchema(schema: Object, paramSelector: string) : Object {
             : paramSelector === "default" ? schema : undefined;
 }
 
-export function composite(schema: Object, _paramsList: Array<SchemaParams>, ownParams: SchemaParams) {
+export function composite(schema: Object, _paramsList: Array<SchemaParams>, ownParams: SchemaParams = {}) {
   const meta = {
     type: "composite",
     schema,

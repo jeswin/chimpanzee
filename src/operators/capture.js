@@ -32,7 +32,7 @@ export function literal(what, params) {
   });
 }
 
-export function take(predicate, schema, params, options = {}) {
+export function take(predicate, schema, params = {}, options = {}) {
   const meta = { type: "take", schema, params, predicate, options };
 
   function fn(obj, key, parents, parentKeys) {
