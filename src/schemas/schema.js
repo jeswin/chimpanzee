@@ -10,12 +10,12 @@ export type SchemaParams<TResult> = {
   build?: (input: any) => TResult
 };
 
-export default class Schema<TResult> {
-  params: SchemaParams<TResult>;
+export default class Schema<TParams : SchemaParams<TResult>, TResult> {
+  params: TParams;
   meta: ?Object;
 
-  constructor(params: SchemaParams<TResult>, meta: ?Object) {
-    this.params = params || {};
+  constructor(params: TParams, meta: ?Object) {
+    this.params = params;
     this.meta = meta;
   }
 }

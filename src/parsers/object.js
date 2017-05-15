@@ -5,13 +5,15 @@ import parse from "../parse";
 import { ObjectSchema } from "../schemas";
 import { getSchemaForLiteralChild } from "./literals";
 
+import type { EvalFunction } from "../types";
+
 function sortFn(schema1, schema2) {
   const schema1Order = schema1.params && schema1.params.order ? schema1.params.order : 0;
   const schema2Order = schema2.params && schema2.params.order ? schema2.params.order : 0;
   return schema1Order - schema2Order;
 }
 
-export default function(schema: ObjectSchema): Result {
+export default function(schema: ObjectSchema): EvalFunction<Object, any> {
   return (_obj, key, parents, parentKeys) => context => {
     const obj = schema.params && schema.params.modifiers && schema.params.modifiers.object
       ? schema.params.modifiers.object(_obj)

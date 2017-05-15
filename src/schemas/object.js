@@ -12,17 +12,25 @@ import type { Primitive } from "../types";
 //   }
 // } & SchemaParams;
 
-export type ObjectSchemaParams = {} & SchemaParams<any>;
+type ObjectSchemaParams = {
+    modifiers?: {
+      object?: (input: any) => any,
+      property?: (input: any) => any,
+      value?: (input: any) => Primitive
+    }
+};
 
-function getParams(params: string | ObjectSchemaParams): ObjectSchemaParams {
+type Params = ObjectSchemaParams & SchemaParams<any>;
+
+function getParams(params: string | Params): Params {
   return typeof params === "string" ? { key: params } : params;
 }
 
-export default class ObjectSchema extends Schema {
+export default class ObjectSchema extends Schema<Params, any> {
   params: ObjectSchemaParams;
   value: Object;
 
-  constructor(value: Object, params: ObjectSchemaParams, meta: ?Object) {
+  constructor(value: Object, params: Params, meta: ?Object) {
     super(getParams(params), meta);
     this.value = value;
   }

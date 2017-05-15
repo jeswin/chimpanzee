@@ -2,7 +2,9 @@
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import PrimitiveSchema from "../schemas/primitive";
 
-export default function(schema: PrimitiveSchema): Result {
+import type { Primitive, EvalFunction } from "../types";
+
+export default function<TResult>(schema: PrimitiveSchema<TResult>): EvalFunction<Primitive, TResult> {
   return (_obj, key, parents, parentKeys) => context => {
     const obj = schema.params && schema.params.modifiers && schema.params.modifiers.value
       ? schema.params.modifiers.value(_obj)

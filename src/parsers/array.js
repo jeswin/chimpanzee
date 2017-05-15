@@ -7,7 +7,7 @@ import { getSchemaForLiteralChild } from "./literals";
 
 import type { EvalFunction, ResultType } from "../types";
 
-export default function(schema: ArraySchema): EvalFunction<Array<any>, Array<any>> {
+export default function<TArrayItem, TResultItem>(schema: ArraySchema<TArrayItem, TResultItem>): EvalFunction<Array<TArrayItem>, Array<TResultItem>> {
   return (obj, key, parents, parentKeys) => context => {
     return Array.isArray(obj)
       ? schema.value.length !== obj.length

@@ -2,7 +2,7 @@
 import { Result, Match, Empty, Skip, Fault } from "./results";
 import { Schema } from "./schemas";
 
-export type SchemaType =
+export type SchemaType<TResult> =
   | string
   | number
   | boolean
@@ -10,13 +10,9 @@ export type SchemaType =
   | Function
   | Object
   | Array<any>
-  | Schema;
+  | Schema<TResult>;
 
 export type Primitive = string | number | boolean | Symbol | Function;
-
-export type Context = {
-  state: any
-};
 
 export type ResultType<TResult> = Match<TResult> | Empty | Skip | Fault;
 
@@ -25,4 +21,4 @@ export type EvalFunction<TObject, TResult> = (
   key: string,
   parents: Array<any>,
   parentKeys: Array<string>
-) => (context: Context) => ResultType<TResult> | TResult;
+) => (context: Object) => ResultType<TResult> | TResult;

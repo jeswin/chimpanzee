@@ -10,7 +10,7 @@ import objectParser from "./parsers/object";
 
 import { ArraySchema, FunctionSchema, PrimitiveSchema, ObjectSchema, Schema } from "./schemas";
 
-import type { Context, EvalFunction } from "./types";
+import type { EvalFunction } from "./types";
 
 function getSchemaAndParser<TSchema>(source: mixed): TSchema {
   const normalize = (src, SchemaClass, params = {}) =>

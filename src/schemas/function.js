@@ -4,17 +4,17 @@ import Schema from "./schema";
 import type { EvalFunction } from "../types";
 import type { SchemaParams } from "./schema";
 
-export type FunctionSchemaParams<TResult> = {} & SchemaParams<TResult>;
+export type Params<TResult> = {} & SchemaParams<TResult>;
 
-function getParams<TResult>(params: string | FunctionSchemaParams<TResult>) : FunctionSchemaParams<TResult> {
+function getParams<TResult>(params: string | Params<TResult>) : Params<TResult> {
   return typeof params === "string" ? { key: params } : params;
 }
 
-export default class FunctionSchema<TObject, TResult> extends Schema<TResult> {
+export default class FunctionSchema<TObject, TResult> extends Schema<Params<TResult>, TResult> {
   fn: EvalFunction<TObject, TResult>;
-  params: FunctionSchemaParams<TResult>;
+  params: Params<TResult>;
 
-  constructor(fn: EvalFunction<TObject, TResult>, params: string | FunctionSchemaParams<TResult>, meta: ?Object) {
+  constructor(fn: EvalFunction<TObject, TResult>, params: string | Params<TResult>, meta: ?Object) {
     super(getParams(params), meta);
     this.fn = fn;
   }
