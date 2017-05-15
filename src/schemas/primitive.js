@@ -14,7 +14,7 @@ export default class PrimitiveSchema extends Schema {
   params: PrimitiveSchemaParams & SchemaParams<Primitive>;
   value: Primitive;
 
-  constructor(value: Primitive, params: PrimitiveSchemaParams, meta: Object) {
+  constructor(value: Primitive, params: PrimitiveSchemaParams, meta: ?Object) {
     super(getParams(params), meta);
     this.value = value;
   }

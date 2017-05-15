@@ -14,7 +14,7 @@ export default class FunctionSchema<TObject, TResult> extends Schema<TResult> {
   fn: EvalFunction<TObject, TResult>;
   params: FunctionSchemaParams<TResult>;
 
-  constructor(fn: EvalFunction<TObject, TResult>, params: string | FunctionSchemaParams<TResult>, meta?: Object) {
+  constructor(fn: EvalFunction<TObject, TResult>, params: string | FunctionSchemaParams<TResult>, meta: ?Object) {
     super(getParams(params), meta);
     this.fn = fn;
   }

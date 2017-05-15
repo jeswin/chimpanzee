@@ -12,9 +12,9 @@ export type SchemaParams<TResult> = {
 
 export default class Schema<TResult> {
   params: SchemaParams<TResult>;
-  meta: mixed;
+  meta: ?Object;
 
-  constructor(params: SchemaParams<TResult>, meta?: Object) {
+  constructor(params: SchemaParams<TResult>, meta: ?Object) {
     this.params = params || {};
     this.meta = meta;
   }

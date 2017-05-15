@@ -13,7 +13,7 @@ export default class ArraySchema<TArrayItem> extends Schema<Array<TArrayItem>> {
   params: ArraySchemaParams<TArrayItem>;
   value: Array<mixed>;
 
-  constructor(value: Array<any>, params: string | ArraySchemaParams<TArrayItem>, meta?: Object) {
+  constructor(value: Array<any>, params: string | ArraySchemaParams<TArrayItem>, meta: ?Object) {
     super(getParams(params), meta);
     this.value = value;
   }

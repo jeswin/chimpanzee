@@ -1,8 +1,8 @@
 /* @flow */
 import Match from "./match";
 
-export default class Empty extends Match {
-  constructor(env: Object, meta?: Object) {
+export default class Empty extends Match<typeof undefined> {
+  constructor(env: ?Object, meta: ?Object) {
     super(undefined, env, meta);
 
     //Unit test support
@@ -11,7 +11,10 @@ export default class Empty extends Match {
     }
   }
 
-  updateEnv(args: Object) : Empty {
-    return new Empty({ ...this.env, ...args }, this.meta);
+  updateEnv(args: Object): Empty {
+    return new Empty(
+      typeof this.env !== "undefined" ? { ...this.env, ...args } : args,
+      this.meta
+    );
   }
 }

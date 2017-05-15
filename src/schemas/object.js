@@ -22,7 +22,7 @@ export default class ObjectSchema extends Schema {
   params: ObjectSchemaParams;
   value: Object;
 
-  constructor(value: Object, params: ObjectSchemaParams, meta?: Object) {
+  constructor(value: Object, params: ObjectSchemaParams, meta: ?Object) {
     super(getParams(params), meta);
     this.value = value;
   }
