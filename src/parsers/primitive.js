@@ -12,6 +12,6 @@ export default function<TResult>(schema: PrimitiveSchema<TResult>): EvalFunction
 
     return schema.value === obj
       ? new Empty({ obj, key, parents, parentKeys })
-      : new Skip(`Expected ${schema.value} but got ${obj}.`, { obj, key, parents, parentKeys });
+      : new Skip(`Expected ${schema.value.toString()} but got ${obj.toString()}.`, { obj, key, parents, parentKeys });
   };
 }

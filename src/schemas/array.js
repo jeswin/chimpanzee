@@ -5,11 +5,12 @@ import type { SchemaParams } from "./schema";
 
 export type Params<TResultItem> = {} & SchemaParams<Array<TResultItem>>;
 
-function getParams<TResultItem>(params: string | Params<TResultItem>) : Params<TResultItem> {
+function getParams<TResultItem>(params: string | Params<TResultItem>): Params<TResultItem> {
   return typeof params === "string" ? { key: params } : params;
 }
 
-export default class ArraySchema<TArrayItem, TResultItem> extends Schema<Params<TResultItem>, Array<TResultItem>> {
+export default class ArraySchema<TArrayItem, TResultItem>
+  extends Schema<Array<TResultItem>, Params<TResultItem>> {
   params: Params<TResultItem>;
   value: Array<TArrayItem>;
 

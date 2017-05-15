@@ -10,7 +10,7 @@ export type SchemaParams<TResult> = {
   build?: (input: any) => TResult
 };
 
-export default class Schema<TParams : SchemaParams<TResult>, TResult> {
+export default class Schema<TResult, TParams : SchemaParams<TResult>> {
   params: TParams;
   meta: ?Object;
 

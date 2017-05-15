@@ -16,7 +16,7 @@ function getParams<TResult>(params: any): Params<TResult> {
   return typeof params === "string" ? { key: params } : params;
 }
 
-export default class PrimitiveSchema<TResult> extends Schema<Params<TResult>, TResult> {
+export default class PrimitiveSchema<TResult> extends Schema<TResult, Params<TResult>> {
   value: Primitive;
 
   constructor(value: Primitive, params: Params<TResult>, meta: ?Object) {
