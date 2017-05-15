@@ -3,6 +3,8 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
+import type { SchemaParams } from "../schemas/schema";
+
 export function exists(predicate, schema) {
   const meta = { type: "exists", schema, predicate };
 

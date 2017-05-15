@@ -2,7 +2,9 @@
 import Result from "./result";
 
 export default class Skip extends Result {
-  constructor(message, env, meta) {
+  message: string;
+
+  constructor(message: string, env: Object, meta?: Object) {
     super(env, meta);
     this.message = message;
 
@@ -12,7 +14,7 @@ export default class Skip extends Result {
     }
   }
 
-  updateEnv(args) {
+  updateEnv(args: Object) : Skip {
     return new Skip(this.message, { ...this.env, ...args }, this.meta);
   }
 }

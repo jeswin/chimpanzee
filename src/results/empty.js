@@ -2,7 +2,7 @@
 import Match from "./match";
 
 export default class Empty extends Match {
-  constructor(env, meta) {
+  constructor(env: Object, meta?: Object) {
     super(undefined, env, meta);
 
     //Unit test support
@@ -11,7 +11,7 @@ export default class Empty extends Match {
     }
   }
 
-  updateEnv(args) {
+  updateEnv(args: Object) : Empty {
     return new Empty({ ...this.env, ...args }, this.meta);
   }
 }

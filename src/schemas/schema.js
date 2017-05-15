@@ -3,20 +3,18 @@
 /*
   This is the base class for all schemas.
 */
-export type SchemaParams<TValueModifier> = {
+export type SchemaParams<TResult> = {
   name?: string,
   key?: string,
   selector?: string,
-  modifiers?: {
-    value?: (input: mixed) => TValueModifier
-  }
+  build?: (input: any) => TResult
 };
 
-export default class Schema<TValueModifier> {
-  params: SchemaParams<TValueModifier>;
+export default class Schema<TResult> {
+  params: SchemaParams<TResult>;
   meta: mixed;
 
-  constructor(params, meta) {
+  constructor(params: SchemaParams<TResult>, meta?: Object) {
     this.params = params || {};
     this.meta = meta;
   }

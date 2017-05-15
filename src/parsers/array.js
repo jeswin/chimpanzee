@@ -5,7 +5,9 @@ import parse from "../parse";
 import { ArraySchema } from "../schemas";
 import { getSchemaForLiteralChild } from "./literals";
 
-export default function(schema: ArraySchema): Result {
+import type { EvalFunction, ResultType } from "../types";
+
+export default function(schema: ArraySchema): EvalFunction<Array<any>, Array<any>> {
   return (obj, key, parents, parentKeys) => context => {
     return Array.isArray(obj)
       ? schema.value.length !== obj.length

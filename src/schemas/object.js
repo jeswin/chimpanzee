@@ -1,21 +1,28 @@
 /* @flow */
 import Schema from "./schema";
 
-export type ObjectSchemaParams = {
-  modifiers?: {
-    value?: (input: mixed) => mixed
-  }
-};
+import type { SchemaParams } from "./schema";
+import type { Primitive } from "../types";
+
+// export type ObjectSchemaParams = {
+//   modifiers?: {
+//     object?: (input: mixed) => any,
+//     property?: (input: mixed) => any,
+//     value?: (input: mixed) => Primitive
+//   }
+// } & SchemaParams;
+
+export type ObjectSchemaParams = {} & SchemaParams<any>;
 
 function getParams(params: string | ObjectSchemaParams): ObjectSchemaParams {
   return typeof params === "string" ? { key: params } : params;
 }
 
-export default class ObjectSchema extends Schema<mixed> {
+export default class ObjectSchema extends Schema {
   params: ObjectSchemaParams;
   value: Object;
 
-  constructor(value: Object, params: string | ObjectSchemaParams, meta) {
+  constructor(value: Object, params: ObjectSchemaParams, meta?: Object) {
     super(getParams(params), meta);
     this.value = value;
   }

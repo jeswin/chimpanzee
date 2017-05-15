@@ -2,6 +2,8 @@
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 
+import type { SchemaParams } from "../schemas/schema";
+
 export function empty() {
   const meta = { type: "empty" };
 

@@ -4,7 +4,10 @@ import { Seq } from "lazily";
 import { Schema, ObjectSchema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-function getSchema(schema, paramSelector) {
+import type { SchemaParams } from "../schemas/schema";
+import type { ObjectSchemaParams } from "../schemas/object";
+
+function getSchema(schema: Object, paramSelector: string) : Object {
   const schemaSelector = schema.params && schema.params.selector
     ? schema.params.selector
     : "default";
@@ -21,7 +24,7 @@ function getSchema(schema, paramSelector) {
             : paramSelector === "default" ? schema : undefined;
 }
 
-export function composite(schema, _paramsList, ownParams) {
+export function composite(schema: Object, _paramsList: Array<SchemaParams>, ownParams: SchemaParams) {
   const meta = {
     type: "composite",
     schema,
@@ -31,7 +34,7 @@ export function composite(schema, _paramsList, ownParams) {
 
   const paramsList = _paramsList.some(params => !params.name || params.name === "default")
     ? _paramsList
-    : [undefined].concat(normalizedParams);
+    : [{ name: "default" }].concat(_paramsList);
 
   const schemas = paramsList.map(
     params => new ObjectSchema(getSchema(schema, (params && params.name) || "default"), params)

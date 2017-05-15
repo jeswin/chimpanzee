@@ -1,10 +1,14 @@
 /* @flow */
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema } from "../schemas";
+import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 
+import type { SchemaType, EvalFunction } from "../types";
+
 class ArrayItem {
-  constructor(fn) {
+  fn: EvalFunction<any, any>;
+
+  constructor(fn: EvalFunction<any, any>) {
     this.fn = fn;
   }
 }
@@ -16,7 +20,13 @@ class ArrayItem {
             ^needle
   returns [4, 4], with needle moved to 5.
 */
-export function repeatingItem(_schema, opts = {}) {
+
+type RepeatingItemOpts = {
+  min?: number,
+  max?: number
+}
+
+export function repeatingItem(_schema: Schema, opts: RepeatingItemOpts = {}) {
   const meta = { type: "repeatingItem", schema: _schema };
 
   const min = opts.min || 0;
@@ -60,7 +70,7 @@ export function repeatingItem(_schema, opts = {}) {
                   : completed(result, needle)
               : result instanceof Skip ? completed(undefined, needle) : { result, needle }; //Fault
           })(obj, [], needle),
-        undefined,
+        {},
         meta
       )
   );
@@ -74,7 +84,7 @@ export function repeatingItem(_schema, opts = {}) {
   returns 1, with needle still pointing at 4.
   We don't care about the needle.
 */
-export function unorderedItem(_schema) {
+export function unorderedItem(_schema: Schema) {
   const meta = { type: "unorderedItem", schema: _schema };
 
   const schema = toNeedledSchema(_schema);
@@ -97,7 +107,7 @@ export function unorderedItem(_schema) {
                     needle
                   };
         })(obj, 0),
-      undefined,
+      {},
       meta
     );
   });
@@ -108,7 +118,7 @@ export function unorderedItem(_schema) {
   A Skip() is not issued when an item is not found.
   The needle is incrementd by 1 if found, otherwise it remains the same.
 */
-export function optionalItem(_schema) {
+export function optionalItem(_schema: Schema) {
   const meta = { type: "optionalItem", schema: _schema };
   const schema = toNeedledSchema(_schema);
 
@@ -126,7 +136,7 @@ export function optionalItem(_schema) {
                 }
               : { result, needle };
       },
-      undefined,
+      {},
       meta
     );
   });
@@ -135,7 +145,7 @@ export function optionalItem(_schema) {
 /*
   Not array types, viz optional, unordered or repeating.
 */
-function regularItem(schema) {
+function regularItem(schema: Schema) : NeedledSchema {
   const meta = { type: "regularItem", schema };
 
   return needle =>
@@ -150,16 +160,18 @@ function regularItem(schema) {
 
         return result instanceof Match ? { result, needle: needle + 1 } : { result, needle };
       },
-      undefined,
+      {},
       meta
     );
 }
 
-function toNeedledSchema(schema) {
+type NeedledSchema = (needle: number) => FunctionSchema<any, any>;
+
+function toNeedledSchema(schema: ArrayItem | Schema) : NeedledSchema {
   return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
 }
 
-export function array(schemas, params) {
+export function array(schemas: Array<Schema>, params: any) {
   const meta = { type: "array", schemas, params };
 
   function fn(obj, key, parents, parentKeys) {

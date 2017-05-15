@@ -4,6 +4,8 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
+import type { SchemaParams } from "../schemas/schema";
+
 export function deep(schema, params) {
   const meta = { type: "deep", schema, params };
 

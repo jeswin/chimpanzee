@@ -4,27 +4,29 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-export function number(params) {
+import type { SchemaParams } from "../schemas/schema";
+
+export function number(params: SchemaParams) : FunctionSchema {
   return checkType("number", params);
 }
 
-export function bool(params) {
+export function bool(params: SchemaParams) : FunctionSchema {
   return checkType("boolean", params);
 }
 
-export function string(params) {
+export function string(params: SchemaParams) : FunctionSchema {
   return checkType("string", params);
 }
 
-export function object(params) {
+export function object(params: SchemaParams) : FunctionSchema {
   return checkType("object", params);
 }
 
-export function func(params) {
+export function func(params: SchemaParams) : FunctionSchema {
   return checkType("function", params);
 }
 
-function checkType(type, params) {
+function checkType(type: string, params: SchemaParams) : FunctionSchema {
   const meta = { type, params };
 
   function fn(obj, key, parents, parentKeys) {
