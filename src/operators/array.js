@@ -42,38 +42,35 @@ export function repeatingItem<TObject, TResult, TParams: SchemaParams<TResult>>(
   return new ArrayItem(
     needle =>
       new FunctionSchema(
-        (obj, key, parents, parentKeys) => context =>
-          (function run(items, results, needle) {
-            const completed = (result, needle) =>
-              results.length >= min && (!max || results.length <= max)
-                ? new Match({
-                    result: new Match(
-                      results.concat(result ? [result.value] : []),
-                      { obj, key, parents, parentKeys },
-                      meta
-                    ),
-                    needle
-                  })
-                : new Match({
-                    result: new Skip(
-                      "Incorrect number of matches.",
-                      { obj, key, parents, parentKeys },
-                      meta
-                    )
-                  });
-
+        (obj, key, parents, parentKeys) => context => {
+          function completed(results, needle) {
+            return results.length >= min && (!max || results.length <= max)
+              ? new Match({
+                  result: new Match(results, { obj, key, parents, parentKeys }, meta),
+                  needle
+                })
+              : new Match({
+                  result: new Skip(
+                    "Incorrect number of matches.",
+                    { obj, key, parents, parentKeys },
+                    meta
+                  )
+                });
+          }
+          return (function run(items, results, needle) {
             const { result, needle: updatedNeedle } = unwrap(
               parse(schema(needle))(items, key, parents, parentKeys)(context)
             );
 
-            return result instanceof Match || result instanceof Empty
+            return result instanceof Match
               ? items.length > needle
                   ? run(items, results.concat([result.value]), updatedNeedle)
-                  : completed(result, needle)
+                  : completed(results.concat([result.value]), needle)
               : result instanceof Skip
-                  ? completed(undefined, needle)
+                  ? completed(results, needle)
                   : new Match({ result, needle }); //Fault
-          })(obj, [], needle),
+          })(obj, [], needle);
+        },
         {},
         meta
       )
