@@ -2,7 +2,9 @@
 import { Result, Match, Empty, Skip, Fault } from "./results";
 import { Schema } from "./schemas";
 
-export type SchemaType<TResult> =
+import type { SchemaParams } from "./schemas/schema";
+
+export type SchemaType<TResult, TParams : SchemaParams<TResult>> =
   | string
   | number
   | boolean
@@ -10,7 +12,7 @@ export type SchemaType<TResult> =
   | Function
   | Object
   | Array<any>
-  | Schema<TResult>;
+  | Schema<TResult, TParams>;
 
 export type Primitive = string | number | boolean | Symbol | Function;
 

@@ -13,6 +13,8 @@ import type { Primitive } from "../types";
 // } & SchemaParams;
 
 type ObjectSchemaParams = {
+  newContext?: boolean,
+  replace?: boolean,
   modifiers?: {
     object?: (input: any) => any,
     property?: (input: any) => any,

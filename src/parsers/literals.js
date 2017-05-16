@@ -1,7 +1,9 @@
 /* @flow */
 import { ObjectSchema, ArraySchema, PrimitiveSchema } from "../schemas";
 
-export function getSchemaForLiteralChild(schema, childSource) {
+type Literal = Object | Array<any> | string | number | boolean | Symbol | Function;
+
+export function getSchemaForLiteralChild(schema: ObjectSchema | ArraySchema<any, any>, childSource: Literal) {
   // Value and property modifiers pass through literal containers ({} and []).
   const modifiersForLiteralChildren = schema.params && schema.params.modifiers
     ? {

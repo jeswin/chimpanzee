@@ -10,11 +10,25 @@ import objectParser from "./parsers/object";
 
 import { ArraySchema, FunctionSchema, PrimitiveSchema, ObjectSchema, Schema } from "./schemas";
 
-import type { EvalFunction } from "./types";
+import type { Primitive, SchemaType, EvalFunction } from "./types";
+import type { SchemaParams } from "./schemas/schema";
 
-function getSchemaAndParser<TSchema>(source: mixed): TSchema {
-  const normalize = (src, SchemaClass, params = {}) =>
-    src instanceof SchemaClass ? src : new SchemaClass(src, params);
+type SchemaAndParserResult<TObject, TResult, TParams: SchemaParams<TResult>> = {
+  schema: Schema<TResult, TParams>,
+  parse: Schema<TResult, TParams> => EvalFunction<TObject, TResult>
+};
+
+function getSchemaAndParser<TResult, TParams: SchemaParams<TResult>>(
+  source: SchemaType<TResult, TParams>
+): SchemaAndParserResult<any, TResult, TParams> {
+
+  function normalize(
+    src: any,
+    SchemaClass: Schema<TResult, TParams>,
+    params = {}
+  ): Schema<TResult, TParams> {
+    return src instanceof SchemaClass ? src : new SchemaClass((src: any), params);
+  }
 
   return source instanceof PrimitiveSchema ||
     ["string", "number", "boolean", "symbol"].includes(typeof source)
@@ -28,12 +42,14 @@ function getSchemaAndParser<TSchema>(source: mixed): TSchema {
                 : exception(`Invalid schema type ${typeof source}.`);
 }
 
-export default function(source: mixed): EvalFunction {
-  const { schema, parse: schemaParse } = getSchemaAndParser(source);
+export default function<TResult, TParams: SchemaParams<TResult>>(
+  source: SchemaType<TResult, TParams>
+): EvalFunction<Primitive | Object, TResult> {
+  const { schema, parse } = getSchemaAndParser(source);
 
   return (obj, key = "__INIT__", parents = [], parentKeys = []) => (_context = {}) => {
     const context = schema.params && schema.params.newContext ? {} : _context;
-    const result = schemaParse(schema)(obj, key, parents, parentKeys)(context);
+    const result = parse(schema)(obj, key, parents, parentKeys)(context);
     return schema.params && schema.params.build
       ? (() => {
           const output = schema.params.build(result)(context);

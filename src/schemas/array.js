@@ -3,7 +3,12 @@ import Schema from "./schema";
 
 import type { SchemaParams } from "./schema";
 
-export type Params<TResultItem> = {} & SchemaParams<Array<TResultItem>>;
+export type Params<TResultItem> = {
+  modifiers?: {
+    property?: (input: any) => any,
+    value?: (input: any) => Primitive
+  }
+} & SchemaParams<Array<TResultItem>>;
 
 function getParams<TResultItem>(params: string | Params<TResultItem>): Params<TResultItem> {
   return typeof params === "string" ? { key: params } : params;
