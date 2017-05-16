@@ -2,9 +2,9 @@
 import Result from "./result";
 
 export default class Match<TResult> extends Result {
-  value: TResult;
+  value: ?TResult;
 
-  constructor(value: TResult, env: ?Object, meta: ?Object) {
+  constructor(value: ?TResult, env: ?Object, meta: ?Object) {
     super(env, meta);
     this.value = value;
 

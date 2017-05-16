@@ -32,7 +32,7 @@ export default class ObjectSchema extends Schema<any, Params> {
   params: Params;
   value: Object;
 
-  constructor(value: Object, params: Params, meta: ?Object) {
+  constructor(value: Object, params: Params, meta?: ?Object) {
     super(getParams(params), meta);
     this.value = value;
   }

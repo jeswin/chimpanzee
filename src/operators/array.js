@@ -1,5 +1,5 @@
 /* @flow */
-import { Match, Empty, Skip, Fault } from "../results";
+import { Result, Match, Empty, Skip, Fault } from "../results";
 import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 
@@ -24,7 +24,7 @@ class ArrayItem {
 type RepeatingItemOpts = {
   min?: number,
   max?: number
-}
+};
 
 export function repeatingItem(_schema: Schema, opts: RepeatingItemOpts = {}) {
   const meta = { type: "repeatingItem", schema: _schema };
@@ -41,34 +41,33 @@ export function repeatingItem(_schema: Schema, opts: RepeatingItemOpts = {}) {
           (function run(items, results, needle) {
             const completed = (result, needle) =>
               results.length >= min && (!max || results.length <= max)
-                ? {
+                ? new Match({
                     result: new Match(
                       results.concat(result ? [result.value] : []),
                       { obj, key, parents, parentKeys },
                       meta
                     ),
                     needle
-                  }
-                : {
+                  })
+                : new Match({
                     result: new Skip(
                       "Incorrect number of matches.",
                       { obj, key, parents, parentKeys },
                       meta
                     )
-                  };
+                  });
 
-            const { result, needle: updatedNeedle } = parse(schema(needle))(
-              items,
-              key,
-              parents,
-              parentKeys
-            )(context);
+            const { result, needle: updatedNeedle } = unwrap(
+              parse(schema(needle))(items, key, parents, parentKeys)(context)
+            );
 
             return result instanceof Match
               ? items.length > needle
                   ? run(items, results.concat([result.value]), updatedNeedle)
                   : completed(result, needle)
-              : result instanceof Skip ? completed(undefined, needle) : { result, needle }; //Fault
+              : result instanceof Skip
+                  ? completed(undefined, needle)
+                  : new Match({ result, needle }); //Fault
           })(obj, [], needle),
         {},
         meta
@@ -92,20 +91,20 @@ export function unorderedItem(_schema: Schema) {
     return new FunctionSchema(
       (obj, key, parents, parentKeys) => context =>
         (function run(items, i) {
-          const { result } = parse(schema(i))(items, key, parents, parentKeys)(context);
+          const { result } = unwrap(parse(schema(i))(items, key, parents, parentKeys)(context));
 
           return result instanceof Match || result instanceof Fault
-            ? { result, needle }
+            ? new Match({ result, needle })
             : items.length > i
                 ? run(items, i + 1)
-                : {
+                : new Match({
                     result: new Skip(
                       `Unordered item was not found.`,
                       { obj, key, parents, parentKeys },
                       meta
                     ),
                     needle
-                  };
+                  });
         })(obj, 0),
       {},
       meta
@@ -125,16 +124,18 @@ export function optionalItem(_schema: Schema) {
   return new ArrayItem(needle => {
     return new FunctionSchema(
       (obj, key, parents, parentKeys) => context => {
-        const { result } = parse(schema(needle))(obj, key, parents, parentKeys)(context);
+        const { result } = unwrap(
+          parse(schema(needle))(obj, key, parents, parentKeys)(context)
+        );
 
         return result instanceof Match
-          ? { result, needle: needle + 1 }
+          ? new Match({ result, needle: needle + 1 })
           : result instanceof Skip
-              ? {
+              ? new Match({
                   result: new Empty({ obj, key, parents, parentKeys }, meta),
                   needle
-                }
-              : { result, needle };
+                })
+              : new Match({ result, needle });
       },
       {},
       meta
@@ -145,7 +146,7 @@ export function optionalItem(_schema: Schema) {
 /*
   Not array types, viz optional, unordered or repeating.
 */
-function regularItem(schema: Schema) : NeedledSchema {
+function regularItem(schema: Schema): NeedledSchema {
   const meta = { type: "regularItem", schema };
 
   return needle =>
@@ -158,7 +159,9 @@ function regularItem(schema: Schema) : NeedledSchema {
           parentKeys.concat(key)
         )(context);
 
-        return result instanceof Match ? { result, needle: needle + 1 } : { result, needle };
+        return result instanceof Match
+          ? new Match({ result, needle: needle + 1 })
+          : new Match({ result, needle });
       },
       {},
       meta
@@ -167,8 +170,12 @@ function regularItem(schema: Schema) : NeedledSchema {
 
 type NeedledSchema = (needle: number) => FunctionSchema<any, any>;
 
-function toNeedledSchema(schema: ArrayItem | Schema) : NeedledSchema {
+function toNeedledSchema(schema: ArrayItem | Schema): NeedledSchema {
   return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
+}
+
+function unwrap(match: any): { result: Result, needle?: number } {
+  return match.value;
 }
 
 export function array(schemas: Array<Schema>, params: any) {
@@ -179,12 +186,9 @@ export function array(schemas: Array<Schema>, params: any) {
       Array.isArray(obj)
         ? (function run(list, results, needle) {
             const schema = toNeedledSchema(list[0]);
-            const { result, needle: updatedNeedle } = parse(schema(needle))(
-              obj,
-              key,
-              parents,
-              parentKeys
-            )(context);
+            const { result, needle: updatedNeedle } = unwrap(
+              parse(schema(needle))(obj, key, parents, parentKeys)(context)
+            );
 
             return result instanceof Skip || result instanceof Fault
               ? result.updateEnv({ needle })

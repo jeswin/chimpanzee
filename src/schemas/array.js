@@ -19,7 +19,7 @@ export default class ArraySchema<TArrayItem, TResultItem>
   params: Params<TResultItem>;
   value: Array<TArrayItem>;
 
-  constructor(value: Array<TArrayItem>, params: string | Params<TResultItem>, meta: ?Object) {
+  constructor(value: Array<TArrayItem>, params: string | Params<TResultItem>, meta?: ?Object) {
     super(getParams(params), meta);
     this.value = value;
   }

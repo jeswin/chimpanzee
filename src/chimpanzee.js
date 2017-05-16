@@ -22,6 +22,6 @@ export { builtins };
 
 import type { Result } from "./results";
 
-export function match<TSchema>(schema: TSchema, input: any) : Result {
+export function match(schema: any, input: any) : Result {
   return parse(schema)(input)();
 }

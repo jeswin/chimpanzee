@@ -19,7 +19,7 @@ function getParams<TResult>(params: any): Params<TResult> {
 export default class PrimitiveSchema<TResult> extends Schema<TResult, Params<TResult>> {
   value: Primitive;
 
-  constructor(value: Primitive, params: Params<TResult>, meta: ?Object) {
+  constructor(value: Primitive, params: Params<TResult>, meta?: ?Object) {
     super(getParams(params), meta);
     this.value = value;
   }
