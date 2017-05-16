@@ -12,7 +12,6 @@ import type { Params as ObjectSchemaParams } from "../schemas/object";
 import ObjectSchema from "../schemas/object";
 
 import type { Primitive, EvalFunction } from "../types";
-import type { SchemaParams } from "../schemas/schema";
 
 export function arr<TArrayItem, TResultItem>(
   literal: Array<TArrayItem>,
@@ -25,7 +24,7 @@ export function arr<TArrayItem, TResultItem>(
 export function func<TObject, TResult>(
   literal: EvalFunction<TObject, TResult>,
   params: string | FunctionSchemaParams<TResult>
-): FunctionSchema<TObject, TResult> {
+): FunctionSchema<TObject, TResult, FunctionSchemaParams<TResult>> {
   const meta = { type: "obj", literal, params };
   return new FunctionSchema(literal, params, meta);
 }
@@ -38,7 +37,10 @@ export function val<TResult>(
   return new PrimitiveSchema(literal, params, meta);
 }
 
-export function obj<TResult>(literal: Object, params: string | ObjectSchemaParams<TResult>): ObjectSchema<TResult> {
+export function obj<TResult>(
+  literal: Object,
+  params: string | ObjectSchemaParams<TResult>
+): ObjectSchema<TResult> {
   const meta = { type: "obj", literal, params };
   return new ObjectSchema(literal, params, meta);
 }

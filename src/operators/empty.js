@@ -4,7 +4,11 @@ import { FunctionSchema } from "../schemas";
 
 import type { Params } from "../schemas/function";
 
-export function empty() {
+export function empty<TObject, TResult, TParams: Params<TResult>>(): FunctionSchema<
+  TObject,
+  TResult,
+  TParams
+> {
   const meta = { type: "empty" };
 
   function fn(obj, key, parents, parentKeys) {

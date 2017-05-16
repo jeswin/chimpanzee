@@ -41,12 +41,12 @@ export function captureAndParse<TObject, TResult, TParams: Params<TResult>>(
   return take(obj => typeof obj !== "undefined", schema, params);
 }
 
-export function literal<TObject, TResult, TParams: Params<TResult>>(
-  what: TObject,
+export function literal<TResult, TParams: Params<TResult>>(
+  what: Primitive,
   params: TParams
-): FunctionSchema<TObject, TResult, TParams> {
+): FunctionSchema<Primitive, TResult, TParams> {
   return take(x => x === what, undefined, params, {
-    skipMessage: x => `Expected value to be ${what} but got ${x.toString()}.`
+    skipMessage: x => `Expected value to be ${what.toString()} but got ${x.toString()}.`
   });
 }
 

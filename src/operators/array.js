@@ -4,7 +4,7 @@ import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 import exception from "../exception";
 
-import type { SchemaParams } from "../schemas/schema";
+import type { Params } from "../schemas/function";
 import type { SchemaType, EvalFunction } from "../types";
 
 class ArrayItem {
@@ -28,7 +28,7 @@ type RepeatingItemOpts = {
   max?: number
 };
 
-export function repeatingItem<TObject, TResult, TParams: SchemaParams<TResult>>(
+export function repeatingItem<TObject, TResult, TParams: Params<TResult>>(
   _schema: SchemaType<TResult, TParams>,
   opts: RepeatingItemOpts = {}
 ) {
@@ -62,10 +62,17 @@ export function repeatingItem<TObject, TResult, TParams: SchemaParams<TResult>>(
               parse(schema(needle))(items, key, parents, parentKeys)(context)
             );
 
-            return result instanceof Match
+            return result instanceof Match || result instanceof Empty
               ? items.length > needle
-                  ? run(items, results.concat([result.value]), updatedNeedle)
-                  : completed(results.concat([result.value]), needle)
+                  ? run(
+                      items,
+                      result instanceof Match ? results.concat([result.value]) : results,
+                      updatedNeedle
+                    )
+                  : completed(
+                      result instanceof Match ? results.concat([result.value]) : results,
+                      needle
+                    )
               : result instanceof Skip
                   ? completed(results, needle)
                   : new Match({ result, needle }); //Fault
@@ -85,7 +92,7 @@ export function repeatingItem<TObject, TResult, TParams: SchemaParams<TResult>>(
   returns 1, with needle still pointing at 4.
   We don't care about the needle.
 */
-export function unorderedItem<TObject, TResult, TParams: SchemaParams<TResult>>(
+export function unorderedItem<TObject, TResult, TParams: Params<TResult>>(
   _schema: SchemaType<TResult, TParams>
 ) {
   const meta = { type: "unorderedItem", schema: _schema };
@@ -121,7 +128,7 @@ export function unorderedItem<TObject, TResult, TParams: SchemaParams<TResult>>(
   A Skip() is not issued when an item is not found.
   The needle is incrementd by 1 if found, otherwise it remains the same.
 */
-export function optionalItem<TObject, TResult, TParams: SchemaParams<TResult>>(
+export function optionalItem<TObject, TResult, TParams: Params<TResult>>(
   _schema: SchemaType<TResult, TParams>
 ) {
   const meta = { type: "optionalItem", schema: _schema };
@@ -152,7 +159,7 @@ export function optionalItem<TObject, TResult, TParams: SchemaParams<TResult>>(
 /*
   Not array types, viz optional, unordered or repeating.
 */
-function regularItem<TObject, TResult, TParams: SchemaParams<TResult>>(
+function regularItem<TObject, TResult, TParams: Params<TResult>>(
   schema: SchemaType<TResult, TParams>
 ): NeedledSchema {
   const meta = { type: "regularItem", schema };
@@ -176,11 +183,13 @@ function regularItem<TObject, TResult, TParams: SchemaParams<TResult>>(
     );
 }
 
+type NeedleResult = { result: Result, needle: number };
+
 type NeedledSchema = (
   needle: number
-) => FunctionSchema<any, { result: Result, needle: number }>;
+) => FunctionSchema<any, NeedleResult, Params<NeedleResult>>;
 
-function toNeedledSchema<TObject, TResult, TParams: SchemaParams<TResult>>(
+function toNeedledSchema<TObject, TResult, TParams: Params<TResult>>(
   schema: ArrayItem | SchemaType<TResult, TParams>
 ): NeedledSchema {
   return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
@@ -190,7 +199,7 @@ function unwrap(match: any): { result: Result, needle?: number } {
   return match.value;
 }
 
-export function array<TObject, TResult, TParams: SchemaParams<TResult>>(
+export function array<TObject, TResult, TParams: Params<TResult>>(
   schemas: Array<SchemaType<TResult, TParams>>,
   params: any
 ) {

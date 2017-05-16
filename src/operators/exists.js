@@ -6,7 +6,7 @@ import parse from "../parse";
 import type { Params } from "../schemas/function";
 import type { Predicate } from "../types";
 
-export function exists<TObject, TResult>(
+export function exists<TObject>(
   predicate: Predicate<TObject>,
   schema: SchemaType<TObject, TResult>
 ): FunctionSchema<TObject, TResult> {
