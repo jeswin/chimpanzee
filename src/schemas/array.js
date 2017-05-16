@@ -1,6 +1,7 @@
 /* @flow */
 import Schema from "./schema";
 
+import type { Primitive } from "../types";
 import type { SchemaParams } from "./schema";
 
 export type Params<TResultItem> = {

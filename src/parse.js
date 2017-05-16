@@ -10,7 +10,7 @@ import objectParser from "./parsers/object";
 
 import { ArraySchema, FunctionSchema, PrimitiveSchema, ObjectSchema, Schema } from "./schemas";
 
-import type { Primitive, SchemaType, EvalFunction } from "./types";
+import type { Primitive, SchemaType, EvalFunction, ResultType } from "./types";
 import type { SchemaParams } from "./schemas/schema";
 
 type SchemaAndParserResult<
@@ -39,14 +39,25 @@ function getSchemaAndParser(source: any): any {
                 : exception(`Invalid schema type ${typeof source}.`);
 }
 
+/*
+  EntryEvalFunction vs EvalFunction:
+    EntryEvalFunction allows key, parents, parentKeys to be empty.
+*/
+type EntryEvalFunction<TObject, TResult> = (
+  obj: TObject,
+  key?: string,
+  parents?: Array<any>,
+  parentKeys?: Array<string>
+) => (context?: Object) => ResultType<TResult>;
+
 export default function<
   TResult,
   TParams: SchemaParams<TResult>,
   TSchema: SchemaType<TResult, TParams>
->(source: TSchema): EvalFunction<Primitive | Object, TResult> {
+>(source: TSchema): EntryEvalFunction<Primitive | Object, TResult> {
   type ParseType = SchemaAndParserResult<TResult, TParams, Schema<TResult, TParams>>;
   const { schema, parse }: ParseType = getSchemaAndParser(source);
-  return (obj, key = "__INIT__", parents = [], parentKeys = []) => (_context = {}) => {
+  return (obj, key = "__UNKNOWN__", parents = [], parentKeys = []) => (_context = {}) => {
     const context = schema.params && schema.params.newContext ? {} : _context;
     const result = parse(schema)(obj, key, parents, parentKeys)(context);
     const build = schema.params && schema.params.build;

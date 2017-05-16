@@ -23,5 +23,5 @@ export { builtins };
 import type { Result } from "./results";
 
 export function match(schema: any, input: any) : Result {
-  return parse(schema)(input)();
+  return parse(schema)(input, "__INIT__")();
 }

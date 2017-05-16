@@ -23,4 +23,4 @@ export type EvalFunction<TObject, TResult> = (
   key: string,
   parents: Array<any>,
   parentKeys: Array<string>
-) => (context: Object) => ResultType<TResult>;
+) => (context?: Object) => ResultType<TResult>;

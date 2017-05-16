@@ -2,7 +2,9 @@
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";
+import exception from "../exception";
 
+import type { SchemaParams } from "../schemas/schema";
 import type { SchemaType, EvalFunction } from "../types";
 
 class ArrayItem {
@@ -26,7 +28,10 @@ type RepeatingItemOpts = {
   max?: number
 };
 
-export function repeatingItem(_schema: Schema, opts: RepeatingItemOpts = {}) {
+export function repeatingItem<TObject, TResult, TParams: SchemaParams<TResult>>(
+  _schema: SchemaType<TResult, TParams>,
+  opts: RepeatingItemOpts = {}
+) {
   const meta = { type: "repeatingItem", schema: _schema };
 
   const min = opts.min || 0;
@@ -83,7 +88,9 @@ export function repeatingItem(_schema: Schema, opts: RepeatingItemOpts = {}) {
   returns 1, with needle still pointing at 4.
   We don't care about the needle.
 */
-export function unorderedItem(_schema: Schema) {
+export function unorderedItem<TObject, TResult, TParams: SchemaParams<TResult>>(
+  _schema: SchemaType<TResult, TParams>
+) {
   const meta = { type: "unorderedItem", schema: _schema };
 
   const schema = toNeedledSchema(_schema);
@@ -117,7 +124,9 @@ export function unorderedItem(_schema: Schema) {
   A Skip() is not issued when an item is not found.
   The needle is incrementd by 1 if found, otherwise it remains the same.
 */
-export function optionalItem(_schema: Schema) {
+export function optionalItem<TObject, TResult, TParams: SchemaParams<TResult>>(
+  _schema: SchemaType<TResult, TParams>
+) {
   const meta = { type: "optionalItem", schema: _schema };
   const schema = toNeedledSchema(_schema);
 
@@ -146,7 +155,9 @@ export function optionalItem(_schema: Schema) {
 /*
   Not array types, viz optional, unordered or repeating.
 */
-function regularItem(schema: Schema): NeedledSchema {
+function regularItem<TObject, TResult, TParams: SchemaParams<TResult>>(
+  schema: SchemaType<TResult, TParams>
+): NeedledSchema {
   const meta = { type: "regularItem", schema };
 
   return needle =>
@@ -170,7 +181,9 @@ function regularItem(schema: Schema): NeedledSchema {
 
 type NeedledSchema = (needle: number) => FunctionSchema<any, any>;
 
-function toNeedledSchema(schema: ArrayItem | Schema): NeedledSchema {
+function toNeedledSchema<TObject, TResult, TParams: SchemaParams<TResult>>(
+  schema: ArrayItem | SchemaType<TResult, TParams>
+): NeedledSchema {
   return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
 }
 
@@ -178,7 +191,10 @@ function unwrap(match: any): { result: Result, needle?: number } {
   return match.value;
 }
 
-export function array(schemas: Array<Schema>, params: any) {
+export function array<TObject, TResult, TParams: SchemaParams<TResult>>(
+  schemas: Array<SchemaType<TResult, TParams>>,
+  params: any
+) {
   const meta = { type: "array", schemas, params };
 
   function fn(obj, key, parents, parentKeys) {
@@ -192,17 +208,19 @@ export function array(schemas: Array<Schema>, params: any) {
 
             return result instanceof Skip || result instanceof Fault
               ? result.updateEnv({ needle })
-              : list.length > 1
-                  ? run(
-                      list.slice(1),
-                      results.concat(result instanceof Empty ? [] : [result.value]),
-                      updatedNeedle
-                    )
-                  : new Match(
-                      results.concat(result.value),
-                      { obj, key, parents, parentKeys },
-                      meta
-                    );
+              : result instanceof Match
+                  ? list.length > 1
+                      ? run(
+                          list.slice(1),
+                          results.concat(result instanceof Empty ? [] : [result.value]),
+                          updatedNeedle
+                        )
+                      : new Match(
+                          results.concat(result.value),
+                          { obj, key, parents, parentKeys },
+                          meta
+                        )
+                  : exception("Unknown result type.");
           })(schemas, [], 0)
         : new Fault(
             `Expected array but got ${typeof obj}.`,
