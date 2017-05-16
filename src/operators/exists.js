@@ -3,9 +3,13 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-import type { SchemaParams } from "../schemas/schema";
+import type { Params } from "../schemas/function";
+import type { Predicate } from "../types";
 
-export function exists(predicate, schema) {
+export function exists<TObject, TResult>(
+  predicate: Predicate<TObject>,
+  schema: SchemaType<TObject, TResult>
+): FunctionSchema<TObject, TResult> {
   const meta = { type: "exists", schema, predicate };
 
   predicate = predicate || (x => typeof x !== "undefined");

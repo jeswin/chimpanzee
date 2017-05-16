@@ -1,9 +1,9 @@
 /* @flow */
-import Match from "./match";
+import Result from "./result";
 
-export default class Empty extends Match<typeof undefined> {
+export default class Empty extends Result {
   constructor(env: ?Object, meta: ?Object) {
-    super(undefined, env, meta);
+    super(env, meta);
 
     //Unit test support
     if (global.__chimpanzeeTestContext) {

@@ -2,7 +2,7 @@
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 
-import type { SchemaParams } from "../schemas/schema";
+import type { Params } from "../schemas/function";
 
 export function empty() {
   const meta = { type: "empty" };

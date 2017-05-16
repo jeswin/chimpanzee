@@ -7,7 +7,7 @@ import parse from "../parse";
 import type { SchemaParams } from "../schemas/schema";
 import type { ObjectSchemaParams } from "../schemas/object";
 
-function getSchema(schema: Object, paramSelector: string) : Object {
+function getSchema(schema: Object, paramSelector: string): Object {
   const schemaSelector = schema.params && schema.params.selector
     ? schema.params.selector
     : "default";
@@ -24,7 +24,11 @@ function getSchema(schema: Object, paramSelector: string) : Object {
             : paramSelector === "default" ? schema : undefined;
 }
 
-export function composite(schema: Object, _paramsList: Array<SchemaParams>, ownParams: SchemaParams = {}) {
+export function composite(
+  schema: Object,
+  _paramsList: Array<SchemaParams>,
+  ownParams: SchemaParams = {}
+) {
   const meta = {
     type: "composite",
     schema,
@@ -51,10 +55,10 @@ export function composite(schema: Object, _paramsList: Array<SchemaParams>, ownP
       return schemas.length
         ? (function run([schema, ...rest], state) {
             const result = parse(schema)(obj, key, parents, parentKeys)(context);
-            return result instanceof Match
+            return result instanceof Match || result instanceof Empty
               ? rest.length
-                  ? run(rest, merge(state, result))
-                  : new Match(merge(state, result), env, meta)
+                  ? run(rest, result instanceof Match ? merge(state, result) : state)
+                  : new Match(result instanceof Match ? merge(state, result) : state, env, meta)
               : result;
           })(schemas, {})
         : new Empty(env, meta);

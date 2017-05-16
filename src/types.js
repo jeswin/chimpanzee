@@ -24,3 +24,5 @@ export type EvalFunction<TObject, TResult> = (
   parents: Array<any>,
   parentKeys: Array<string>
 ) => (context?: Object) => ResultType<TResult>;
+
+export type Predicate<T> = (obj: T) => boolean;

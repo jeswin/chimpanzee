@@ -4,29 +4,42 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-import type { SchemaParams } from "../schemas/schema";
+import type { Params } from "../schemas/function";
 
-export function number(params: SchemaParams) : FunctionSchema {
+export function number<TObject, TResult, TParams: Params<TResult>>(
+  params: TParams
+): FunctionSchema<TObject, TResult, TParams> {
   return checkType("number", params);
 }
 
-export function bool(params: SchemaParams) : FunctionSchema {
+export function bool<TObject, TResult, TParams: Params<TResult>>(
+  params: TParams
+): FunctionSchema<TObject, TResult, TParams> {
   return checkType("boolean", params);
 }
 
-export function string(params: SchemaParams) : FunctionSchema {
+export function string<TObject, TResult, TParams: Params<TResult>>(
+  params: TParams
+): FunctionSchema<TObject, TResult, TParams> {
   return checkType("string", params);
 }
 
-export function object(params: SchemaParams) : FunctionSchema {
+export function object<TObject, TResult, TParams: Params<TResult>>(
+  params: TParams
+): FunctionSchema<TObject, TResult, TParams> {
   return checkType("object", params);
 }
 
-export function func(params: SchemaParams) : FunctionSchema {
+export function func<TObject, TResult, TParams: Params<TResult>>(
+  params: TParams
+): FunctionSchema<TObject, TResult, TParams> {
   return checkType("function", params);
 }
 
-function checkType(type: string, params: SchemaParams = {}) : FunctionSchema {
+function checkType<TObject, TResult, TParams: Params<TResult>>(
+  type: string,
+  params: TParams = {}
+): FunctionSchema<TObject, TResult, TParams> {
   const meta = { type, params };
 
   function fn(obj, key, parents, parentKeys) {

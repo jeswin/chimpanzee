@@ -55,20 +55,17 @@ export default function(schema: ObjectSchema): EvalFunction<Object, any> {
                 )(context);
 
                 return result instanceof Match
-                  ? !(result instanceof Empty)
-                      ? (childSchema.params && childSchema.params.replace) ||
-                          isChildLiteralObject
-                          ? {
-                              ...context,
-                              ...result.value
-                            }
-                          : {
-                              ...context,
-                              [(childSchema.params && childSchema.params.key) ||
-                                childKey]: result.value
-                            }
-                      : context
-                  : result;
+                  ? (childSchema.params && childSchema.params.replace) || isChildLiteralObject
+                      ? {
+                          ...context,
+                          ...result.value
+                        }
+                      : {
+                          ...context,
+                          [(childSchema.params && childSchema.params.key) ||
+                            childKey]: result.value
+                        }
+                  : result instanceof Empty ? context : result;
               },
               context,
               (acc, item) => acc instanceof Skip || acc instanceof Fault

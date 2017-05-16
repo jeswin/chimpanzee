@@ -9,15 +9,18 @@ import type { Params } from "../schemas/function";
 
 export function any<TResult, TParams: Params<TResult>>(
   schemas: Array<SchemaType<TResult, TParams>>,
-  params: string | Params<TResult>
-): FunctionSchema<any, TResult> {
+  params: string | TParams
+): FunctionSchema<any, TResult, TParams> {
   const meta = { type: "any", schemas, params };
 
   function fn(obj: any, key: string, parents: Array<any>, parentKeys: Array<string>) {
     return (context: Object) =>
-      (function run(schemas: Array<SchemaType<TResult, TParams>>, nonMatching: Array<SchemaType<TResult, TParams>>) {
+      (function run(
+        schemas: Array<SchemaType<TResult, TParams>>,
+        nonMatching: Array<SchemaType<TResult, TParams>>
+      ) {
         const result = parse(schemas[0])(obj, key, parents, parentKeys)(context);
-        return result instanceof Match || result instanceof Fault
+        return result instanceof Match || result instanceof Empty || result instanceof Fault
           ? result
           : schemas.length > 1
               ? run(schemas.slice(1), nonMatching.concat(schemas[0]))

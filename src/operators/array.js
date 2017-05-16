@@ -66,7 +66,7 @@ export function repeatingItem<TObject, TResult, TParams: SchemaParams<TResult>>(
               parse(schema(needle))(items, key, parents, parentKeys)(context)
             );
 
-            return result instanceof Match
+            return result instanceof Match || result instanceof Empty
               ? items.length > needle
                   ? run(items, results.concat([result.value]), updatedNeedle)
                   : completed(result, needle)
@@ -100,7 +100,7 @@ export function unorderedItem<TObject, TResult, TParams: SchemaParams<TResult>>(
         (function run(items, i) {
           const { result } = unwrap(parse(schema(i))(items, key, parents, parentKeys)(context));
 
-          return result instanceof Match || result instanceof Fault
+          return result instanceof Match || result instanceof Empty || result instanceof Fault
             ? new Match({ result, needle })
             : items.length > i
                 ? run(items, i + 1)
@@ -137,7 +137,7 @@ export function optionalItem<TObject, TResult, TParams: SchemaParams<TResult>>(
           parse(schema(needle))(obj, key, parents, parentKeys)(context)
         );
 
-        return result instanceof Match
+        return result instanceof Match || result instanceof Empty
           ? new Match({ result, needle: needle + 1 })
           : result instanceof Skip
               ? new Match({
@@ -170,7 +170,7 @@ function regularItem<TObject, TResult, TParams: SchemaParams<TResult>>(
           parentKeys.concat(key)
         )(context);
 
-        return result instanceof Match
+        return result instanceof Match || result instanceof Empty
           ? new Match({ result, needle: needle + 1 })
           : new Match({ result, needle });
       },
@@ -179,7 +179,9 @@ function regularItem<TObject, TResult, TParams: SchemaParams<TResult>>(
     );
 }
 
-type NeedledSchema = (needle: number) => FunctionSchema<any, any>;
+type NeedledSchema = (
+  needle: number
+) => FunctionSchema<any, { result: Result, needle: number }>;
 
 function toNeedledSchema<TObject, TResult, TParams: SchemaParams<TResult>>(
   schema: ArrayItem | SchemaType<TResult, TParams>
@@ -208,7 +210,7 @@ export function array<TObject, TResult, TParams: SchemaParams<TResult>>(
 
             return result instanceof Skip || result instanceof Fault
               ? result.updateEnv({ needle })
-              : result instanceof Match
+              : result instanceof Match || result instanceof Empty
                   ? list.length > 1
                       ? run(
                           list.slice(1),

@@ -4,9 +4,12 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-import type { SchemaParams } from "../schemas/schema";
+import type { Params } from "../schemas/function";
 
-export function regex(regex, params = {}) {
+export function regex<TObject, TResult, TParams: Params<TResult>>(
+  regex: string | RegExp,
+  params: TParams = {}
+): FunctionSchema<TObject, TResult, TParams> {
   const meta = { type: "regex", regex, params };
 
   function fn(obj, key, parents, parentKeys) {

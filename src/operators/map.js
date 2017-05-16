@@ -3,9 +3,13 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-import type { SchemaParams } from "../schemas/schema";
+import type { Params } from "../schemas/function";
 
-export function map(schema, mapper, params = {}) {
+export function map<TObject, TOriginalResult, TResult>(
+  schema: SchemaType<TObject, TOriginalResult>,
+  mapper: (input: TOriginalResult) => TResult,
+  params: Params<TResult> = {}
+): FunctionSchema<TObject, TResult> {
   const meta = { type: "map", schema, mapper, params };
 
   function fn(obj, key, parents, parentKeys) {

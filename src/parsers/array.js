@@ -7,7 +7,9 @@ import { getSchemaForLiteralChild } from "./literals";
 
 import type { EvalFunction, ResultType } from "../types";
 
-export default function<TArrayItem, TResultItem>(schema: ArraySchema<TArrayItem, TResultItem>): EvalFunction<Array<TArrayItem>, Array<TResultItem>> {
+export default function<TArrayItem, TResultItem>(
+  schema: ArraySchema<TArrayItem, TResultItem>
+): EvalFunction<Array<TArrayItem>, Array<TResultItem>> {
   return (obj, key, parents, parentKeys) => context => {
     return Array.isArray(obj)
       ? schema.value.length !== obj.length
@@ -39,12 +41,10 @@ export default function<TArrayItem, TResultItem>(schema: ArraySchema<TArrayItem,
 
               const last = results.slice(-1)[0];
 
-              return !(last instanceof Match)
+              return last instanceof Skip || last instanceof Fault
                 ? last
                 : (() => {
-                    const resultArr = results
-                      .filter(r => !(r instanceof Empty))
-                      .map(r => r.value);
+                    const resultArr = results.filter(r => r instanceof Match).map(r => r.value);
                     const modifyResult = schema.params.build;
                     return modifyResult
                       ? (() => {

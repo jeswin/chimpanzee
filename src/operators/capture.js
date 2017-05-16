@@ -3,36 +3,59 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-import type { SchemaParams } from "../schemas/schema";
+import type { Predicate, Primitive, SchemaType } from "../types";
+import type { Params } from "../schemas/function";
 
-export function capture(params) {
-  return captureIf(obj => typeof obj !== "undefined", params);
+type Modifier<TInput, TOutput> = (obj: TInput) => TOutput;
+
+type TakeOptions<TModifierInput, TModifierOutput> = {
+  modifier?: Modifier<TModifierInput, TModifierOutput>,
+  skipMessage?: (obj: any) => string
+};
+
+export function capture<TObject, TResult, TParams: Params<TResult>>(
+  params: TParams
+): FunctionSchema<TObject, TResult, TParams> {
+  return captureIf((obj: TObject) => typeof obj !== "undefined", params);
 }
 
-export function captureIf(predicate, params) {
+export function captureIf<TObject, TResult, TParams: Params<TResult>>(
+  predicate: Predicate<TObject>,
+  params: TParams
+): FunctionSchema<TObject, TResult, TParams> {
   return take(predicate, undefined, params);
 }
 
-export function modify(comparand, modifier, params) {
-  return take(
-    typeof comparand === "function" ? comparand : x => x === comparand,
-    undefined,
-    params,
-    { modifier }
-  );
+export function modify<TObject, TUnmodifedResult, TResult, TParams: Params<TResult>>(
+  predicate: Predicate<TObject>,
+  modifier: Modifier<TUnmodifedResult, TResult>,
+  params: TParams
+): FunctionSchema<TObject, TResult, TParams> {
+  return take(predicate, undefined, params, { modifier });
 }
 
-export function captureAndParse(schema, params) {
+export function captureAndParse<TObject, TResult, TParams: Params<TResult>>(
+  schema: SchemaType<TResult, TParams>,
+  params: TParams
+): FunctionSchema<TObject, TResult, TParams> {
   return take(obj => typeof obj !== "undefined", schema, params);
 }
 
-export function literal(what, params) {
+export function literal<TObject, TResult, TParams: Params<TResult>>(
+  what: TObject,
+  params: TParams
+): FunctionSchema<TObject, TResult, TParams> {
   return take(x => x === what, undefined, params, {
     skipMessage: x => `Expected value to be ${what} but got ${x.toString()}.`
   });
 }
 
-export function take(predicate, schema, params = {}, options = {}) {
+export function take<TObject, TUnmodifedResult, TResult, TParams: Params<TResult>>(
+  predicate: Predicate<any>,
+  schema: SchemaType<TUnmodifedResult>,
+  params: TParams = {},
+  options: TakeOptions<TUnmodifedResult, TResult> = {}
+): FunctionSchema<TObject, TResult, TParams> {
   const meta = { type: "take", schema, params, predicate, options };
 
   function fn(obj, key, parents, parentKeys) {
@@ -51,13 +74,21 @@ export function take(predicate, schema, params = {}, options = {}) {
                       { obj, key, parents, parentKeys },
                       meta
                     )
-                  : result instanceof Skip
-                      ? new Skip(
-                          "Capture failed in inner schema.",
+                  : result instanceof Empty
+                      ? new Match(
+                          {
+                            ...obj
+                          },
                           { obj, key, parents, parentKeys },
                           meta
                         )
-                      : result; //Fault
+                      : result instanceof Skip
+                          ? new Skip(
+                              "Capture failed in inner schema.",
+                              { obj, key, parents, parentKeys },
+                              meta
+                            )
+                          : result; //Fault
               })()
             : new Match(
                 options.modifier ? options.modifier(obj) : obj,

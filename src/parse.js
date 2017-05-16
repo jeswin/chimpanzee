@@ -19,7 +19,7 @@ type SchemaAndParserResult<
   TSchema: Schema<TResult, TParams>
 > = {
   schema: TSchema,
-  parse: TSchema => EvalFunction<any, TResult>
+  parse: (schema: TSchema) => EvalFunction<any, TResult>
 };
 
 function getSchemaAndParser(source: any): any {
