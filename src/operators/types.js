@@ -3,6 +3,7 @@ import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
+import { getParams } from "./utils";
 
 export function number(params) {
   return checkType("number", params);
@@ -45,5 +46,5 @@ function checkType(type, params = {}) {
     };
   }
 
-  return new FunctionSchema(fn, params, meta);
+  return new FunctionSchema(fn, getParams(params), meta);
 }

@@ -2,6 +2,7 @@
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
+import { getParams } from "./utils";
 
 export function optional(schema, params = {}) {
   const meta = { type: "optional", schema, params };
@@ -15,5 +16,5 @@ export function optional(schema, params = {}) {
     };
   }
 
-  return new FunctionSchema(fn, params, meta);
+  return new FunctionSchema(fn, getParams(params), meta);
 }

@@ -2,6 +2,7 @@
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
+import { getParams } from "./utils";
 
 export function exists(predicate, schema) {
   const meta = { type: "exists", schema, predicate };
@@ -17,5 +18,5 @@ export function exists(predicate, schema) {
         : new Skip("Does not exist.", { obj, key, parents, parentKeys }, meta);
   }
 
-  return new FunctionSchema(fn, undefined, meta);
+  return new FunctionSchema(fn, getParams({}), meta);
 }

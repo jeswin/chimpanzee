@@ -1,6 +1,7 @@
 /*       */
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
+import { getParams } from "./utils";
 
 export function empty() {
   const meta = { type: "empty" };
@@ -12,5 +13,5 @@ export function empty() {
         : new Skip("Not empty.", { obj, key, parents, parentKeys }, meta);
   }
 
-  return new FunctionSchema(fn, undefined, meta);
+  return new FunctionSchema(fn, getParams({}), meta);
 }

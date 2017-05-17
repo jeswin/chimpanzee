@@ -4,7 +4,7 @@ import { Schema } from "./schemas";
 
 import type { SchemaParams } from "./schemas/schema";
 
-export type SchemaType<TResult, TParams : SchemaParams<TResult>> =
+export type SchemaType<TResult, TFinalResult, TParams: SchemaParams<TResult, TFinalResult>> =
   | string
   | number
   | boolean
@@ -12,17 +12,17 @@ export type SchemaType<TResult, TParams : SchemaParams<TResult>> =
   | Function
   | Object
   | Array<any>
-  | Schema<TResult, TParams>;
+  | Schema<TResult, TFinalResult, TParams>;
 
 export type Primitive = string | number | boolean | Symbol | Function;
 
-export type ResultType<TResult> = Match<TResult> | Empty | Skip | Fault;
+export type ResultType<TResultItem> = Match<TResultItem> | Empty | Skip | Fault;
 
-export type EvalFunction<TObject, TResult> = (
+export type Predicate<T> = (obj: T) => boolean;
+
+export type EvalFunction<TObject, TResult: Result> = (
   obj: TObject,
   key: string,
   parents: Array<any>,
   parentKeys: Array<string>
-) => (context?: Object) => ResultType<TResult>;
-
-export type Predicate<T> = (obj: T) => boolean;
+) => (context?: Object) => TResult;

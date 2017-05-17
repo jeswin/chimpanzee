@@ -3,6 +3,7 @@ import { Result, Match, Empty, Skip, Fault } from "../results";
 import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 import exception from "../exception";
+import { getParams } from "./utils";
 
 function toNeedledSchema(schema) {
   return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
@@ -206,5 +207,5 @@ export function array(schemas, params) {
             meta
           );
   }
-  return new FunctionSchema(fn, params, { name: "array" });
+  return new FunctionSchema(fn, getParams(params), { name: "array" });
 }

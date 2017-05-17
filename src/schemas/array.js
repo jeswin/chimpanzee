@@ -11,22 +11,17 @@ export type Params<TResultItem, TFinalResult> = {
   }
 } & SchemaParams<Array<TResultItem>, TFinalResult>;
 
-function getParams<TResultItem, TFinalResult>(
-  params: string | Params<TResultItem, TFinalResult>
-): Params<TResultItem, TFinalResult> {
-  return typeof params === "string" ? { key: params } : params;
-}
-
 export default class ArraySchema<
   TArrayItem,
   TResultItem,
   TFinalResult,
-> extends Schema<Array<TResultItem>, TFinalResult, Params<TResultItem, TFinalResult>> {
-  params: Params<TResultItem, TFinalResult>;
+  TParams: Params<TResultItem, TFinalResult>
+> extends Schema<Array<TResultItem>, TFinalResult, TParams> {
+  params: TParams;
   value: Array<TArrayItem>;
 
-  constructor(value: Array<TArrayItem>, params: string | Params<TResultItem, TFinalResult>, meta?: ?Object) {
-    super(getParams(params), meta);
+  constructor(value: Array<TArrayItem>, params: TParams, meta?: ?Object) {
+    super(params, meta);
     this.value = value;
   }
 }

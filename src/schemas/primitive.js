@@ -16,16 +16,12 @@ type PrimitiveSchemaParams = {
 export type Params<TFinalResult> = PrimitiveSchemaParams &
   SchemaParams<ResultTypes, TFinalResult>;
 
-function getParams<TFinalResult>(params: string | Params<TFinalResult>): Params<TFinalResult> {
-  return typeof params === "string" ? { key: params } : params;
-}
-
-export default class PrimitiveSchema<TFinalResult>
-  extends Schema<ResultTypes, TFinalResult, Params<TFinalResult>> {
+export default class PrimitiveSchema<TFinalResult, TParams: Params<TFinalResult>>
+  extends Schema<ResultTypes, TFinalResult, TParams> {
   value: Primitive;
 
-  constructor(value: Primitive, params: string | Params<TFinalResult>, meta?: ?Object) {
-    super(getParams(params), meta);
+  constructor(value: Primitive, params: TParams, meta?: ?Object) {
+    super(params, meta);
     this.value = value;
   }
 }

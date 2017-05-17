@@ -3,6 +3,7 @@ import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
+import { getParams } from "./utils";
 
 export function regex(regex, params) {
   const meta = { type: "regex", regex, params };
@@ -22,5 +23,5 @@ export function regex(regex, params) {
         : result;
     };
   }
-  return new FunctionSchema(fn, params, { name: "regex" });
+  return new FunctionSchema(fn, getParams(params), { name: "regex" });
 }

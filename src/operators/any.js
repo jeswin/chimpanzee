@@ -3,6 +3,7 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import { Seq } from "lazily";
 import parse from "../parse";
+import { getParams } from "./utils";
 
 export function any(schemas, params) {
   const meta = { type: "any", schemas, params };
@@ -29,5 +30,5 @@ export function any(schemas, params) {
       })(schemas, []);
   }
 
-  return new FunctionSchema(fn, params, meta);
+  return new FunctionSchema(fn, getParams(params), meta);
 }

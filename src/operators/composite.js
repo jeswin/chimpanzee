@@ -3,6 +3,7 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { Seq } from "lazily";
 import { Schema, ObjectSchema, FunctionSchema } from "../schemas";
 import parse from "../parse";
+import { getParams } from "./utils";
 
 function getSchema(schema, paramSelector) {
   const schemaSelector = schema.params && schema.params.selector
@@ -58,5 +59,5 @@ export function composite(schema, _paramsList, ownParams = {}) {
     };
   }
 
-  return new FunctionSchema(fn, ownParams, meta);
+  return new FunctionSchema(fn, getParams(ownParams), meta);
 }

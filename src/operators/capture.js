@@ -2,6 +2,7 @@
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
+import { getParams } from "./utils";
 
 export function capture(params) {
   return captureIf(obj => typeof obj !== "undefined", params);
@@ -74,5 +75,5 @@ export function take(predicate, schema, params = {}, options = {}) {
           );
   }
 
-  return new FunctionSchema(fn, params, meta);
+  return new FunctionSchema(fn, getParams(params), meta);
 }
