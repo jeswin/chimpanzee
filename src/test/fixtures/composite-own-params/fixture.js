@@ -16,5 +16,8 @@ export const schema = composite(
     prop: capture({ key: "second", selector: "alt" })
   },
   [{ name: "default", modifiers: { object: x => x.node } }, { name: "alt" }],
-  { build: result => context => result instanceof Match ? new Match({ third: "yaaay", ...result.value }) : result }
+  {
+    build: obj => context => result =>
+      result instanceof Match ? new Match({ third: "yaaay", ...result.value }) : result
+  }
 );

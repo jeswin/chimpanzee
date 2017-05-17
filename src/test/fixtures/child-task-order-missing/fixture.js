@@ -10,10 +10,8 @@ export const input = {
 export const schema = {
   level1: {
     prop1: number({
-      build: result => context =>
-        result instanceof Match
-          ? result.value + (context.prop2 || 100)
-          : result
+      build: obj => context => result =>
+        result instanceof Match ? result.value + (context.prop2 || 100) : result
     }),
     prop2: number()
   }

@@ -476,7 +476,7 @@ export const schema = $.obj(
     hello: capture()
   },
   {
-    build: result => context =>
+    build: obj => context => result =>
       result instanceof Match ? new Match({ hello: `${result.value.hello}!!!` }) : result
   }
 );

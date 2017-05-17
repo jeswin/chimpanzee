@@ -38,7 +38,7 @@ export default function(source) {
     const build = schema.params && schema.params.build;
     return build
       ? (() => {
-          const output = build(result)(context);
+          const output = build(obj, key, parents, parentKeys)(context)(result);
           return output instanceof Result
             ? output
             : new Match(output, { obj, key, parents, parentKeys });

@@ -11,8 +11,8 @@ export const schema = {
   level1: {
     prop1: number({
       order: 2,
-      build: result => context =>
-        result instanceof Match ? (result.value + context.prop2) : result
+      build: obj => context => result =>
+        result instanceof Match ? result.value + context.prop2 : result
     }),
     prop2: number({ order: 1 })
   }
