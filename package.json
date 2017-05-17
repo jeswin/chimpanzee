@@ -1,6 +1,6 @@
 {
   "name": "chimpanzee",
-  "version": "0.0.42",
+  "version": "0.0.43",
   "author": "Jeswin<jeswinpk@agilehead.com>",
   "scripts": {
     "test": "mocha dist/test/test.js",
@@ -8,7 +8,7 @@
   },
   "main": "dist/chimpanzee.js",
   "dependencies": {
-    "lazily": "0.0.18"
+    "lazily": "0.0.17"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
