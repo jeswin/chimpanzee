@@ -17,7 +17,9 @@ function getSchema(schema, paramSelector) {
         : typeof schema === "object"
             ? Seq.of(Object.keys(schema)).reduce((acc, key) => {
                 const result = getSchema(schema[key], paramSelector);
-                return result !== undefined ? { ...acc, [key]: result } : acc;
+                return result !== undefined && Object.keys(result).length > 0
+                  ? { ...acc, [key]: result }
+                  : acc;
               }, {})
             : paramSelector === "default" ? schema : undefined;
 }
