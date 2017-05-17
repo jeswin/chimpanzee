@@ -1,8 +1,5 @@
-/* @flow */
+/*       */
 import Schema from "./schema";
-
-import type { SchemaParams } from "./schema";
-import type { Primitive } from "../types";
 
 // export type ObjectSchemaParams = {
 //   modifiers?: {
@@ -12,25 +9,8 @@ import type { Primitive } from "../types";
 //   }
 // } & SchemaParams;
 
-type ObjectSchemaParams = {
-  newContext?: boolean,
-  replace?: boolean,
-  modifiers?: {
-    object?: (input: any) => any,
-    property?: (input: any) => any,
-    value?: (input: any) => Primitive
-  }
-};
-
-export type Params<TResult, TFinalResult> = ObjectSchemaParams &
-  SchemaParams<TResult, TFinalResult>;
-
-export default class ObjectSchema<TResult, TFinalResult, TParams: Params<TResult, TFinalResult>>
-  extends Schema<TResult, TFinalResult, TParams> {
-  params: TParams;
-  value: Object;
-
-  constructor(value: Object, params: TParams, meta?: ?Object) {
+export default class ObjectSchema extends Schema {
+  constructor(value, params, meta) {
     super(params, meta);
     this.value = value;
   }

@@ -1,4 +1,3 @@
-/* @flow */
 import exception from "./exception";
 
 import { Result, Match, Empty, Skip, Fault } from "./results";
@@ -9,9 +8,6 @@ import primitiveParser from "./parsers/primitive";
 import objectParser from "./parsers/object";
 
 import { ArraySchema, FunctionSchema, PrimitiveSchema, ObjectSchema, Schema } from "./schemas";
-
-import type { SchemaParams } from "./schemas/schema";
-import type { SchemaType } from "./types";
 
 function getSchemaAndParser(source) {
   function normalize(src, SchemaClass, params = {}) {
@@ -34,12 +30,7 @@ function getSchemaAndParser(source) {
   EntryEvalFunction vs EvalFunction:
     EntryEvalFunction allows key, parents, parentKeys to be empty.
 */
-
-export default function<
-  TResult: Result,
-  TFinalResult: Result,
-  TParams: SchemaParams<TResult, TFinalResult>
->(source: SchemaType<TResult, TFinalResult, TParams>): Result {
+export default function(source) {
   const { schema, parse } = getSchemaAndParser(source);
   return (obj, key = "__UNKNOWN__", parents = [], parentKeys = []) => (_context = {}) => {
     const context = schema.params && schema.params.newContext ? {} : _context;
