@@ -1,45 +1,30 @@
-/* @flow */
+/*       */
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-import type { Params } from "../schemas/function";
-
-export function number<TObject, TResult, TParams: Params<TResult>>(
-  params: TParams
-): FunctionSchema<TObject, TResult, TParams> {
+export function number(params) {
   return checkType("number", params);
 }
 
-export function bool<TObject, TResult, TParams: Params<TResult>>(
-  params: TParams
-): FunctionSchema<TObject, TResult, TParams> {
+export function bool(params) {
   return checkType("boolean", params);
 }
 
-export function string<TObject, TResult, TParams: Params<TResult>>(
-  params: TParams
-): FunctionSchema<TObject, TResult, TParams> {
+export function string(params) {
   return checkType("string", params);
 }
 
-export function object<TObject, TResult, TParams: Params<TResult>>(
-  params: TParams
-): FunctionSchema<TObject, TResult, TParams> {
+export function object(params) {
   return checkType("object", params);
 }
 
-export function func<TObject, TResult, TParams: Params<TResult>>(
-  params: TParams
-): FunctionSchema<TObject, TResult, TParams> {
+export function func(params) {
   return checkType("function", params);
 }
 
-function checkType<TObject, TResult, TParams: Params<TResult>>(
-  type: string,
-  params: TParams = {}
-): FunctionSchema<TObject, TResult, TParams> {
+function checkType(type, params = {}) {
   const meta = { type, params };
 
   function fn(obj, key, parents, parentKeys) {

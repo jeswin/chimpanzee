@@ -4,14 +4,20 @@ import Schema from "./schema";
 import type { EvalFunction } from "../types";
 import type { SchemaParams } from "./schema";
 
-export type Params<TResult> = {} & SchemaParams<TResult>;
+export type Params<TResult, TFinalResult> = {} & SchemaParams<TResult, TFinalResult>;
 
-function getParams<TResult>(params: string | Params<TResult>): Params<TResult> {
+function getParams<TResult, TFinalResult, TParams: Params<TResult, TFinalResult>>(
+  params: string | TParams
+): TParams {
   return typeof params === "string" ? { key: params } : params;
 }
 
-export default class FunctionSchema<TObject, TResult, TParams: Params<TResult>>
-  extends Schema<TResult, TParams> {
+export default class FunctionSchema<
+  TObject,
+  TResult,
+  TFinalResult,
+  TParams: Params<TResult, TFinalResult>
+> extends Schema<TResult, TFinalResult, TParams> {
   fn: EvalFunction<TObject, TResult>;
   params: TParams;
 

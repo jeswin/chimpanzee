@@ -1,15 +1,9 @@
-/* @flow */
+/*       */
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-import type { Params } from "../schemas/function";
-import type { Predicate } from "../types";
-
-export function exists<TObject>(
-  predicate: Predicate<TObject>,
-  schema: SchemaType<TObject, TResult>
-): FunctionSchema<TObject, TResult> {
+export function exists(predicate, schema) {
   const meta = { type: "exists", schema, predicate };
 
   predicate = predicate || (x => typeof x !== "undefined");

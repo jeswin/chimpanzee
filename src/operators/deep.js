@@ -1,15 +1,10 @@
-/* @flow */
+/*       */
 import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-import type { Params } from "../schemas/function";
-
-export function deep<TObject, TResult, TParams: Params<TResult>>(
-  schema: SchemaType<TResult, TParams>,
-  params: TParams = {}
-): FunctionSchema<TObject, TResult, TParams> {
+export function deep(schema, params = {}) {
   const meta = { type: "deep", schema, params };
 
   function fn(obj, key, parents, parentKeys) {

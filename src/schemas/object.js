@@ -22,17 +22,21 @@ type ObjectSchemaParams = {
   }
 };
 
-export type Params<TResult> = ObjectSchemaParams & SchemaParams<TResult>;
+export type Params<TResult, TFinalResult> = ObjectSchemaParams &
+  SchemaParams<TResult, TFinalResult>;
 
-function getParams<TResult>(params: string | Params<TResult>): Params<TResult> {
+function getParams<TResult, TFinalResult, TParams: Params<TResult, TFinalResult>>(
+  params: string | TParams
+): TParams {
   return typeof params === "string" ? { key: params } : params;
 }
 
-export default class ObjectSchema<TResult> extends Schema<any, Params<TResult>> {
-  params: Params<TResult>;
+export default class ObjectSchema<TResult, TFinalResult, TParams: Params<TResult, TFinalResult>>
+  extends Schema<TResult, TFinalResult, TParams> {
+  params: TParams;
   value: Object;
 
-  constructor(value: Object, params: string | Params<TResult>, meta?: ?Object) {
+  constructor(value: Object, params: string | TParams, meta?: ?Object) {
     super(getParams(params), meta);
     this.value = value;
   }

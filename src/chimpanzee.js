@@ -1,10 +1,16 @@
-/* @flow */
-
+/*       */
 import parse from "./parse";
 
 export { default as parse } from "./parse";
 export { any } from "./operators/any";
-export { capture, captureIf, captureAndParse, literal, modify, take } from "./operators/capture";
+export {
+  capture,
+  captureIf,
+  captureAndParse,
+  literal,
+  modify,
+  take
+} from "./operators/capture";
 export { composite } from "./operators/composite";
 export { deep } from "./operators/deep";
 export { empty } from "./operators/empty";
@@ -20,8 +26,6 @@ export { Match, Empty, Skip, Fault } from "./results";
 import * as builtins from "./operators/builtins";
 export { builtins };
 
-import type { Result } from "./results";
-
-export function match(schema: any, input: any) : Result {
+export function match(schema, input) {
   return parse(schema)(input, "__INIT__")();
 }

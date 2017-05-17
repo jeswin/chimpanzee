@@ -1,13 +1,10 @@
-/* @flow */
+/*       */
 import { Match, Empty, Skip, Fault } from "../results";
 import { Seq } from "lazily";
 import { Schema, ObjectSchema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-import type { SchemaParams } from "../schemas/schema";
-import type { ObjectSchemaParams } from "../schemas/object";
-
-function getSchema(schema: Object, paramSelector: string): Object {
+function getSchema(schema, paramSelector) {
   const schemaSelector = schema.params && schema.params.selector
     ? schema.params.selector
     : "default";
@@ -24,11 +21,7 @@ function getSchema(schema: Object, paramSelector: string): Object {
             : paramSelector === "default" ? schema : undefined;
 }
 
-export function composite(
-  schema: Object,
-  _paramsList: Array<SchemaParams>,
-  ownParams: SchemaParams = {}
-) {
+export function composite(schema, _paramsList, ownParams = {}) {
   const meta = {
     type: "composite",
     schema,

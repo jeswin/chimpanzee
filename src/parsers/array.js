@@ -1,15 +1,11 @@
-/* @flow */
+/*       */
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import parse from "../parse";
 import { ArraySchema } from "../schemas";
 import { getSchemaForLiteralChild } from "./literals";
 
-import type { EvalFunction, ResultType } from "../types";
-
-export default function<TArrayItem, TResultItem>(
-  schema: ArraySchema<TArrayItem, TResultItem>
-): EvalFunction<Array<TArrayItem>, Array<TResultItem>> {
+export default function(schema) {
   return (obj, key, parents, parentKeys) => context => {
     return Array.isArray(obj)
       ? schema.value.length !== obj.length

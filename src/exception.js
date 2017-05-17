@@ -1,4 +1,4 @@
-/* @flow */
-export default function(message: string) : any {
+/*       */
+export default function(message) {
   throw new Error(message);
 }

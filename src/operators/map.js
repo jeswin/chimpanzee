@@ -1,15 +1,9 @@
-/* @flow */
+/*       */
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-import type { Params } from "../schemas/function";
-
-export function map<TObject, TOriginalResult, TResult>(
-  schema: SchemaType<TObject, TOriginalResult>,
-  mapper: (input: TOriginalResult) => TResult,
-  params: Params<TResult> = {}
-): FunctionSchema<TObject, TResult> {
+export function map(schema, mapper, params) {
   const meta = { type: "map", schema, mapper, params };
 
   function fn(obj, key, parents, parentKeys) {

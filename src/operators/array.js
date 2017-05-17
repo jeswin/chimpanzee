@@ -1,18 +1,21 @@
-/* @flow */
+/*       */
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 import exception from "../exception";
 
-import type { Params } from "../schemas/function";
-import type { SchemaType, EvalFunction } from "../types";
+function toNeedledSchema(schema) {
+  return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
+}
 
 class ArrayItem {
-  fn: EvalFunction<any, any>;
-
-  constructor(fn: EvalFunction<any, any>) {
+  constructor(fn) {
     this.fn = fn;
   }
+}
+
+function unwrap(match) {
+  return match.value;
 }
 
 /*
@@ -23,15 +26,7 @@ class ArrayItem {
   returns [4, 4], with needle moved to 5.
 */
 
-type RepeatingItemOpts = {
-  min?: number,
-  max?: number
-};
-
-export function repeatingItem<TObject, TResult, TParams: Params<TResult>>(
-  _schema: SchemaType<TResult, TParams>,
-  opts: RepeatingItemOpts = {}
-) {
+export function repeatingItem(_schema, opts = {}) {
   const meta = { type: "repeatingItem", schema: _schema };
 
   const min = opts.min || 0;
@@ -92,9 +87,7 @@ export function repeatingItem<TObject, TResult, TParams: Params<TResult>>(
   returns 1, with needle still pointing at 4.
   We don't care about the needle.
 */
-export function unorderedItem<TObject, TResult, TParams: Params<TResult>>(
-  _schema: SchemaType<TResult, TParams>
-) {
+export function unorderedItem(_schema) {
   const meta = { type: "unorderedItem", schema: _schema };
 
   const schema = toNeedledSchema(_schema);
@@ -126,11 +119,9 @@ export function unorderedItem<TObject, TResult, TParams: Params<TResult>>(
 /*
   Optional items may or may not exist.
   A Skip() is not issued when an item is not found.
-  The needle is incrementd by 1 if found, otherwise it remains the same.
+  The needle is incremented by 1 if found, otherwise it remains the same.
 */
-export function optionalItem<TObject, TResult, TParams: Params<TResult>>(
-  _schema: SchemaType<TResult, TParams>
-) {
+export function optionalItem(_schema) {
   const meta = { type: "optionalItem", schema: _schema };
   const schema = toNeedledSchema(_schema);
 
@@ -159,9 +150,7 @@ export function optionalItem<TObject, TResult, TParams: Params<TResult>>(
 /*
   Not array types, viz optional, unordered or repeating.
 */
-function regularItem<TObject, TResult, TParams: Params<TResult>>(
-  schema: SchemaType<TResult, TParams>
-): NeedledSchema {
+function regularItem(schema) {
   const meta = { type: "regularItem", schema };
 
   return needle =>
@@ -183,26 +172,7 @@ function regularItem<TObject, TResult, TParams: Params<TResult>>(
     );
 }
 
-type NeedleResult = { result: Result, needle: number };
-
-type NeedledSchema = (
-  needle: number
-) => FunctionSchema<any, NeedleResult, Params<NeedleResult>>;
-
-function toNeedledSchema<TObject, TResult, TParams: Params<TResult>>(
-  schema: ArrayItem | SchemaType<TResult, TParams>
-): NeedledSchema {
-  return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
-}
-
-function unwrap(match: any): { result: Result, needle?: number } {
-  return match.value;
-}
-
-export function array<TObject, TResult, TParams: Params<TResult>>(
-  schemas: Array<SchemaType<TResult, TParams>>,
-  params: any
-) {
+export function array(schemas, params) {
   const meta = { type: "array", schemas, params };
 
   function fn(obj, key, parents, parentKeys) {
@@ -224,7 +194,7 @@ export function array<TObject, TResult, TParams: Params<TResult>>(
                           updatedNeedle
                         )
                       : new Match(
-                          results.concat(result.value),
+                          result instanceof Match ? results.concat(result.value) : results,
                           { obj, key, parents, parentKeys },
                           meta
                         )

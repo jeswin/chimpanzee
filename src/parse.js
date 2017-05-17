@@ -1,4 +1,4 @@
-/* @flow */
+/*       */
 import exception from "./exception";
 
 import { Result, Match, Empty, Skip, Fault } from "./results";
@@ -10,21 +10,9 @@ import objectParser from "./parsers/object";
 
 import { ArraySchema, FunctionSchema, PrimitiveSchema, ObjectSchema, Schema } from "./schemas";
 
-import type { Primitive, SchemaType, EvalFunction, ResultType } from "./types";
-import type { SchemaParams } from "./schemas/schema";
-
-type SchemaAndParserResult<
-  TResult,
-  TParams: SchemaParams<TResult>,
-  TSchema: Schema<TResult, TParams>
-> = {
-  schema: TSchema,
-  parse: (schema: TSchema) => EvalFunction<any, TResult>
-};
-
-function getSchemaAndParser(source: any): any {
-  function normalize(src: any, SchemaClass: any, params = {}): any {
-    return src instanceof SchemaClass ? src : new SchemaClass((src: any), params);
+function getSchemaAndParser(source) {
+  function normalize(src, SchemaClass, params = {}) {
+    return src instanceof SchemaClass ? src : new SchemaClass(src, params);
   }
 
   return source instanceof PrimitiveSchema ||
@@ -43,20 +31,9 @@ function getSchemaAndParser(source: any): any {
   EntryEvalFunction vs EvalFunction:
     EntryEvalFunction allows key, parents, parentKeys to be empty.
 */
-type EntryEvalFunction<TObject, TResult> = (
-  obj: TObject,
-  key?: string,
-  parents?: Array<any>,
-  parentKeys?: Array<string>
-) => (context?: Object) => ResultType<TResult>;
 
-export default function<
-  TResult,
-  TParams: SchemaParams<TResult>,
-  TSchema: SchemaType<TResult, TParams>
->(source: TSchema): EntryEvalFunction<Primitive | Object, TResult> {
-  type ParseType = SchemaAndParserResult<TResult, TParams, Schema<TResult, TParams>>;
-  const { schema, parse }: ParseType = getSchemaAndParser(source);
+export default function(source) {
+  const { schema, parse } = getSchemaAndParser(source);
   return (obj, key = "__UNKNOWN__", parents = [], parentKeys = []) => (_context = {}) => {
     const context = schema.params && schema.params.newContext ? {} : _context;
     const result = parse(schema)(obj, key, parents, parentKeys)(context);

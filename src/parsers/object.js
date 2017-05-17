@@ -1,11 +1,9 @@
-/* @flow */
+/*       */
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import parse from "../parse";
 import { ObjectSchema } from "../schemas";
 import { getSchemaForLiteralChild } from "./literals";
-
-import type { EvalFunction } from "../types";
 
 function sortFn(schema1, schema2) {
   const schema1Order = schema1.params && schema1.params.order ? schema1.params.order : 0;
@@ -13,7 +11,7 @@ function sortFn(schema1, schema2) {
   return schema1Order - schema2Order;
 }
 
-export default function(schema: ObjectSchema): EvalFunction<Object, any> {
+export default function(schema) {
   return (_obj, key, parents, parentKeys) => context => {
     const obj = schema.params && schema.params.modifiers && schema.params.modifiers.object
       ? schema.params.modifiers.object(_obj)

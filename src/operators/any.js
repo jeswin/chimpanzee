@@ -1,24 +1,15 @@
-/* @flow */
+/*       */
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import { Seq } from "lazily";
 import parse from "../parse";
 
-import type { SchemaType } from "../types";
-import type { Params } from "../schemas/function";
-
-export function any<TResult, TParams: Params<TResult>>(
-  schemas: Array<SchemaType<TResult, TParams>>,
-  params: string | TParams
-): FunctionSchema<any, TResult, TParams> {
+export function any(schemas, params) {
   const meta = { type: "any", schemas, params };
 
-  function fn(obj: any, key: string, parents: Array<any>, parentKeys: Array<string>) {
-    return (context: Object) =>
-      (function run(
-        schemas: Array<SchemaType<TResult, TParams>>,
-        nonMatching: Array<SchemaType<TResult, TParams>>
-      ) {
+  function fn(obj, key, parents, parentKeys) {
+    return context =>
+      (function run(schemas, nonMatching) {
         const result = parse(schemas[0])(obj, key, parents, parentKeys)(context);
         return result instanceof Match || result instanceof Empty || result instanceof Fault
           ? result

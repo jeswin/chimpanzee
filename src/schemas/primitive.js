@@ -1,8 +1,11 @@
 /* @flow */
 import Schema from "./schema";
 
+import { Empty, Skip, Fault } from "../results";
 import type { SchemaParams } from "./schema";
 import type { Primitive } from "../types";
+
+type ResultTypes = Empty | Skip | Fault;
 
 type PrimitiveSchemaParams = {
   modifiers?: {
@@ -10,16 +13,18 @@ type PrimitiveSchemaParams = {
   }
 };
 
-export type Params<TResult> = PrimitiveSchemaParams & SchemaParams<TResult>;
+export type Params<TFinalResult> = PrimitiveSchemaParams &
+  SchemaParams<ResultTypes, TFinalResult>;
 
-function getParams<TResult>(params: any): Params<TResult> {
+function getParams<TFinalResult, TParams: Params<TFinalResult>>(params: TParams): TParams {
   return typeof params === "string" ? { key: params } : params;
 }
 
-export default class PrimitiveSchema<TResult> extends Schema<TResult, Params<TResult>> {
+export default class PrimitiveSchema<TFinalResult, TParams: Params<TFinalResult>>
+  extends Schema<ResultTypes, TFinalResult, TParams> {
   value: Primitive;
 
-  constructor(value: Primitive, params: string | Params<TResult>, meta?: ?Object) {
+  constructor(value: Primitive, params: string | TParams, meta?: ?Object) {
     super(getParams(params), meta);
     this.value = value;
   }

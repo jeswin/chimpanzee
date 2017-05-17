@@ -1,14 +1,8 @@
-/* @flow */
+/*       */
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 
-import type { Params } from "../schemas/function";
-
-export function empty<TObject, TResult, TParams: Params<TResult>>(): FunctionSchema<
-  TObject,
-  TResult,
-  TParams
-> {
+export function empty() {
   const meta = { type: "empty" };
 
   function fn(obj, key, parents, parentKeys) {

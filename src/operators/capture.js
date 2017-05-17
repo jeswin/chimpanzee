@@ -1,61 +1,31 @@
-/* @flow */
+/*       */
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 
-import type { Predicate, Primitive, SchemaType } from "../types";
-import type { Params } from "../schemas/function";
-
-type Modifier<TInput, TOutput> = (obj: TInput) => TOutput;
-
-type TakeOptions<TModifierInput, TModifierOutput> = {
-  modifier?: Modifier<TModifierInput, TModifierOutput>,
-  skipMessage?: (obj: any) => string
-};
-
-export function capture<TObject, TResult, TParams: Params<TResult>>(
-  params: TParams
-): FunctionSchema<TObject, TResult, TParams> {
-  return captureIf((obj: TObject) => typeof obj !== "undefined", params);
+export function capture(params) {
+  return captureIf(obj => typeof obj !== "undefined", params);
 }
 
-export function captureIf<TObject, TResult, TParams: Params<TResult>>(
-  predicate: Predicate<TObject>,
-  params: TParams
-): FunctionSchema<TObject, TResult, TParams> {
+export function captureIf(predicate, params) {
   return take(predicate, undefined, params);
 }
 
-export function modify<TObject, TUnmodifedResult, TResult, TParams: Params<TResult>>(
-  predicate: Predicate<TObject>,
-  modifier: Modifier<TUnmodifedResult, TResult>,
-  params: TParams
-): FunctionSchema<TObject, TResult, TParams> {
+export function modify(predicate, modifier, params) {
   return take(predicate, undefined, params, { modifier });
 }
 
-export function captureAndParse<TObject, TResult, TParams: Params<TResult>>(
-  schema: SchemaType<TResult, TParams>,
-  params: TParams
-): FunctionSchema<TObject, TResult, TParams> {
+export function captureAndParse(schema, params) {
   return take(obj => typeof obj !== "undefined", schema, params);
 }
 
-export function literal<TResult, TParams: Params<TResult>>(
-  what: Primitive,
-  params: TParams
-): FunctionSchema<Primitive, TResult, TParams> {
+export function literal(what, params) {
   return take(x => x === what, undefined, params, {
     skipMessage: x => `Expected value to be ${what.toString()} but got ${x.toString()}.`
   });
 }
 
-export function take<TObject, TUnmodifedResult, TResult, TParams: Params<TResult>>(
-  predicate: Predicate<any>,
-  schema: SchemaType<TUnmodifedResult>,
-  params: TParams = {},
-  options: TakeOptions<TUnmodifedResult, TResult> = {}
-): FunctionSchema<TObject, TResult, TParams> {
+export function take(predicate, schema, params = {}, options = {}) {
   const meta = { type: "take", schema, params, predicate, options };
 
   function fn(obj, key, parents, parentKeys) {
