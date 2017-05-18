@@ -3,7 +3,7 @@ import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import parse from "../parse";
 import { ObjectSchema } from "../schemas";
-import { getSchemaForLiteralChild } from "./literals";
+import { wrapSchemaIfLiteralChild } from "./literals";
 
 function sortFn(schema1, schema2) {
   const schema1Order = schema1.params && schema1.params.order ? schema1.params.order : 0;
@@ -43,7 +43,7 @@ export default function(schema) {
                 const isChildLiteralObject =
                   typeof childSource === "object" && childSource.constructor === Object;
 
-                const childSchema = getSchemaForLiteralChild(schema, childSource);
+                const childSchema = wrapSchemaIfLiteralChild(schema, childSource);
 
                 const result = parse(childSchema)(
                   childItem,

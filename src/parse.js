@@ -33,7 +33,7 @@ function getSchemaAndParser(source) {
 export default function(source) {
   const { schema, parse } = getSchemaAndParser(source);
   return (obj, key = "__UNKNOWN__", parents = [], parentKeys = []) => (_context = {}) => {
-    const context = schema.params && schema.params.newContext ? {} : _context;
+    const context = schema.params && schema.params.reuseContext ? _context : {};
     const result = parse(schema)(obj, key, parents, parentKeys)(context);
     const build = schema.params && schema.params.build;
     return build

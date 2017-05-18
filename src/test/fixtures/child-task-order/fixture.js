@@ -10,6 +10,7 @@ export const input = {
 export const schema = {
   level1: {
     prop1: number({
+      reuseContext: true,
       order: 2,
       build: obj => context => result =>
         result instanceof Match ? result.value + context.prop2 : result

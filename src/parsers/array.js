@@ -3,7 +3,7 @@ import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import parse from "../parse";
 import { ArraySchema } from "../schemas";
-import { getSchemaForLiteralChild } from "./literals";
+import { wrapSchemaIfLiteralChild } from "./literals";
 
 export default function(schema) {
   return (obj, key, parents, parentKeys) => context => {
@@ -18,7 +18,7 @@ export default function(schema) {
           : (() => {
               const results = Seq.of(schema.value).reduce(
                 (acc, childSource, i) => {
-                  const childSchema = getSchemaForLiteralChild(schema, childSource);
+                  const childSchema = wrapSchemaIfLiteralChild(schema, childSource);
 
                   const result = parse(childSchema)(
                     obj[i],

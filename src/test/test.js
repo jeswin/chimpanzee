@@ -76,6 +76,8 @@ describe("chimpanzee", () => {
     ["composite-nested", "composite-nested", "match"],
     ["composite-own-params", "composite-own-params", "match"],
     ["composite-skip", "composite-skip", "skip"],
+    ["context-reset-in-child-object", "context-reset-in-child-object", "match"],
+    ["context-reset-override-in-child-object", "context-reset-override-in-child-object", "match"],
     ["deep", "deep", "match"],
     ["deep-fault", "deep-fault", "fault"],
     ["empty", "empty", "match"],
