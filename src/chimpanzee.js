@@ -20,7 +20,7 @@ export { number, bool, string, object, func } from "./operators/types";
 export { optional } from "./operators/optional";
 export { regex } from "./operators/regex";
 export { repeatingItem, unorderedItem, optionalItem, array } from "./operators/array";
-
+export { wrap } from "./operators/wrap";
 export { Match, Empty, Skip, Fault } from "./results";
 
 import * as builtins from "./operators/builtins";

@@ -77,7 +77,11 @@ describe("chimpanzee", () => {
     ["composite-own-params", "composite-own-params", "match"],
     ["composite-skip", "composite-skip", "skip"],
     ["context-reset-in-child-object", "context-reset-in-child-object", "match"],
-    ["context-reset-override-in-child-object", "context-reset-override-in-child-object", "match"],
+    [
+      "context-reset-override-in-child-object",
+      "context-reset-override-in-child-object",
+      "match"
+    ],
     ["deep", "deep", "match"],
     ["deep-fault", "deep-fault", "fault"],
     ["empty", "empty", "match"],
@@ -118,7 +122,8 @@ describe("chimpanzee", () => {
     ["regex-negative", "regex-negative", "skip"],
     ["string", "string", "match"],
     ["string-negative", "string-negative", "skip"],
-    ["value-modifier", "value-modifier", "match"]
+    ["value-modifier", "value-modifier", "match"],
+    ["wrap", "wrap", "match"]
   ];
 
   for (const test of tests) {
