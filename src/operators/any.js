@@ -28,7 +28,7 @@ export function any(schemas, params) {
                   parents,
                   parentKeys,
                   skippedSchemas: skippedSchemas.concat(schemas[0]),
-                  skippedResults: skippedSchemas.concat(result)
+                  skippedResults: skippedResults.concat(result)
                 },
                 meta
               );
