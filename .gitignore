@@ -30,8 +30,5 @@ node_modules
 #Nothing in dist
 dist/*
 
-#yarn
-yarn.lock
-
 #flow-errors
 flow-errors.txt
