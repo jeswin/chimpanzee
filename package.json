@@ -1,7 +1,7 @@
 {
   "name": "chimpanzee",
   "version": "0.0.50",
-  "author": "Jeswin<jeswinpk@agilehead.com>",
+  "author": "Isotropy Team<isotropy@agilehead.com>",
   "scripts": {
     "test": "mocha dist/test/test.js",
     "debug": "mocha --debug-brk dist/test/test.js"
