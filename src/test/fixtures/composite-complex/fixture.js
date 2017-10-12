@@ -1,10 +1,16 @@
-import { builtins as $, composite, capture } from "../../../chimpanzee";
+import { builtins as $, wrap, composite, capture } from "../../../chimpanzee";
 
 export const input = {
   node: {
     something: "else",
     jeff: "buckley",
     hello: "world",
+    list: [
+      {
+        inner: 1,
+        otherInner: { node: 2 }
+      }
+    ],
     heal: {
       node: {
         what: "the world"
@@ -18,6 +24,7 @@ export const schema = composite(
   {
     something: "else",
     hello: capture({ key: "first" }),
+    list: [{ inner: capture() }],
     prop: capture({ key: "second", selector: "alt" }),
     heal: $.obj(
       {
