@@ -56,8 +56,6 @@ export function composite(schema, _paramsList, ownParams = {}) {
       )
   );
 
-  debugger;
-
   function fn(obj, key, parents, parentKeys) {
     return context => {
       const env = { obj, key, parents, parentKeys };
