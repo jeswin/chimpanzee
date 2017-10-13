@@ -66,14 +66,15 @@ export function composite(schema, _paramsList, ownParams = {}) {
             const result = parse(schema)(obj, key, parents, parentKeys)(
               context
             );
+            const mergeArray = schema.params && schema.params.mergeArray;
             return result instanceof Match || result instanceof Empty
               ? rest.length
                 ? run(
                     rest,
-                    result instanceof Match ? merge(state, result.value) : state
+                    result instanceof Match ? merge(state, result.value, { mergeArray }) : state
                   )
                 : new Match(
-                    result instanceof Match ? merge(state, result.value) : state,
+                    result instanceof Match ? merge(state, result.value, { mergeArray }) : state,
                     env,
                     meta
                   )
