@@ -4,6 +4,7 @@ import { Seq } from "lazily";
 import { Schema, ObjectSchema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 import { getParams } from "./utils";
+import merge from "../utils/merge";
 
 function getSchema(schema, paramSelector) {
   const schemaSelector =
@@ -60,10 +61,6 @@ export function composite(schema, _paramsList, ownParams = {}) {
     return context => {
       const env = { obj, key, parents, parentKeys };
 
-      function merge(state, result) {
-        return { ...state, ...result.value };
-      }
-
       return schemas.length
         ? (function run([schema, ...rest], state) {
             const result = parse(schema)(obj, key, parents, parentKeys)(
@@ -73,10 +70,10 @@ export function composite(schema, _paramsList, ownParams = {}) {
               ? rest.length
                 ? run(
                     rest,
-                    result instanceof Match ? merge(state, result) : state
+                    result instanceof Match ? merge(state, result.value) : state
                   )
                 : new Match(
-                    result instanceof Match ? merge(state, result) : state,
+                    result instanceof Match ? merge(state, result.value) : state,
                     env,
                     meta
                   )

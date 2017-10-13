@@ -72,6 +72,7 @@ describe("chimpanzee", () => {
     ["child-task-order", "child-task-order", "match"],
     ["child-task-order-missing", "child-task-order-missing", "match"],
     ["composite", "composite", "match"],
+    ["composite-arrays", "composite-arrays", "match"],
     ["composite-complex", "composite-complex", "match"],
     ["composite-nested", "composite-nested", "match"],
     ["composite-own-params", "composite-own-params", "match"],
