@@ -29,7 +29,7 @@ function getSchemaAndParser(source) {
         ? { schema: normalize(source, ArraySchema), parse: arrayParser }
         : source instanceof ObjectSchema || source.constructor === Object
           ? { schema: normalize(source, ObjectSchema), parse: objectParser }
-          : exception(`Invalid schema type ${typeof source}.`);
+          : exception(`Invalid schema type ${typeof source}.`, undefined, { schema: source });
 }
 
 /*
@@ -57,7 +57,7 @@ export default function(source) {
           })()
         : result;
     } catch (ex) {
-      return exception(ex.message, ex, schema);
+      return exception(ex.message, ex, { schema });
     }
   };
 }
