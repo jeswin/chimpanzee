@@ -1,8 +1,7 @@
-/* @flow */
 import Result from "./result";
 
 export default class Empty extends Result {
-  constructor(env: ?Object, meta: ?Object) {
+  constructor(env, meta) {
     super(env, meta);
 
     //Unit test support
@@ -11,7 +10,7 @@ export default class Empty extends Result {
     }
   }
 
-  updateEnv(args: Object): Empty {
+  updateEnv(args) {
     return new Empty(
       typeof this.env !== "undefined" ? { ...this.env, ...args } : args,
       this.meta

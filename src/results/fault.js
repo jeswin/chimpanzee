@@ -1,10 +1,9 @@
-/* @flow */
 import Result from "./result";
 
 export default class Fault extends Result {
-  message: string;
+  message;
 
-  constructor(message: string, env: ?Object, meta: ?Object) {
+  constructor(message, env, meta) {
     super(env, meta);
     this.message = message;
 
@@ -14,7 +13,7 @@ export default class Fault extends Result {
     }
   }
 
-  updateEnv(args: Object): Fault {
+  updateEnv(args) {
     return new Fault(
       this.message,
       typeof this.env !== "undefined" ? { ...this.env, ...args } : args,

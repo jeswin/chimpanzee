@@ -1,4 +1,3 @@
-/* @flow */
 export { default as Result } from "./result";
 export { default as Match } from "./match";
 export { default as Empty } from "./empty";
