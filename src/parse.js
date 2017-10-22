@@ -29,7 +29,9 @@ function getSchemaAndParser(source) {
         ? { schema: normalize(source, ArraySchema), parse: arrayParser }
         : source instanceof ObjectSchema || source.constructor === Object
           ? { schema: normalize(source, ObjectSchema), parse: objectParser }
-          : exception(`Invalid schema type ${typeof source}.`, undefined, { schema: source });
+          : exception(`Invalid schema type ${typeof source}.`, undefined, {
+              schema: source
+            });
 }
 
 /*
@@ -41,23 +43,16 @@ export default function(source) {
   return (obj, key = "__UNKNOWN__", parents = [], parentKeys = []) => (
     _context = {}
   ) => {
-    try {
-      const context =
-        schema.params && schema.params.reuseContext ? _context : {};
-      const result = parse(schema)(obj, key, parents, parentKeys)(context);
-      const build = schema.params && schema.params.build;
-      return build
-        ? (() => {
-            const output = build(obj, key, parents, parentKeys)(context)(
-              result
-            );
-            return output instanceof Result
-              ? output
-              : new Match(output, { obj, key, parents, parentKeys });
-          })()
-        : result;
-    } catch (ex) {
-      return exception(ex.message, ex, { schema });
-    }
+    const context = schema.params && schema.params.reuseContext ? _context : {};
+    const result = parse(schema)(obj, key, parents, parentKeys)(context);
+    const build = schema.params && schema.params.build;
+    return build
+      ? (() => {
+          const output = build(obj, key, parents, parentKeys)(context)(result);
+          return output instanceof Result
+            ? output
+            : new Match(output, { obj, key, parents, parentKeys });
+        })()
+      : result;
   };
 }
