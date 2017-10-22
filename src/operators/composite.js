@@ -51,7 +51,7 @@ export function composite(schema, _paramsList, ownParams = {}) {
   const schemas = paramsList.map(
     params =>
       new ObjectSchema(
-        getSchema(schema, (params && params.name) || "default"),
+        getSchema(schema, (params && params.name) || "default") || {},
         params
       )
   );
