@@ -1,4 +1,3 @@
-/*       */
 import { Match, Empty, Skip, Fault } from "../results";
 import { Seq } from "lazily";
 import { Schema, ObjectSchema, FunctionSchema } from "../schemas";
