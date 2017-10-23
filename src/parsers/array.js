@@ -27,9 +27,7 @@ export default function(schema) {
                     parentKeys.concat(key)
                   )(context);
 
-                  return result instanceof Skip || result instanceof Fault
-                    ? result
-                    : acc.concat(result);
+                  return acc.concat(result);
                 },
                 [],
                 (acc, item) => acc instanceof Skip || acc instanceof Fault

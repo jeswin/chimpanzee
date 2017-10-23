@@ -1,6 +1,6 @@
 {
   "name": "chimpanzee",
-  "version": "0.0.60",
+  "version": "0.0.61",
   "author": "Isotropy Team<isotropy@agilehead.com>",
   "scripts": {
     "test": "mocha dist/test/test.js",
