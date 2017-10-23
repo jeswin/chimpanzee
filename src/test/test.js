@@ -23,10 +23,10 @@ describe("chimpanzee", () => {
         actual.should.be.an.instanceOf(Empty);
       } else if (resultType === "skip") {
         actual.should.be.an.instanceOf(Skip);
-        actual.message.should.deepEqual(expected.result);
+        actual.message.should.equal(expected.result);
       } else if (resultType === "fault") {
         actual.should.be.an.instanceOf(Fault);
-        actual.message.should.deepEqual(expected.result);
+        actual.message.should.equal(expected.result);
       }
 
       if (expected.allResults) {
