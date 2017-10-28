@@ -1,4 +1,3 @@
-/*       */
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 import { getParams } from "./utils";

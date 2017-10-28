@@ -1,4 +1,3 @@
-/*       */
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";

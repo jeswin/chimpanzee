@@ -1,4 +1,3 @@
-/*       */
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";

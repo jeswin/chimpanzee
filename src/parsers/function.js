@@ -1,4 +1,3 @@
-/*       */
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 

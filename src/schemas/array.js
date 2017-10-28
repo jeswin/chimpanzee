@@ -1,4 +1,3 @@
-/*       */
 import Schema from "./schema";
 
 export default class ArraySchema extends Schema {

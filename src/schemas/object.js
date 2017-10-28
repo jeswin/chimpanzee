@@ -1,4 +1,3 @@
-/*       */
 import Schema from "./schema";
 
 // export type ObjectSchemaParams = {

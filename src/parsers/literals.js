@@ -1,4 +1,3 @@
-/*       */
 import { ObjectSchema, ArraySchema, PrimitiveSchema } from "../schemas";
 
 export function wrapSchemaIfLiteralChild(schema, childSource) {

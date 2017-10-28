@@ -1,4 +1,3 @@
-/*       */
 import Schema from "./schema";
 
 import { Empty, Skip, Fault } from "../results";

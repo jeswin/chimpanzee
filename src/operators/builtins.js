@@ -1,5 +1,3 @@
-/*       */
-
 import ArraySchema from "../schemas/array";
 
 import { FunctionSchema } from "../schemas";
