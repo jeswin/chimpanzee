@@ -1,8 +1,9 @@
 {
   "name": "chimpanzee",
-  "version": "0.0.61",
+  "version": "0.0.62",
   "author": "Isotropy Team<isotropy@agilehead.com>",
   "scripts": {
+    "build": "./build.sh",
     "test": "mocha dist/test/test.js",
     "debug": "mocha --debug-brk dist/test/test.js"
   },

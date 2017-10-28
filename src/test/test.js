@@ -124,6 +124,9 @@ describe("chimpanzee", () => {
     ["regex-negative", "regex-negative", "skip"],
     ["string", "string", "match"],
     ["string-negative", "string-negative", "skip"],
+    ["then", "then", "match"],
+    ["then-negative", "then-negative", "skip"],
+    ["then-fail-schema", "then-fail-schema", "skip"],
     ["value-modifier", "value-modifier", "match"],
     ["wrap", "wrap", "match"]
   ];
