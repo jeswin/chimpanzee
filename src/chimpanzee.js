@@ -1,6 +1,7 @@
 import parse from "./parse";
 
 export { default as parse } from "./parse";
+
 export { any } from "./operators/any";
 export {
   capture,
@@ -18,8 +19,15 @@ export { map } from "./operators/map";
 export { number, bool, string, object, func } from "./operators/types";
 export { optional } from "./operators/optional";
 export { regex } from "./operators/regex";
-export { repeatingItem, unorderedItem, optionalItem, array } from "./operators/array";
+export {
+  repeatingItem,
+  unorderedItem,
+  optionalItem,
+  array
+} from "./operators/array";
 export { wrap } from "./operators/wrap";
+export { permute, permuteObject, permuteArray } from "./operators/permute";
+
 export { Match, Empty, Skip, Fault } from "./results";
 
 import * as builtins from "./operators/builtins";

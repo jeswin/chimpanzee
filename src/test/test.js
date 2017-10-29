@@ -12,36 +12,43 @@ sourceMapSupport.install();
 describe("chimpanzee", () => {
   function run([description, dir, resultType]) {
     it(`${description}`, () => {
-      global.__chimpanzeeTestContext = [];
-      const fixture = require(`./fixtures/${dir}/fixture`);
-      const actual = match(fixture.schema, fixture.input);
-      const expected = require(`./fixtures/${dir}/expected`);
-      if (resultType === "match") {
-        actual.should.be.an.instanceOf(Match);
-        actual.value.should.deepEqual(expected.result);
-      } else if (resultType === "empty") {
-        actual.should.be.an.instanceOf(Empty);
-      } else if (resultType === "skip") {
-        actual.should.be.an.instanceOf(Skip);
-        actual.message.should.equal(expected.result);
-      } else if (resultType === "fault") {
-        actual.should.be.an.instanceOf(Fault);
-        actual.message.should.equal(expected.result);
-      }
+      if (["match", "empty", "skip", "fault"].includes(resultType)) {
+        global.__chimpanzeeTestContext = [];
+        const fixture = require(`./fixtures/${dir}/fixture`);
+        const actual = match(fixture.schema, fixture.input);
+        const expected = require(`./fixtures/${dir}/expected`);
+        if (resultType === "match") {
+          actual.should.be.an.instanceOf(Match);
+          actual.value.should.deepEqual(expected.result);
+        } else if (resultType === "empty") {
+          actual.should.be.an.instanceOf(Empty);
+        } else if (resultType === "skip") {
+          actual.should.be.an.instanceOf(Skip);
+          actual.message.should.equal(expected.result);
+        } else if (resultType === "fault") {
+          actual.should.be.an.instanceOf(Fault);
+          actual.message.should.equal(expected.result);
+        }
 
-      if (expected.allResults) {
-        for (const [actualIndex, expectedResult] of expected.allResults) {
-          const actualResult = global.__chimpanzeeTestContext[actualIndex];
-          if (expectedResult.message) {
-            actualResult.message.should.equal(expectedResult.message);
-          }
-          if (expectedResult.env && expectedResult.env.parentKeys) {
-            actualResult.env.parentKeys.should.deepEqual(expectedResult.env.parentKeys);
-          }
-          if (expectedResult.meta && expectedResult.meta.type) {
-            actualResult.meta.type.should.equal(expectedResult.meta.type);
+        if (expected.allResults) {
+          for (const [actualIndex, expectedResult] of expected.allResults) {
+            const actualResult = global.__chimpanzeeTestContext[actualIndex];
+            if (expectedResult.message) {
+              actualResult.message.should.equal(expectedResult.message);
+            }
+            if (expectedResult.env && expectedResult.env.parentKeys) {
+              actualResult.env.parentKeys.should.deepEqual(
+                expectedResult.env.parentKeys
+              );
+            }
+            if (expectedResult.meta && expectedResult.meta.type) {
+              actualResult.meta.type.should.equal(expectedResult.meta.type);
+            }
           }
         }
+      } else {
+        const fixture = require(`./fixtures/${dir}/fixture`);
+        fixture.fn();
       }
     });
   }
@@ -53,7 +60,11 @@ describe("chimpanzee", () => {
     ["any-negative", "any-negative", "skip"],
     ["array", "array", "match"],
     ["array-injects-modifiers", "array-injects-modifiers", "empty"],
-    ["array-inside-object-injects-modifiers", "array-inside-object-injects-modifiers", "match"],
+    [
+      "array-inside-object-injects-modifiers",
+      "array-inside-object-injects-modifiers",
+      "match"
+    ],
     ["array-repeating", "array-repeating", "match"],
     ["array-repeating-fault", "array-repeating-fault", "fault"],
     ["array-unordered", "array-unordered", "match"],
@@ -104,19 +115,30 @@ describe("chimpanzee", () => {
     ["native-array-simple", "native-array-simple", "match"],
     ["nested-any", "nested-any", "match"],
     ["nested-native-array-simple", "nested-native-array-simple", "match"],
-    ["nested-native-array-simple-capture", "nested-native-array-simple-capture", "match"],
+    [
+      "nested-native-array-simple-capture",
+      "nested-native-array-simple-capture",
+      "match"
+    ],
     ["nested-capture", "nested-capture", "match"],
     ["nested-named-capture", "nested-named-capture", "match"],
     ["number", "number", "match"],
     ["number-negative", "number-negative", "skip"],
     ["object", "object", "match"],
     ["object-injects-modifiers", "object-injects-modifiers", "match"],
-    ["object-inside-array-injects-modifiers", "object-inside-array-injects-modifiers", "match"],
+    [
+      "object-inside-array-injects-modifiers",
+      "object-inside-array-injects-modifiers",
+      "match"
+    ],
     ["object-modifier", "object-modifier", "match"],
     ["object-modifier-override", "object-modifier-override", "match"],
     ["object-negative", "object-negative", "skip"],
     ["optional", "optional", "match"],
     ["optional-fault", "optional-fault", "fault"],
+    ["permute", "permute"],
+    ["permute-array", "permute-array"],
+    ["permute-object", "permute-object"],
     ["property-modifier", "property-modifier", "match"],
     ["property-modifier-nested", "property-modifier-nested", "match"],
     ["property-modifier-override", "property-modifier-override", "match"],
