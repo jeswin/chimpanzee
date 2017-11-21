@@ -5,6 +5,8 @@ This is especially useful for analyzing ASTs, which can be fairly large and comp
 
 This is still work in progress. The first non-beta version will come out along with the release of the parent project (Isotropy).
 
+This project is being maintained at gitlab.com/looptype. Everything else is just a mirror.
+
 Installation
 ------------
 ```
