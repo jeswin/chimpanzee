@@ -159,28 +159,36 @@ export function slice(schemas) {
                 });
           }
           return (function loop(items, results, needle, schemaIndex) {
-            const { result, needle: updatedNeedle } = unwrap(
-              parse(schema(needle))(items, key, parents, parentKeys)(context)
-            );
+            return schemas.length > schemaIndex
+              ? (() => {
+                  const schema = toNeedledSchema(schemas[schemaIndex]);
 
-            return result instanceof Match || result instanceof Empty
-              ? items.length > needle
-                ? loop(
-                    items,
-                    result instanceof Match
-                      ? results.concat([result.value])
-                      : results,
-                    updatedNeedle
-                  )
-                : completed(
-                    result instanceof Match
-                      ? results.concat([result.value])
-                      : results,
-                    needle
-                  )
-              : result instanceof Skip
-                ? completed(results, needle)
-                : new Match({ result, needle }); //Fault
+                  const { result, needle: updatedNeedle } = unwrap(
+                    parse(schema(needle))(items, key, parents, parentKeys)(
+                      context
+                    )
+                  );
+
+                  return result instanceof Match || result instanceof Empty
+                    ? items.length > needle
+                      ? loop(
+                          items,
+                          result instanceof Match
+                            ? results.concat([result.value])
+                            : results,
+                          updatedNeedle
+                        )
+                      : completed(
+                          result instanceof Match
+                            ? results.concat([result.value])
+                            : results,
+                          needle
+                        )
+                    : result instanceof Skip
+                      ? completed(results, needle)
+                      : new Match({ result, needle }); //Fault
+                })()
+              : completed(results, needle);
           })(obj, [], needle, 0);
         },
         {},
