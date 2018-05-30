@@ -41,7 +41,11 @@ export function repeatingItem(_schema, opts = {}) {
           function completed(results, needle) {
             return results.length >= min && (!max || results.length <= max)
               ? new Match({
-                  result: new Match(results, { obj, key, parents, parentKeys }, meta),
+                  result: new Match(
+                    results,
+                    { obj, key, parents, parentKeys },
+                    meta
+                  ),
                   needle
                 })
               : new Match({
@@ -52,25 +56,29 @@ export function repeatingItem(_schema, opts = {}) {
                   )
                 });
           }
-          return (function run(items, results, needle) {
+          return (function loop(items, results, needle) {
             const { result, needle: updatedNeedle } = unwrap(
               parse(schema(needle))(items, key, parents, parentKeys)(context)
             );
 
             return result instanceof Match || result instanceof Empty
               ? items.length > needle
-                  ? run(
-                      items,
-                      result instanceof Match ? results.concat([result.value]) : results,
-                      updatedNeedle
-                    )
-                  : completed(
-                      result instanceof Match ? results.concat([result.value]) : results,
-                      needle
-                    )
+                ? loop(
+                    items,
+                    result instanceof Match
+                      ? results.concat([result.value])
+                      : results,
+                    updatedNeedle
+                  )
+                : completed(
+                    result instanceof Match
+                      ? results.concat([result.value])
+                      : results,
+                    needle
+                  )
               : result instanceof Skip
-                  ? completed(results, needle)
-                  : new Match({ result, needle }); //Fault
+                ? completed(results, needle)
+                : new Match({ result, needle }); //Fault
           })(obj, [], needle);
         },
         {},
@@ -94,26 +102,91 @@ export function unorderedItem(_schema) {
   return new ArrayItem(needle => {
     return new FunctionSchema(
       (obj, key, parents, parentKeys) => context =>
-        (function run(items, i) {
-          const { result } = unwrap(parse(schema(i))(items, key, parents, parentKeys)(context));
+        (function loop(items, i) {
+          const { result } = unwrap(
+            parse(schema(i))(items, key, parents, parentKeys)(context)
+          );
 
-          return result instanceof Match || result instanceof Empty || result instanceof Fault
+          return result instanceof Match ||
+            result instanceof Empty ||
+            result instanceof Fault
             ? new Match({ result, needle })
             : items.length > i
-                ? run(items, i + 1)
-                : new Match({
-                    result: new Skip(
-                      `Unordered item was not found.`,
-                      { obj, key, parents, parentKeys },
-                      meta
-                    ),
-                    needle
-                  });
+              ? loop(items, i + 1)
+              : new Match({
+                  result: new Skip(
+                    `Unordered item was not found.`,
+                    { obj, key, parents, parentKeys },
+                    meta
+                  ),
+                  needle
+                });
         })(obj, 0),
       {},
       meta
     );
   });
+}
+
+/*  
+  A slice is schema that represents a part of an array.
+  If found the needle moves by the length of the slice.
+  A Skip() is issued when the slice is not found.
+*/
+export function slice(schemas) {
+  const meta = { type: "slice", schemas };
+
+  return new ArrayItem(
+    needle =>
+      new FunctionSchema(
+        (obj, key, parents, parentKeys) => context => {
+          function completed(results, needle) {
+            return results.length >= min && (!max || results.length <= max)
+              ? new Match({
+                  result: new Match(
+                    results,
+                    { obj, key, parents, parentKeys },
+                    meta
+                  ),
+                  needle
+                })
+              : new Match({
+                  result: new Skip(
+                    "Incorrect number of matches.",
+                    { obj, key, parents, parentKeys },
+                    meta
+                  )
+                });
+          }
+          return (function loop(items, results, needle, schemaIndex) {
+            const { result, needle: updatedNeedle } = unwrap(
+              parse(schema(needle))(items, key, parents, parentKeys)(context)
+            );
+
+            return result instanceof Match || result instanceof Empty
+              ? items.length > needle
+                ? loop(
+                    items,
+                    result instanceof Match
+                      ? results.concat([result.value])
+                      : results,
+                    updatedNeedle
+                  )
+                : completed(
+                    result instanceof Match
+                      ? results.concat([result.value])
+                      : results,
+                    needle
+                  )
+              : result instanceof Skip
+                ? completed(results, needle)
+                : new Match({ result, needle }); //Fault
+          })(obj, [], needle, 0);
+        },
+        {},
+        meta
+      )
+  );
 }
 
 /*
@@ -135,11 +208,11 @@ export function optionalItem(_schema) {
         return result instanceof Match || result instanceof Empty
           ? new Match({ result, needle: needle + 1 })
           : result instanceof Skip
-              ? new Match({
-                  result: new Empty({ obj, key, parents, parentKeys }, meta),
-                  needle
-                })
-              : new Match({ result, needle });
+            ? new Match({
+                result: new Empty({ obj, key, parents, parentKeys }, meta),
+                needle
+              })
+            : new Match({ result, needle });
       },
       {},
       meta
@@ -178,8 +251,8 @@ export function array(schemas, params) {
   function fn(obj, key, parents, parentKeys) {
     return context =>
       Array.isArray(obj)
-        ? (function run(list, results, needle) {
-            const schema = toNeedledSchema(list[0]);
+        ? (function loop(schemaList, results, needle) {
+            const schema = toNeedledSchema(schemaList[0]);
             const { result, needle: updatedNeedle } = unwrap(
               parse(schema(needle))(obj, key, parents, parentKeys)(context)
             );
@@ -187,18 +260,22 @@ export function array(schemas, params) {
             return result instanceof Skip || result instanceof Fault
               ? result.updateEnv({ needle })
               : result instanceof Match || result instanceof Empty
-                  ? list.length > 1
-                      ? run(
-                          list.slice(1),
-                          results.concat(result instanceof Empty ? [] : [result.value]),
-                          updatedNeedle
-                        )
-                      : new Match(
-                          result instanceof Match ? results.concat(result.value) : results,
-                          { obj, key, parents, parentKeys },
-                          meta
-                        )
-                  : exception("Unknown result type.");
+                ? schemaList.length > 1
+                  ? loop(
+                      schemaList.slice(1),
+                      results.concat(
+                        result instanceof Empty ? [] : [result.value]
+                      ),
+                      updatedNeedle
+                    )
+                  : new Match(
+                      result instanceof Match
+                        ? results.concat(result.value)
+                        : results,
+                      { obj, key, parents, parentKeys },
+                      meta
+                    )
+                : exception("Unknown result type.");
           })(schemas, [], 0)
         : new Fault(
             `Expected array but got ${typeof obj}.`,
