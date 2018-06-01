@@ -56,15 +56,14 @@ export function repeatingItem(_schema, opts = {}) {
                   )
                 });
           }
-          return (function loop(items, results, needle) {
+          return (function loop(results, needle) {
             const { result, needle: updatedNeedle } = unwrap(
-              parse(schema(needle))(items, key, parents, parentKeys)(context)
+              parse(schema(needle))(obj, key, parents, parentKeys)(context)
             );
 
             return result instanceof Match || result instanceof Empty
-              ? items.length > needle
+              ? obj.length > needle
                 ? loop(
-                    items,
                     result instanceof Match
                       ? results.concat([result.value])
                       : results,
@@ -79,7 +78,7 @@ export function repeatingItem(_schema, opts = {}) {
               : result instanceof Skip
                 ? completed(results, needle)
                 : new Match({ result, needle }); //Fault
-          })(obj, [], needle);
+          })([], needle);
         },
         {},
         meta
@@ -102,17 +101,17 @@ export function unorderedItem(_schema) {
   return new ArrayItem(needle => {
     return new FunctionSchema(
       (obj, key, parents, parentKeys) => context =>
-        (function loop(items, i) {
+        (function loop(i) {
           const { result } = unwrap(
-            parse(schema(i))(items, key, parents, parentKeys)(context)
+            parse(schema(i))(obj, key, parents, parentKeys)(context)
           );
 
           return result instanceof Match ||
             result instanceof Empty ||
             result instanceof Fault
             ? new Match({ result, needle })
-            : items.length > i
-              ? loop(items, i + 1)
+            : obj.length > i
+              ? loop(i + 1)
               : new Match({
                   result: new Skip(
                     `Unordered item was not found.`,
@@ -121,7 +120,7 @@ export function unorderedItem(_schema) {
                   ),
                   needle
                 });
-        })(obj, 0),
+        })(0),
       {},
       meta
     );
@@ -158,21 +157,20 @@ export function slice(schemas) {
                   )
                 });
           }
-          return (function loop(items, results, needle, schemaIndex) {
+          return (function loop(results, needle, schemaIndex) {
             return schemas.length > schemaIndex
               ? (() => {
                   const schema = toNeedledSchema(schemas[schemaIndex]);
 
                   const { result, needle: updatedNeedle } = unwrap(
-                    parse(schema(needle))(items, key, parents, parentKeys)(
+                    parse(schema(needle))(obj, key, parents, parentKeys)(
                       context
                     )
                   );
 
                   return result instanceof Match || result instanceof Empty
-                    ? items.length > needle
+                    ? obj.length > needle
                       ? loop(
-                          items,
                           result instanceof Match
                             ? results.concat([result.value])
                             : results,
@@ -189,7 +187,7 @@ export function slice(schemas) {
                       : new Match({ result, needle }); //Fault
                 })()
               : completed(results, needle);
-          })(obj, [], needle, 0);
+          })([], needle, 0);
         },
         {},
         meta
