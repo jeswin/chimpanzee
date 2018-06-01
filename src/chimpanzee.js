@@ -16,19 +16,20 @@ export { deep } from "./operators/deep";
 export { empty } from "./operators/empty";
 export { exists } from "./operators/exists";
 export { map } from "./operators/map";
-export { number, bool, string, object, func } from "./operators/types";
+export { bool, func, number, object, string } from "./operators/types";
 export { optional } from "./operators/optional";
 export { regex } from "./operators/regex";
 export {
-  repeatingItem,
-  unorderedItem,
+  array,
   optionalItem,
-  array
+  repeatingItem,
+  slice,
+  unorderedItem
 } from "./operators/array";
 export { wrap } from "./operators/wrap";
-export { permute, permuteObject, permuteArray } from "./operators/permute";
+export { permute, permuteArray, permuteObject } from "./operators/permute";
 
-export { Match, Empty, Skip, Fault } from "./results";
+export { Empty, Fault, Match, Skip } from "./results";
 
 import * as builtins from "./operators/builtins";
 export { builtins };

@@ -1,4 +1,11 @@
-import { capture, array, repeatingItem, slice } from "../../../chimpanzee";
+import {
+  any,
+  array,
+  capture,
+  captureIf,
+  repeatingItem,
+  slice
+} from "../../../chimpanzee";
 
 export const input = {
   level1: [
