@@ -1,3 +1,7 @@
+const IS_DEBUG =
+  typeof process.env.CHIMPANZEE_DEBUG !== "undefined" &&
+  process.env.CHIMPANZEE_DEBUG !== false;
+
 import Result from "./result";
 
 export default class Fault extends Result {
@@ -10,6 +14,10 @@ export default class Fault extends Result {
     //Unit test support
     if (global.__chimpanzeeTestContext) {
       global.__chimpanzeeTestContext.push(this);
+    }
+
+    if (IS_DEBUG) {
+      console.log(new Error().stack);
     }
   }
 
