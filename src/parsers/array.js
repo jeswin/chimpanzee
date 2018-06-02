@@ -4,6 +4,7 @@ import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 import { ArraySchema } from "../schemas";
 import { wrapSchemaIfLiteralChild } from "./literals";
+import exception from "../exception";
 
 export function toNeedledSchema(schema) {
   return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
@@ -63,7 +64,6 @@ export default function(schema) {
                 : {}
             )
           )(obj, key, parents, parentKeys)(context);
-          console.log(result);
           return result instanceof Skip || result instanceof Fault
             ? result.updateEnv({ needle })
             : result instanceof Match || result instanceof Empty
@@ -90,7 +90,7 @@ export default function(schema) {
                   })()
               : exception("Unknown result type.");
         })(schema.value, [], 0)
-      : new Fault(
+      : new Skip(
           `Expected array but got ${typeof obj}.`,
           { obj, key, parents, parentKeys },
           meta
