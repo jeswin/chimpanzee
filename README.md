@@ -199,7 +199,7 @@ const input = {
 
 const schema = {
   level1: [
-    repeatingItem(string())
+    repeating(string())
   ]
 };
 ```
@@ -217,8 +217,8 @@ const input = {
 
 const schema = {
   level1: [
-    unorderedItem(string()),
-    unorderedItem(bool())
+    unordered(string()),
+    unordered(bool())
   ]
 };
 ```
@@ -237,7 +237,7 @@ const input = {
 
 const schema = {
   level1: [
-    optionalItem(number()),
+    optional(number()),
     string(),
     bool()
   ]

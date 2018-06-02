@@ -160,6 +160,11 @@ describe("chimpanzee", () => {
     ["wrap", "wrap", "match"]
   ];
 
+  // while (tests.length) {
+  //   tests.pop();
+  // }
+  // tests.push(["array-slice", "array-slice", "match"]);
+
   for (const test of tests) {
     run(test);
   }

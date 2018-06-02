@@ -2,7 +2,7 @@ import {
   any,
   capture,
   captureIf,
-  repeatingItem,
+  repeating,
   slice,
   string
 } from "../../../chimpanzee";
@@ -21,14 +21,15 @@ export const input = {
   ]
 };
 
-const titleSchema = seq(["title", repeatingItem(captureIf(x => x !== "."))]);
-const commentsSchema = seq(["comments", any(["off", "on"])]);
-const urlSchema = seq(["url", captureIf(x => x.startsWith("https:"))]);
+const titleSchema = ["title", repeating(captureIf(x => x !== "."))];
+const commentsSchema = ["comments", any(["off", "on"])];
+const urlSchema = ["url", captureIf(x => x.startsWith("https:"))];
 
 export const schema = {
   level1: [
-    repeatingItem(
-      slice(any([commentsSchema, urlSchema, titleSchema, ".", "promote"]))
+    repeating(
+      any([commentsSchema, urlSchema, titleSchema, ["."], ["promote"]]),
+      { recursive: true }
     )
   ]
 };

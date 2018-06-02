@@ -1,8 +1,8 @@
 import {
   capture,
   literal,
-  unorderedItem,
-  repeatingItem,
+  unordered,
+  repeating,
   bool,
   number,
   string
@@ -14,8 +14,8 @@ export const input = {
 
 export const schema = {
   level1: [
-    repeatingItem(literal("HELLO")),
-    unorderedItem(number()),
-    unorderedItem(bool())
+    repeating(literal("HELLO")),
+    unordered(number()),
+    unordered(bool())
   ]
 };

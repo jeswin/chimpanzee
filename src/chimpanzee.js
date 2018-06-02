@@ -21,9 +21,9 @@ export { optional } from "./operators/optional";
 export { regex } from "./operators/regex";
 export {
   optionalItem,
-  repeatingItem,
+  repeating,
   slice,
-  unorderedItem
+  unordered
 } from "./operators/array";
 export { wrap } from "./operators/wrap";
 export { permute, permuteArray, permuteObject } from "./operators/permute";

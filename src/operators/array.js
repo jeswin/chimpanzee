@@ -13,11 +13,12 @@ import { toNeedledSchema, ArrayOperator, Wrapped } from "../parsers/array";
   returns [4, 4], with needle moved to 5.
 */
 
-export function repeatingItem(_schema, opts = {}) {
-  const meta = { type: "repeatingItem", schema: _schema };
+export function repeating(_schema, opts = {}) {
+  const meta = { type: "repeating", schema: _schema };
 
   const min = opts.min || 0;
   const max = opts.max;
+  const recursive = opts.recursive || false;
 
   const schema = toNeedledSchema(_schema);
 
@@ -40,6 +41,7 @@ export function repeatingItem(_schema, opts = {}) {
                   needle
                 );
           }
+
           return (function loop(results, needle) {
             const { result, needle: updatedNeedle } = parse(schema(needle))(
               obj,
@@ -50,12 +52,17 @@ export function repeatingItem(_schema, opts = {}) {
 
             return result instanceof Match || result instanceof Empty
               ? obj.length > needle
-                ? loop(
-                    result instanceof Match
-                      ? results.concat([result.value])
-                      : results,
-                    updatedNeedle
-                  )
+                ? (() => {
+                    const { items, effectiveNeedle } = recursive
+                      ? { items: obj.slice(needle), effectiveNeedle: 0 }
+                      : { items: obj, effectiveNeedle: needle };
+                    return loop(
+                      result instanceof Match
+                        ? results.concat([result.value])
+                        : results,
+                      updatedNeedle
+                    );
+                  })()
                 : completed(
                     result instanceof Match
                       ? results.concat([result.value])
@@ -81,10 +88,10 @@ export function repeatingItem(_schema, opts = {}) {
   returns 1, with needle still pointing at 4.
   We don't care about the needle.
 */
-export function unorderedItem(_schema, opts = {}) {
+export function unordered(_schema, opts = {}) {
   const useNeedle = opts.searchPrevious === false ? true : false;
 
-  const meta = { type: "unorderedItem", schema: _schema };
+  const meta = { type: "unordered", schema: _schema };
 
   const schema = toNeedledSchema(_schema);
   return new ArrayOperator(
