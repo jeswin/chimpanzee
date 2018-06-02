@@ -54,49 +54,59 @@ export default function(schema) {
   return (obj, key, parents, parentKeys) => context => {
     const meta = { type: "array", schema };
     return Array.isArray(obj)
-      ? (function loop(schemaList, results, needle) {
-          const wrappedSchema = wrapSchemaIfLiteralChild(schema, schemaList[0]);
-          const needledSchema = toNeedledSchema(wrappedSchema);
-          const { result, needle: updatedNeedle } = parse(
-            needledSchema(
-              needle,
-              schema.params && schema.params.modifiers
-                ? schema.params.modifiers
-                : {}
-            )
-          )(obj, key, parents, parentKeys)(context);
-          return result instanceof Skip || result instanceof Fault
-            ? result.updateEnv({ needle })
-            : result instanceof Match || result instanceof Empty
-              ? schemaList.length > 1
-                ? loop(
-                    schemaList.slice(1),
-                    results.concat(
-                      result instanceof Empty ? [] : [result.value]
-                    ),
-                    updatedNeedle
-                  )
-                : (() => {
-                    const finalResults =
-                      result instanceof Match
-                        ? results.concat(result.value)
-                        : results;
-                    return finalResults.length
-                      ? new Match(
-                          finalResults,
-                          {
-                            obj,
-                            key,
-                            parents,
-                            parentKeys,
-                            needle: updatedNeedle
-                          },
-                          meta
-                        )
-                      : new Empty({ obj, key, parents, parentKeys }, meta);
-                  })()
-              : exception("Unknown result type.");
-        })(schema.value, [], 0)
+      ? schema.params &&
+        schema.params.exact &&
+        obj.length !== schema.value.length
+        ? new Skip(
+            `Expected an array of length ${schema.value.length} but got ${
+              obj.length
+            }.`,
+            { obj, key, parents, parentKeys },
+            meta
+          )
+        : (function loop(schemas, results, needle) {
+            const wrappedSchema = wrapSchemaIfLiteralChild(schema, schemas[0]);
+            const needledSchema = toNeedledSchema(wrappedSchema);
+            const { result, needle: updatedNeedle } = parse(
+              needledSchema(
+                needle,
+                schema.params && schema.params.modifiers
+                  ? schema.params.modifiers
+                  : {}
+              )
+            )(obj, key, parents, parentKeys)(context);
+            return result instanceof Skip || result instanceof Fault
+              ? result.updateEnv({ needle })
+              : result instanceof Match || result instanceof Empty
+                ? schemas.length > 1
+                  ? loop(
+                      schemas.slice(1),
+                      results.concat(
+                        result instanceof Empty ? [] : [result.value]
+                      ),
+                      updatedNeedle
+                    )
+                  : (() => {
+                      const finalResults =
+                        result instanceof Match
+                          ? results.concat(result.value)
+                          : results;
+                      return finalResults.length
+                        ? new Match(
+                            finalResults,
+                            {
+                              obj,
+                              key,
+                              parents,
+                              parentKeys,
+                              needle: updatedNeedle
+                            },
+                            meta
+                          )
+                        : new Empty({ obj, key, parents, parentKeys }, meta);
+                    })()
+                : exception("Unknown result type.");
+          })(schema.value, [], 0)
       : new Skip(
           `Expected array but got ${typeof obj}.`,
           { obj, key, parents, parentKeys },

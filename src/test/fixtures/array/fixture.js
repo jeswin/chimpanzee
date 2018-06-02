@@ -5,7 +5,7 @@ import {
 } from "../../../chimpanzee";
 
 export const input = {
-  level1: [true, "two", 3]
+  level1: [true, "two", 3, 4]
 };
 
 export const schema = {

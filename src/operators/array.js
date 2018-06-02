@@ -128,6 +128,7 @@ export function recursive(schema, params) {
 
   return new FunctionSchema(
     (obj, key, parents, parentKeys) => context => {
+      console.log({ obj })
       return (function loop(items, results) {
         const result = parse(schema)(items, key, parents, parentKeys)(context);
 

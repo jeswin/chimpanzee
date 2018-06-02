@@ -26,7 +26,7 @@ const commentsSchema = ["comments", any(["off", "on"])];
 const urlSchema = ["url", captureIf(x => x.startsWith("https:"))];
 
 export const schema = {
-  level1: [
-    recursive(any([commentsSchema, urlSchema, titleSchema, ["."], ["promote"]]))
-  ]
+  level1: recursive(
+    any([commentsSchema, urlSchema, titleSchema, ["."], ["promote"]])
+  )
 };

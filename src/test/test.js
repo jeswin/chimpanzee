@@ -59,6 +59,8 @@ describe("chimpanzee", () => {
     ["any-native-types", "any-native-types", "empty"],
     ["any-negative", "any-negative", "skip"],
     ["array", "array", "match"],
+    ["array-exact", "array-exact", "match"],
+    ["array-exact-negative", "array-exact-negative", "skip"],
     ["array-injects-modifiers", "array-injects-modifiers", "empty"],
     [
       "array-injects-modifiers-with-capture",
@@ -160,10 +162,10 @@ describe("chimpanzee", () => {
     ["wrap", "wrap", "match"]
   ];
 
-  while (tests.length) {
-    tests.pop();
-  }
-  tests.push(["array-slice", "array-slice", "match"]);
+  // while (tests.length) {
+  //   tests.pop();
+  // }
+  // tests.push(["array-slice", "array-slice", "match"]);
 
   for (const test of tests) {
     run(test);
