@@ -14,7 +14,7 @@
       "cwd": "${workspaceRoot}",
       "preLaunchTask": "build",
       "env": {
-        "CHIMPANZEE_DEBUG": "yep"
+        "CHIMPANZEE_DEBUG": "1"
       }
     }
   ]

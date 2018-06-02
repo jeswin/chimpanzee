@@ -1,6 +1,6 @@
 const IS_DEBUG =
-  typeof process.env.CHIMPANZEE_DEBUG !== "undefined" &&
-  process.env.CHIMPANZEE_DEBUG !== false;
+  process.env.CHIMPANZEE_DEBUG === "true" ||
+  process.env.CHIMPANZEE_DEBUG === "1";
 
 class ChimpanzeeError extends Error {
   constructor(message, inner, props) {

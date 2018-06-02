@@ -3,7 +3,7 @@ import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 import exception from "../exception";
 import { getParams } from "./utils";
-import { toNeedledSchema, ArrayItem, Wrapped } from "../parsers/array";
+import { toNeedledSchema, ArrayOperator, Wrapped } from "../parsers/array";
 
 /*
   Unordered does not change the needle.
@@ -21,7 +21,7 @@ export function repeatingItem(_schema, opts = {}) {
 
   const schema = toNeedledSchema(_schema);
 
-  return new ArrayItem(
+  return new ArrayOperator(
     needle =>
       new FunctionSchema(
         (obj, key, parents, parentKeys) => context => {
@@ -64,7 +64,7 @@ export function repeatingItem(_schema, opts = {}) {
                   )
               : result instanceof Skip
                 ? completed(results, needle)
-                : new Wrapped(result, needle); //Fault
+                : new Wrapped(result, needle); // Fault
           })([], needle);
         },
         {},
@@ -81,37 +81,40 @@ export function repeatingItem(_schema, opts = {}) {
   returns 1, with needle still pointing at 4.
   We don't care about the needle.
 */
-export function unorderedItem(_schema) {
+export function unorderedItem(_schema, opts = {}) {
+  const useNeedle = opts.searchPrevious === false ? true : false;
+
   const meta = { type: "unorderedItem", schema: _schema };
 
   const schema = toNeedledSchema(_schema);
-  return new ArrayItem(needle => {
-    return new FunctionSchema(
-      (obj, key, parents, parentKeys) => context =>
-        (function loop(i) {
-          const { result } = parse(schema(i))(obj, key, parents, parentKeys)(
-            context
-          );
+  return new ArrayOperator(
+    needle =>
+      new FunctionSchema(
+        (obj, key, parents, parentKeys) => context =>
+          (function loop(i) {
+            const { result } = parse(schema(i))(obj, key, parents, parentKeys)(
+              context
+            );
 
-          return result instanceof Match ||
-            result instanceof Empty ||
-            result instanceof Fault
-            ? new Wrapped(result, needle)
-            : obj.length > i
-              ? loop(i + 1)
-              : new Wrapped(
-                  new Skip(
-                    `Unordered item was not found.`,
-                    { obj, key, parents, parentKeys },
-                    meta
-                  ),
-                  needle
-                );
-        })(0),
-      {},
-      meta
-    );
-  });
+            return result instanceof Match ||
+              result instanceof Empty ||
+              result instanceof Fault
+              ? new Wrapped(result, needle)
+              : obj.length > i
+                ? loop(i + 1)
+                : new Wrapped(
+                    new Skip(
+                      `Unordered item was not found.`,
+                      { obj, key, parents, parentKeys },
+                      meta
+                    ),
+                    needle
+                  );
+          })(useNeedle ? needle : 0),
+        {},
+        meta
+      )
+  );
 }
 
 /*  
@@ -122,22 +125,17 @@ export function unorderedItem(_schema) {
 export function slice(schemas) {
   const meta = { type: "slice", schemas };
 
-  return new ArrayItem(
+  return new ArrayOperator(
     needle =>
       new FunctionSchema(
-        (obj, key, parents, parentKeys) => context => {
-          const effectiveItems = obj.slice(needle);
-          const effectiveNeedle = 0;
-
-          function completed(results, needle) {}
-
-          return (function loop(items, results, needle, schemaIndex) {
+        (obj, key, parents, parentKeys) => context =>
+          (function loop(items, results, sliceNeedle, schemaIndex) {
             return schemas.length > schemaIndex
               ? (() => {
                   const schema = toNeedledSchema(schemas[schemaIndex]);
 
                   const { result, needle: updatedNeedle } = parse(
-                    schema(needle)
+                    schema(sliceNeedle)
                   )(items, key, parents, parentKeys)(context);
 
                   return result instanceof Match || result instanceof Empty
@@ -149,14 +147,13 @@ export function slice(schemas) {
                         updatedNeedle,
                         schemaIndex++
                       )
-                    : new Wrapped(result, needle);
+                    : new Wrapped(result, needle + sliceNeedle);
                 })()
               : new Wrapped(
                   new Match(results, { obj, key, parents, parentKeys }, meta),
-                  needle
+                  needle + sliceNeedle
                 );
-          })(effectiveItems, [], effectiveNeedle, 0);
-        },
+          })(obj.slice(needle), [], 0, 0),
         {},
         meta
       )
@@ -172,7 +169,7 @@ export function optionalItem(_schema) {
   const meta = { type: "optionalItem", schema: _schema };
   const schema = toNeedledSchema(_schema);
 
-  return new ArrayItem(needle => {
+  return new ArrayOperator(needle => {
     return new FunctionSchema(
       (obj, key, parents, parentKeys) => context => {
         const { result } = parse(schema(needle))(obj, key, parents, parentKeys)(

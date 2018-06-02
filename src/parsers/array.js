@@ -7,12 +7,18 @@ import { wrapSchemaIfLiteralChild } from "./literals";
 import exception from "../exception";
 
 export function toNeedledSchema(schema) {
-  return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
+  return schema instanceof ArrayOperator ? schema.fn : regularItem(schema);
 }
 
-export class ArrayItem {
+export class ArrayOperator {
   constructor(fn) {
     this.fn = fn;
+  }
+}
+
+export class SequenceItem {
+  constructor(items) {
+    this.items = items;
   }
 }
 
@@ -25,6 +31,7 @@ export class Wrapped {
 
 /*
   Not array types, viz optional, unordered or repeating.
+  Not a sequence
 */
 function regularItem(schema) {
   const meta = { type: "regularItem", schema };
@@ -35,6 +42,32 @@ function regularItem(schema) {
         const item = obj[needle];
         const result = parse(schema)(
           item,
+          `${key}.${needle}`,
+          parents.concat(obj),
+          parentKeys.concat(key)
+        )(context);
+
+        return result instanceof Match || result instanceof Empty
+          ? new Wrapped(result, needle + 1)
+          : new Wrapped(result, needle);
+      },
+      {},
+      meta
+    );
+}
+
+/*
+  A sequence item. 
+*/
+function sequenceItem(schema) {
+  const meta = { type: "regularItem", schema };
+
+  return needle =>
+    new FunctionSchema(
+      (obj, key, parents, parentKeys) => context => {
+        const items = obj.slice(needle);
+        const result = parse(schema)(
+          items,
           `${key}.${needle}`,
           parents.concat(obj),
           parentKeys.concat(key)
@@ -83,7 +116,13 @@ export default function(schema) {
                     return finalResults.length
                       ? new Match(
                           finalResults,
-                          { obj, key, parents, parentKeys },
+                          {
+                            obj,
+                            key,
+                            parents,
+                            parentKeys,
+                            needle: updatedNeedle
+                          },
                           meta
                         )
                       : new Empty({ obj, key, parents, parentKeys }, meta);
