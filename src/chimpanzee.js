@@ -21,6 +21,7 @@ export { optional } from "./operators/optional";
 export { regex } from "./operators/regex";
 export {
   optionalItem,
+  recursive,
   repeating,
   slice,
   unordered

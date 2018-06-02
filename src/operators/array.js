@@ -18,7 +18,6 @@ export function repeating(_schema, opts = {}) {
 
   const min = opts.min || 0;
   const max = opts.max;
-  const recursive = opts.recursive || false;
 
   const schema = toNeedledSchema(_schema);
 
@@ -52,17 +51,12 @@ export function repeating(_schema, opts = {}) {
 
             return result instanceof Match || result instanceof Empty
               ? obj.length > needle
-                ? (() => {
-                    const { items, effectiveNeedle } = recursive
-                      ? { items: obj.slice(needle), effectiveNeedle: 0 }
-                      : { items: obj, effectiveNeedle: needle };
-                    return loop(
-                      result instanceof Match
-                        ? results.concat([result.value])
-                        : results,
-                      updatedNeedle
-                    );
-                  })()
+                ? loop(
+                    result instanceof Match
+                      ? results.concat([result.value])
+                      : results,
+                    updatedNeedle
+                  )
                 : completed(
                     result instanceof Match
                       ? results.concat([result.value])
@@ -125,45 +119,40 @@ export function unordered(_schema, opts = {}) {
 }
 
 /*  
-  A slice is schema that represents a part of an array.
-  If found the needle moves by the length of the slice.
-  A Skip() is issued when the slice is not found.
+  A recursive is schema that calls child schemas with all the remaining items as an array, instead of with each array element.   For instance, [1, 2, 3, 4] will be passed to child schemas as [1, 2, 3, 4], [2, 3, 4], [3, 4], [4] - if each child schema invocation consumes a single item.
+  
+  If a child schema invocation consumes multiple items, the next iteration will have as many items less.
 */
-export function slice(schemas) {
-  const meta = { type: "slice", schemas };
+export function recursive(schema, params) {
+  const meta = { type: "recursive", schema, params };
 
-  return new ArrayOperator(
-    needle =>
-      new FunctionSchema(
-        (obj, key, parents, parentKeys) => context =>
-          (function loop(items, results, sliceNeedle, schemaIndex) {
-            return schemas.length > schemaIndex
-              ? (() => {
-                  const schema = toNeedledSchema(schemas[schemaIndex]);
+  return new FunctionSchema(
+    (obj, key, parents, parentKeys) => context => {
+      return (function loop(items, results) {
+        const result = parse(schema)(items, key, parents, parentKeys)(context);
 
-                  const { result, needle: updatedNeedle } = parse(
-                    schema(sliceNeedle)
-                  )(items, key, parents, parentKeys)(context);
-
-                  return result instanceof Match || result instanceof Empty
-                    ? loop(
-                        items,
-                        result instanceof Match
-                          ? results.concat([result.value])
-                          : results,
-                        updatedNeedle,
-                        schemaIndex++
-                      )
-                    : new Wrapped(result, needle + sliceNeedle);
-                })()
-              : new Wrapped(
-                  new Match(results, { obj, key, parents, parentKeys }, meta),
-                  needle + sliceNeedle
-                );
-          })(obj.slice(needle), [], 0, 0),
-        {},
-        meta
-      )
+        console.log(result);
+        // return result instanceof Match || result instanceof Empty
+        //   ? obj.length > needle
+        //     ? loop(
+        //         result instanceof Match
+        //           ? results.concat([result.value])
+        //           : results,
+        //         updatedNeedle
+        //       )
+        //     : completed(
+        //         result instanceof Match
+        //           ? results.concat([result.value])
+        //           : results,
+        //         needle
+        //       )
+        //   : result instanceof Skip
+        //     ? completed(results, needle)
+        //     : new Wrapped(result, needle); // Fault
+      })(obj, []);
+    },
+    {},
+    meta
   );
 }
 

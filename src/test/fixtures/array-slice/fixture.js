@@ -3,7 +3,7 @@ import {
   capture,
   captureIf,
   repeating,
-  slice,
+  recursive,
   string
 } from "../../../chimpanzee";
 
@@ -27,9 +27,6 @@ const urlSchema = ["url", captureIf(x => x.startsWith("https:"))];
 
 export const schema = {
   level1: [
-    repeating(
-      any([commentsSchema, urlSchema, titleSchema, ["."], ["promote"]]),
-      { recursive: true }
-    )
+    recursive(any([commentsSchema, urlSchema, titleSchema, ["."], ["promote"]]))
   ]
 };
