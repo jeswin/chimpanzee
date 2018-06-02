@@ -11,7 +11,9 @@ export default function(schema) {
     return schema.value === obj
       ? new Empty({ obj, key, parents, parentKeys })
       : new Skip(
-          `Expected ${schema.value.toString()} but got ${obj.toString()}.`,
+          `Expected ${schema.value.toString()} but got ${
+            typeof obj !== "undefined" ? obj.toString() : "undefined"
+          }.`,
           {
             obj,
             key,
