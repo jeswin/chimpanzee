@@ -21,10 +21,12 @@ export const input = {
   ]
 };
 
-const titleSchema = slice(["title", repeatingItem(captureIf(x => x !== "."))]);
-const commentsSchema = slice(["comments", any(["off", "on"])]);
-const urlSchema = slice(["url", captureIf(x => x.startsWith("https:"))]);
+const titleSchema = ["title", repeatingItem(captureIf(x => x !== "."))];
+const commentsSchema = ["comments", any(["off", "on"])];
+const urlSchema = ["url", captureIf(x => x.startsWith("https:"))];
 
-export const schema = array([
-  repeatingItem(any([commentsSchema, urlSchema, "promote", titleSchema, "."]))
-]);
+export const schema = {
+  level1: array([
+    repeatingItem(any([commentsSchema, urlSchema, "promote", titleSchema, "."]))
+  ])
+};

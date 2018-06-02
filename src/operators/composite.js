@@ -61,14 +61,14 @@ export function composite(schema, _paramsList, ownParams = {}) {
       const env = { obj, key, parents, parentKeys };
 
       return schemas.length
-        ? (function run([schema, ...rest], state) {
+        ? (function loop([schema, ...rest], state) {
             const result = parse(schema)(obj, key, parents, parentKeys)(
               context
             );
             const mergeArray = schema.params && schema.params.mergeArray;
             return result instanceof Match || result instanceof Empty
               ? rest.length
-                ? run(
+                ? loop(
                     rest,
                     result instanceof Match ? merge(state, result.value, { mergeArray }) : state
                   )
