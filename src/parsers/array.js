@@ -103,7 +103,16 @@ export default function(schema) {
                             },
                             meta
                           )
-                        : new Empty({ obj, key, parents, parentKeys }, meta);
+                        : new Empty(
+                            {
+                              obj,
+                              key,
+                              parents,
+                              parentKeys,
+                              needle: updatedNeedle
+                            },
+                            meta
+                          );
                     })()
                 : exception("Unknown result type.");
           })(schema.value, [], 0)

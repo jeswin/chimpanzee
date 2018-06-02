@@ -2,6 +2,7 @@ import {
   any,
   capture,
   captureIf,
+  literal,
   repeating,
   recursive,
   string
@@ -18,15 +19,17 @@ export const input = {
     "world",
     ".",
     "promote"
-  ]
+  ],
+  hello: "world"
 };
 
-const titleSchema = ["title", repeating(captureIf(x => x !== "."))];
-const commentsSchema = ["comments", any(["off", "on"])];
+const titleSchema = [literal("title"), repeating(captureIf(x => x !== "."))];
+const commentsSchema = ["comments", any([literal("off"), literal("on")])];
 const urlSchema = ["url", captureIf(x => x.startsWith("https:"))];
 
 export const schema = {
   level1: recursive(
     any([commentsSchema, urlSchema, titleSchema, ["."], ["promote"]])
-  )
+  ),
+  hello: capture()
 };
