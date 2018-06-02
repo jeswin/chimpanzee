@@ -1,6 +1,5 @@
 import {
   any,
-  array,
   capture,
   captureIf,
   repeatingItem,
@@ -26,7 +25,7 @@ const commentsSchema = ["comments", any(["off", "on"])];
 const urlSchema = ["url", captureIf(x => x.startsWith("https:"))];
 
 export const schema = {
-  level1: array([
+  level1: [
     repeatingItem(any([commentsSchema, urlSchema, "promote", titleSchema, "."]))
-  ])
+  ]
 };

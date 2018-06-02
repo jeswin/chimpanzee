@@ -1,7 +1,6 @@
 import {
   capture,
   optionalItem,
-  array,
   bool,
   number,
   string
@@ -12,5 +11,5 @@ export const input = {
 };
 
 export const schema = {
-  level1: array([optionalItem(number()), string(), bool()])
+  level1: [optionalItem(number()), string(), bool()]
 };

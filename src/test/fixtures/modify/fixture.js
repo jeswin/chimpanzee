@@ -5,8 +5,5 @@ export const input = {
 };
 
 export const schema = {
-  hello: modify(
-    x => x === "world",
-    result => `${result}!!!`
-  )
+  hello: modify(x => x === "world", result => `${result}!!!`)
 };

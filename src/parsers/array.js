@@ -1,75 +1,99 @@
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
+import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 import { ArraySchema } from "../schemas";
 import { wrapSchemaIfLiteralChild } from "./literals";
 
+export function toNeedledSchema(schema) {
+  return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
+}
+
+export class ArrayItem {
+  constructor(fn) {
+    this.fn = fn;
+  }
+}
+
+export class Wrapped {
+  constructor(result, needle) {
+    this.result = result;
+    this.needle = needle;
+  }
+}
+
+/*
+  Not array types, viz optional, unordered or repeating.
+*/
+function regularItem(schema) {
+  const meta = { type: "regularItem", schema };
+
+  return needle =>
+    new FunctionSchema(
+      (obj, key, parents, parentKeys) => context => {
+        const item = obj[needle];
+        const result = parse(schema)(
+          item,
+          `${key}.${needle}`,
+          parents.concat(obj),
+          parentKeys.concat(key)
+        )(context);
+
+        return result instanceof Match || result instanceof Empty
+          ? new Wrapped(result, needle + 1)
+          : new Wrapped(result, needle);
+      },
+      {},
+      meta
+    );
+}
+
 export default function(schema) {
   return (obj, key, parents, parentKeys) => context => {
+    const meta = { type: "array", schema };
     return Array.isArray(obj)
-      ? schema.value.length !== obj.length
-        ? new Skip(
-            `Expected array of length ${schema.value
-              .length} but got ${obj.length}.`,
-            {
-              obj,
-              key,
-              parents,
-              parentKeys
-            }
-          )
-        : (() => {
-            const results = Seq.of(schema.value).reduce(
-              (acc, childSource, i) => {
-                const childSchema = wrapSchemaIfLiteralChild(
-                  schema,
-                  childSource
-                );
-
-                const result = parse(childSchema)(
-                  obj[i],
-                  `${key}.${i}`,
-                  parents.concat(obj),
-                  parentKeys.concat(key)
-                )(context);
-
-                return result instanceof Match || result instanceof Empty
-                  ? acc.concat(result)
-                  : [result];
-              },
-              [],
-              (acc, item) => acc[0] instanceof Skip || acc[0] instanceof Fault
-            );
-
-            return results[0] instanceof Skip || results[0] instanceof Fault
-              ? results[0]
-              : (() => {
-                  const resultArr = results
-                    .filter(r => r instanceof Match)
-                    .map(r => r.value);
-                  const modifyResult = schema.params.build;
-                  return modifyResult
-                    ? (() => {
-                        const output = modifyResult(resultArr);
-                        return output instanceof Result
-                          ? output
-                          : new Match(output, {
-                              obj,
-                              key,
-                              parents,
-                              parentKeys
-                            });
-                      })()
-                    : resultArr.length
-                      ? new Match(resultArr, { obj, key, parents, parentKeys })
-                      : new Empty({ obj, key, parents, parentKeys });
-                })();
-          })()
-      : new Skip(`Schema is an array but property is a non-array.`, {
-          obj,
-          key,
-          parents,
-          parentKeys
-        });
+      ? (function loop(schemaList, results, needle) {
+          const wrappedSchema = wrapSchemaIfLiteralChild(schema, schemaList[0]);
+          const needledSchema = toNeedledSchema(wrappedSchema);
+          const { result, needle: updatedNeedle } = parse(
+            needledSchema(
+              needle,
+              schema.params && schema.params.modifiers
+                ? schema.params.modifiers
+                : {}
+            )
+          )(obj, key, parents, parentKeys)(context);
+          console.log(result);
+          return result instanceof Skip || result instanceof Fault
+            ? result.updateEnv({ needle })
+            : result instanceof Match || result instanceof Empty
+              ? schemaList.length > 1
+                ? loop(
+                    schemaList.slice(1),
+                    results.concat(
+                      result instanceof Empty ? [] : [result.value]
+                    ),
+                    updatedNeedle
+                  )
+                : (() => {
+                    const finalResults =
+                      result instanceof Match
+                        ? results.concat(result.value)
+                        : results;
+                    return finalResults.length
+                      ? new Match(
+                          finalResults,
+                          { obj, key, parents, parentKeys },
+                          meta
+                        )
+                      : new Empty({ obj, key, parents, parentKeys }, meta);
+                  })()
+              : exception("Unknown result type.");
+        })(schema.value, [], 0)
+      : new Fault(
+          `Expected array but got ${typeof obj}.`,
+          { obj, key, parents, parentKeys },
+          meta
+        );
   };
 }

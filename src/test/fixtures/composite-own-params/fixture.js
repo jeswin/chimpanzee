@@ -18,6 +18,8 @@ export const schema = composite(
   [{ name: "default", modifiers: { object: x => x.node } }, { name: "alt" }],
   {
     build: obj => context => result =>
-      result instanceof Match ? new Match({ third: "yaaay", ...result.value }) : result
+      result instanceof Match
+        ? new Match({ third: "yaaay", ...result.value })
+        : result
   }
 );

@@ -10,6 +10,8 @@ export const schema = $.obj(
   },
   {
     build: obj => context => result =>
-      result instanceof Match ? new Match({ hello: `${result.value.hello}!!!` }) : result
+      result instanceof Match
+        ? new Match({ hello: `${result.value.hello}!!!` })
+        : result
   }
 );

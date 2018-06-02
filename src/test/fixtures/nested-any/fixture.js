@@ -12,6 +12,8 @@ export const input = {
 export const schema = {
   level1: {
     prop1: capture(),
-    level2: any([{ prop2a: capture() }, { prop2b: capture() }], { replace: true })
+    level2: any([{ prop2a: capture() }, { prop2b: capture() }], {
+      replace: true
+    })
   }
 };

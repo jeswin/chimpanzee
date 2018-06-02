@@ -16,22 +16,27 @@ function getSchema(schema, paramSelector) {
         .map(item => getSchema(item, paramSelector))
         .filter(x => x !== undefined)
     : schema instanceof Schema
-      ? schemaSelector === paramSelector ? schema : undefined
+      ? schemaSelector === paramSelector
+        ? schema
+        : undefined
       : typeof schema === "object"
         ? (() => {
-            const innerSchema = Seq.of(
-              Object.keys(schema)
-            ).reduce((acc, key) => {
-              const result = getSchema(schema[key], paramSelector);
-              return result !== undefined && Object.keys(result).length > 0
-                ? { ...acc, [key]: result }
-                : acc;
-            }, {});
+            const innerSchema = Seq.of(Object.keys(schema)).reduce(
+              (acc, key) => {
+                const result = getSchema(schema[key], paramSelector);
+                return result !== undefined && Object.keys(result).length > 0
+                  ? { ...acc, [key]: result }
+                  : acc;
+              },
+              {}
+            );
             return Object.keys(innerSchema).length > 0
               ? innerSchema
               : undefined;
           })()
-        : paramSelector === "default" ? schema : undefined;
+        : paramSelector === "default"
+          ? schema
+          : undefined;
 }
 
 export function composite(schema, _paramsList, ownParams = {}) {
@@ -70,10 +75,14 @@ export function composite(schema, _paramsList, ownParams = {}) {
               ? rest.length
                 ? loop(
                     rest,
-                    result instanceof Match ? merge(state, result.value, { mergeArray }) : state
+                    result instanceof Match
+                      ? merge(state, result.value, { mergeArray })
+                      : state
                   )
                 : new Match(
-                    result instanceof Match ? merge(state, result.value, { mergeArray }) : state,
+                    result instanceof Match
+                      ? merge(state, result.value, { mergeArray })
+                      : state,
                     env,
                     meta
                   )

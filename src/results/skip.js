@@ -1,7 +1,6 @@
 import Result from "./result";
 
 export default class Skip extends Result {
-
   constructor(message, env, meta) {
     super(env, meta);
     this.message = message;

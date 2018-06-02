@@ -3,23 +3,7 @@ import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 import exception from "../exception";
 import { getParams } from "./utils";
-
-function toNeedledSchema(schema) {
-  return schema instanceof ArrayItem ? schema.fn : regularItem(schema);
-}
-
-class ArrayItem {
-  constructor(fn) {
-    this.fn = fn;
-  }
-}
-
-class Wrapped {
-  constructor(result, needle) {
-    this.result = result;
-    this.needle = needle;
-  }
-}
+import { toNeedledSchema, ArrayItem, Wrapped } from "../parsers/array";
 
 /*
   Unordered does not change the needle.
@@ -208,72 +192,4 @@ export function optionalItem(_schema) {
       meta
     );
   });
-}
-
-/*
-  Not array types, viz optional, unordered or repeating.
-*/
-function regularItem(schema) {
-  const meta = { type: "regularItem", schema };
-
-  return needle =>
-    new FunctionSchema(
-      (obj, key, parents, parentKeys) => context => {
-        const result = parse(schema)(
-          obj[needle],
-          `${key}.${needle}`,
-          parents.concat(obj),
-          parentKeys.concat(key)
-        )(context);
-
-        return result instanceof Match || result instanceof Empty
-          ? new Wrapped(result, needle + 1)
-          : new Wrapped(result, needle);
-      },
-      {},
-      meta
-    );
-}
-
-export function array(schemas, params) {
-  const meta = { type: "array", schemas, params };
-
-  function fn(obj, key, parents, parentKeys) {
-    return context =>
-      Array.isArray(obj)
-        ? (function loop(schemaList, results, needle) {
-            const schema = toNeedledSchema(schemaList[0]);
-            const { result, needle: updatedNeedle } = parse(schema(needle))(
-              obj,
-              key,
-              parents,
-              parentKeys
-            )(context);
-            return result instanceof Skip || result instanceof Fault
-              ? result.updateEnv({ needle })
-              : result instanceof Match || result instanceof Empty
-                ? schemaList.length > 1
-                  ? loop(
-                      schemaList.slice(1),
-                      results.concat(
-                        result instanceof Empty ? [] : [result.value]
-                      ),
-                      updatedNeedle
-                    )
-                  : new Match(
-                      result instanceof Match
-                        ? results.concat(result.value)
-                        : results,
-                      { obj, key, parents, parentKeys },
-                      meta
-                    )
-                : exception("Unknown result type.");
-          })(schemas, [], 0)
-        : new Fault(
-            `Expected array but got ${typeof obj}.`,
-            { obj, key, parents, parentKeys },
-            meta
-          );
-  }
-  return new FunctionSchema(fn, getParams(params), { name: "array" });
 }

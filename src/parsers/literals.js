@@ -1,28 +1,29 @@
 import { ObjectSchema, ArraySchema, PrimitiveSchema } from "../schemas";
 
-export function wrapSchemaIfLiteralChild(schema, childSource) {
+export function wrapSchemaIfLiteralChild(schema, childSchema) {
   // Value and property modifiers pass through literal containers ({} and []).
-  const modifiersForLiteralChildren = schema.params && schema.params.modifiers
-    ? {
-        modifiers: {
-          value: schema.params.modifiers.value,
-          property: schema.params.modifiers.property
+  const modifiersForLiteralChildren =
+    schema.params && schema.params.modifiers
+      ? {
+          modifiers: {
+            value: schema.params.modifiers.value,
+            property: schema.params.modifiers.property
+          }
         }
-      }
-    : { modifiers: {} };
+      : { modifiers: {} };
 
   // child is { ... }
   const isChildLiteralObject =
-    typeof childSource === "object" && childSource.constructor === Object;
+    typeof childSchema === "object" && childSchema.constructor === Object;
 
   return isChildLiteralObject
-    ? new ObjectSchema(childSource, modifiersForLiteralChildren)
-    : Array.isArray(childSource)
-        ? new ArraySchema(childSource, modifiersForLiteralChildren)
-        : typeof childSource === "string" ||
-            typeof childSource === "number" ||
-            typeof childSource === "boolean" ||
-            typeof childSource === "symbol"
-            ? new PrimitiveSchema(childSource, modifiersForLiteralChildren)
-            : childSource;
+    ? new ObjectSchema(childSchema, modifiersForLiteralChildren)
+    : Array.isArray(childSchema)
+      ? new ArraySchema(childSchema, modifiersForLiteralChildren)
+      : typeof childSchema === "string" ||
+        typeof childSchema === "number" ||
+        typeof childSchema === "boolean" ||
+        typeof childSchema === "symbol"
+        ? new PrimitiveSchema(childSchema, modifiersForLiteralChildren)
+        : childSchema;
 }

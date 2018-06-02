@@ -16,5 +16,8 @@ export const schema = composite(
       }
     ]
   },
-  [{ name: "default", modifiers: { object: x => x.node } }, { name: "alt", mergeArray: true }]
+  [
+    { name: "default", modifiers: { object: x => x.node } },
+    { name: "alt", mergeArray: true }
+  ]
 );

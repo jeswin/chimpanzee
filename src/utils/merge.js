@@ -10,7 +10,9 @@ export default function merge(target, source, options) {
           (acc, key) =>
             target[key] && source[key]
               ? { ...acc, [key]: merge(target[key], source[key], options) }
-              : source[key] ? { ...acc, [key]: source[key] } : acc,
+              : source[key]
+                ? { ...acc, [key]: source[key] }
+                : acc,
           { ...target }
         )
     : Array.isArray(target) && Array.isArray(source)

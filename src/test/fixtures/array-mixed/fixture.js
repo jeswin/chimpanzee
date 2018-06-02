@@ -3,7 +3,6 @@ import {
   literal,
   unorderedItem,
   repeatingItem,
-  array,
   bool,
   number,
   string
@@ -14,9 +13,9 @@ export const input = {
 };
 
 export const schema = {
-  level1: array([
+  level1: [
     repeatingItem(literal("HELLO")),
     unorderedItem(number()),
     unorderedItem(bool())
-  ])
+  ]
 };

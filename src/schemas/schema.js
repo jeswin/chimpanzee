@@ -16,7 +16,9 @@ export default class Schema {
         ? parse(fnSuccessSchema(result.value))(obj, key, parents, parentKeys)(
             context
           )
-        : fnFailSchema ? fnFailSchema(result) : result;
+        : fnFailSchema
+          ? fnFailSchema(result)
+          : result;
     };
   }
 }

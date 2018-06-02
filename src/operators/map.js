@@ -10,7 +10,11 @@ export function map(schema, mapper, params) {
     return context => {
       const result = parse(schema)(obj, key, parents, parentKeys)(context);
       return result instanceof Match
-        ? new Match(mapper(result.value), { obj, key, parents, parentKeys }, meta)
+        ? new Match(
+            mapper(result.value),
+            { obj, key, parents, parentKeys },
+            meta
+          )
         : result;
     };
   }

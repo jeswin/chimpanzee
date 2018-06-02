@@ -20,7 +20,6 @@ export { bool, func, number, object, string } from "./operators/types";
 export { optional } from "./operators/optional";
 export { regex } from "./operators/regex";
 export {
-  array,
   optionalItem,
   repeatingItem,
   slice,

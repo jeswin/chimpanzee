@@ -4,6 +4,6 @@ export const input = {
   hello: "world"
 };
 
-export const schema ={
+export const schema = {
   hello: regex(/^world$/)
 };

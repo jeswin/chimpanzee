@@ -1,7 +1,6 @@
 import {
   capture,
   unorderedItem,
-  array,
   bool,
   string,
   Match,
@@ -14,9 +13,10 @@ export const input = {
 };
 
 export const schema = {
-  level1: array([
+  level1: [
     unorderedItem(string()),
     unorderedItem((obj, key, parents, parentKeys) => context =>
-      (obj !== "two" ? new Skip() : new Fault("TWO can't happen.")))
-  ])
+      obj !== "two" ? new Skip() : new Fault("TWO can't happen.")
+    )
+  ]
 };

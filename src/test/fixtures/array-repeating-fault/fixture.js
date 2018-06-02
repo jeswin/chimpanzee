@@ -1,6 +1,5 @@
 import {
   capture,
-  array,
   repeatingItem,
   string,
   Match,
@@ -12,8 +11,9 @@ export const input = {
 };
 
 export const schema = {
-  level1: array([
+  level1: [
     repeatingItem((obj, key, parents, parentKeys) => context =>
-      (obj !== "three" ? new Match(obj) : new Fault("THREE can't happen.")))
-  ])
+      obj !== "three" ? new Match(obj) : new Fault("THREE can't happen.")
+    )
+  ]
 };

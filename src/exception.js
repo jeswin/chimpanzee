@@ -11,10 +11,10 @@ class ChimpanzeeError extends Error {
 
 export default function(message, inner, props) {
   console.log("CHIMPANZEE_DEBUG:", message);
-  
+
   if (IS_DEBUG && inner && inner.stack) {
     console.log("CHIMPANZEE_DEBUG:", inner.stack);
   }
-  
+
   throw new ChimpanzeeError(message, inner, props);
 }

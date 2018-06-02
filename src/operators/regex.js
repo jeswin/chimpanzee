@@ -18,7 +18,11 @@ export function regex(regex, params) {
         )
       )(obj, key, parents, parentKeys)(context);
       return result instanceof Skip
-        ? new Skip(`Did not match regex.`, { obj, key, parents, parentKeys }, meta)
+        ? new Skip(
+            `Did not match regex.`,
+            { obj, key, parents, parentKeys },
+            meta
+          )
         : result;
     };
   }
