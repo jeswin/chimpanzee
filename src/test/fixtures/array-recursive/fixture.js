@@ -12,6 +12,7 @@ export const input = {
   level1: [
     "comments",
     "off",
+    ".",
     "url",
     "https://www.example.com",
     "title",
@@ -24,8 +25,8 @@ export const input = {
 };
 
 const titleSchema = [literal("title"), repeating(captureIf(x => x !== "."))];
-const commentsSchema = ["comments", any([literal("off"), literal("on")])];
-const urlSchema = ["url", captureIf(x => x.startsWith("https:"))];
+const commentsSchema = [literal("comments"), any([literal("off"), literal("on")])];
+const urlSchema = [literal("url"), captureIf(x => x.startsWith("https:"))];
 
 export const schema = {
   level1: recursive(

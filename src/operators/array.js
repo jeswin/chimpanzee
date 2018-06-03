@@ -127,31 +127,48 @@ export function recursive(schema, params) {
   const meta = { type: "recursive", schema, params };
 
   return new FunctionSchema(
-    (obj, key, parents, parentKeys) => context => {
-      console.log({ obj })
-      return (function loop(items, results) {
-        const result = parse(schema)(items, key, parents, parentKeys)(context);
-
-        console.log(result);
-        // return result instanceof Match || result instanceof Empty
-        //   ? obj.length > needle
-        //     ? loop(
-        //         result instanceof Match
-        //           ? results.concat([result.value])
-        //           : results,
-        //         updatedNeedle
-        //       )
-        //     : completed(
-        //         result instanceof Match
-        //           ? results.concat([result.value])
-        //           : results,
-        //         needle
-        //       )
-        //   : result instanceof Skip
-        //     ? completed(results, needle)
-        //     : new Wrapped(result, needle); // Fault
-      })(obj, []);
-    },
+    (obj, key, parents, parentKeys) => context =>
+      (function loop(items, results) {
+        return items.length
+          ? (() => {
+              const result = parse(schema)(items, key, parents, parentKeys)(
+                context
+              );
+              debugger;
+              return result.env && typeof result.env.needle !== "undefined"
+                ? result instanceof Match
+                  ? loop(
+                      items.slice(result.env.needle),
+                      results.concat([result.value])
+                    )
+                  : result instanceof Empty
+                    ? loop(items.slice(result.env.needle), results)
+                    : result
+                : new Fault(
+                    `The child expression in recursive() needs to be an array.`
+                  );
+            })()
+          : results.length
+            ? new Match(
+                results,
+                {
+                  obj,
+                  key,
+                  parents,
+                  parentKeys
+                },
+                meta
+              )
+            : new Empty(
+                {
+                  obj,
+                  key,
+                  parents,
+                  parentKeys
+                },
+                meta
+              );
+      })(obj, [], 0),
     {},
     meta
   );

@@ -80,6 +80,7 @@ describe("chimpanzee", () => {
     ["array-optional", "array-optional", "match"],
     ["array-optional-missing", "array-optional-missing", "match"],
     ["array-mixed", "array-mixed", "match"],
+    ["array-recursive", "array-recursive", "match"],
     ["bool", "bool", "match"],
     ["bool-negative", "bool-negative", "skip"],
     ["build", "build", "match"],
@@ -162,10 +163,11 @@ describe("chimpanzee", () => {
     ["wrap", "wrap", "match"]
   ];
 
-  while (tests.length) {
-    tests.pop();
-  }
-  tests.push(["array-slice", "array-slice", "match"]);
+  // Use this when you want to disable other tests.
+  // while (tests.length) {
+  //   tests.pop();
+  // }
+  // tests.push();
 
   for (const test of tests) {
     run(test);
