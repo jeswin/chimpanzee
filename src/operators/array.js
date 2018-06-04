@@ -134,7 +134,6 @@ export function recursive(schema, params) {
               const result = parse(schema)(items, key, parents, parentKeys)(
                 context
               );
-              debugger;
               return result.env && typeof result.env.needle !== "undefined"
                 ? result instanceof Match
                   ? loop(

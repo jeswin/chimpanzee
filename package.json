@@ -1,6 +1,6 @@
 {
   "name": "chimpanzee",
-  "version": "0.0.67",
+  "version": "0.0.68",
   "author": "Isotropy Team<isotropy@agilehead.com>",
   "scripts": {
     "build": "./build.sh",
