@@ -1,4 +1,4 @@
-import { parse, capture, Match } from "../../../chimpanzee";
+import { parse, capture, Match } from "../../../";
 
 export const input = {
   level1: {

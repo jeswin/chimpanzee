@@ -1,7 +1,7 @@
 /*
   This is the base class for all schemas.
 */
-import { parse, Match, Empty } from "../chimpanzee";
+import { parse, Match, Empty } from "..";
 
 export default class Schema {
   constructor(params, meta) {

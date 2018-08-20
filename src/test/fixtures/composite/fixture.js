@@ -1,4 +1,4 @@
-import { composite, capture } from "../../../chimpanzee";
+import { composite, capture } from "../../../";
 
 export const input = {
   node: {

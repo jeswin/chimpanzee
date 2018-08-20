@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import sourceMapSupport from "source-map-support";
 import { Match, Skip, Fault, Empty } from "../results";
-import { match } from "../chimpanzee";
+import { match } from "..";
 import util from "util";
 
 sourceMapSupport.install();

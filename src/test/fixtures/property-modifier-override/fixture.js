@@ -1,4 +1,4 @@
-import { builtins as $, captureIf } from "../../../chimpanzee";
+import { builtins as $, captureIf } from "../../../";
 
 export const input = {
   hello: "world"

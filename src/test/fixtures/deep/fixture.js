@@ -1,4 +1,4 @@
-import { builtins as $, deep, capture } from "../../../chimpanzee";
+import { builtins as $, deep, capture } from "../../../";
 
 export const input = {
   level1: {

@@ -492,7 +492,7 @@ const schema = types.obj(
 The build option lets you modify the result of a parse.
 
 ```
-import { builtins as $, capture, Match } from "../../../chimpanzee";
+import { builtins as $, capture, Match } from "../../../";
 
 export const input = {
   hello: "world"

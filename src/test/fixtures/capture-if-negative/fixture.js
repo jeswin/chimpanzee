@@ -1,4 +1,4 @@
-import { captureIf } from "../../../chimpanzee";
+import { captureIf } from "../../../";
 
 export const input = {
   hello: "world"

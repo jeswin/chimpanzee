@@ -1,4 +1,4 @@
-import { bool } from "../../../chimpanzee";
+import { bool } from "../../../";
 
 export const input = {
   hello: "world"

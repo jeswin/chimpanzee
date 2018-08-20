@@ -1,4 +1,4 @@
-import { regex } from "../../../chimpanzee";
+import { regex } from "../../../";
 
 export const input = {
   hello: "world"

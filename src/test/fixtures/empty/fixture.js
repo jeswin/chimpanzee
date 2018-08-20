@@ -1,4 +1,4 @@
-import { capture, empty } from "../../../chimpanzee";
+import { capture, empty } from "../../../";
 
 export const input = {
   prop1: "hello",

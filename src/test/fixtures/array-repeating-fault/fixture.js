@@ -4,7 +4,7 @@ import {
   string,
   Match,
   Fault
-} from "../../../chimpanzee";
+} from "../../../";
 
 export const input = {
   level1: ["one", "two", "three"]

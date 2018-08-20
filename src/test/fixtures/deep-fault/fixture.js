@@ -1,4 +1,4 @@
-import { deep, Fault } from "../../../chimpanzee";
+import { deep, Fault } from "../../../";
 
 export const input = {
   level1: {

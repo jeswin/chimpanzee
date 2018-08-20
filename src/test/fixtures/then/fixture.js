@@ -1,4 +1,4 @@
-import { wrap, object, capture } from "../../../chimpanzee";
+import { wrap, object, capture } from "../../../";
 
 export const input = {
   hello: "world",

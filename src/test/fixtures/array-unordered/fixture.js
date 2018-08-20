@@ -1,4 +1,4 @@
-import { capture, unordered, bool, string } from "../../../chimpanzee";
+import { capture, unordered, bool, string } from "../../../";
 
 export const input = {
   level1: ["one", "two", true]

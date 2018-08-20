@@ -1,4 +1,4 @@
-import { object } from "../../../chimpanzee";
+import { object } from "../../../";
 
 export const input = {
   hello: { world: "again" }

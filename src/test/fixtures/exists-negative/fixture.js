@@ -1,4 +1,4 @@
-import { exists, capture } from "../../../chimpanzee";
+import { exists, capture } from "../../../";
 
 export const input = {
   prop1: "val1"

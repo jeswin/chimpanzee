@@ -1,4 +1,4 @@
-import { builtins as $, wrap, composite, capture } from "../../../chimpanzee";
+import { builtins as $, wrap, composite, capture } from "../../../";
 
 export const input = {
   node: {

@@ -1,4 +1,4 @@
-import { any } from "../../../chimpanzee";
+import { any } from "../../../";
 
 export const input = {
   operator: "<"

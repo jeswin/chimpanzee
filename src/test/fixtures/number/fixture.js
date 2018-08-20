@@ -1,4 +1,4 @@
-import { number } from "../../../chimpanzee";
+import { number } from "../../../";
 
 export const input = {
   hello: 9

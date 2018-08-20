@@ -1,4 +1,4 @@
-import { permute } from "../../../chimpanzee";
+import { permute } from "../../../";
 
 export function fn() {
   const result = permute([1, 2, 3]);

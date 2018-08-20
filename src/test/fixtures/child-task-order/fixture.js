@@ -1,4 +1,4 @@
-import { number, Result, Match } from "../../../chimpanzee";
+import { number, Result, Match } from "../../../";
 
 export const input = {
   level1: {

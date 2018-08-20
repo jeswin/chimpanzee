@@ -1,4 +1,4 @@
-import { literal } from "../../../chimpanzee";
+import { literal } from "../../../";
 
 export const input = {
   hello: "world"

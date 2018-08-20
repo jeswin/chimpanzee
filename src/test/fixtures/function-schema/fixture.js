@@ -1,4 +1,4 @@
-import { Match } from "../../../chimpanzee";
+import { Match } from "../../../";
 
 export const input = {
   hello: "world"

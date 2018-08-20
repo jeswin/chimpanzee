@@ -1,4 +1,4 @@
-import { capture, any } from "../../../chimpanzee";
+import { capture, any } from "../../../";
 
 export const input = {
   hello: "world"

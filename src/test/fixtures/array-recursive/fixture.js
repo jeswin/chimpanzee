@@ -6,7 +6,7 @@ import {
   repeating,
   recursive,
   string
-} from "../../../chimpanzee";
+} from "../../../";
 
 export const input = {
   level1: [

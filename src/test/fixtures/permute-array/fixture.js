@@ -1,4 +1,4 @@
-import { permuteArray } from "../../../chimpanzee";
+import { permuteArray } from "../../../";
 
 export function fn() {
   const result = permuteArray([1, 2], [10, 20, 30]);

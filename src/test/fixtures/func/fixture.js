@@ -1,4 +1,4 @@
-import { func } from "../../../chimpanzee";
+import { func } from "../../../";
 
 export function testFunc() {}
 

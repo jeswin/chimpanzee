@@ -2,7 +2,7 @@ import {
   bool,
   string,
   number
-} from "../../../chimpanzee";
+} from "../../../";
 
 export const input = {
   level1: [true, "two", 3, 4]
