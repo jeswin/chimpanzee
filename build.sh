@@ -1,3 +1,4 @@
 rm -rf dist
-cp -r src dist
-babel src/ -d dist/ "$@" --source-maps 
+mkdir -p dist/test
+cp -r src/test/fixtures dist/test
+tsc

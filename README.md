@@ -3,8 +3,6 @@
 Chimpanzee is a library with which you can write a "Schema" for traversing trees structures and capturing values of certain nodes.
 This is especially useful for analyzing ASTs, which can be fairly large and complex. Schemas can be composed, allowing common structures to be abstracted out.
 
-This is still work in progress. The first non-beta version will come out along with the release of the parent project (Isotropy).
-
 This project is being maintained at gitlab.com/looptype. Everything else is just a mirror.
 
 ## Installation
