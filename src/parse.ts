@@ -14,14 +14,12 @@ import {
   ObjectSchema,
   Schema,
 } from "./schemas";
-import { Value, ParseFunc } from "./types";
+import { Value, SchemaParseFunc, IContext, ParseFunc } from "./types";
 
-function getSchemaAndParser(source: any): { schema: Schema; parse: ParseFunc } {
-  function normalize(
-    src: Schema,
-    SchemaClass: any,
-    params = {}
-  ) {
+function getSchemaAndParser(
+  source: any
+): { schema: Schema; parse: SchemaParseFunc } {
+  function normalize(src: Schema, SchemaClass: any, params = {}) {
     return src instanceof SchemaClass ? src : new SchemaClass(src, params);
   }
 
@@ -43,14 +41,14 @@ function getSchemaAndParser(source: any): { schema: Schema; parse: ParseFunc } {
   EntryEvalFunction vs EvalFunction:
     EntryEvalFunction allows key, parents, parentKeys to be empty.
 */
-export default function (source: any) {
+export default function (source: any): ParseFunc {
   const { schema, parse } = getSchemaAndParser(source);
   return (
     obj: Value,
     key: string = "__UNKNOWN__",
     parents: Value[] = [],
     parentKeys: string[] = []
-  ) => (_context = {}) => {
+  ) => (_context: IContext = {}) => {
     const context = schema.params && schema.params.reuseContext ? _context : {};
     const result = parse(schema)(obj, key, parents, parentKeys)(context);
     const build = schema.params && schema.params.build;

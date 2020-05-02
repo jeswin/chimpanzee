@@ -13,8 +13,8 @@ function sortFn(schema1: Schema, schema2: Schema) {
   return schema1Order - schema2Order;
 }
 
-export default function (schema: Schema) {
-  return (_obj: Value, key: string, parents: Value, parentKeys: string[]) => (
+export default function (schema: ObjectSchema) {
+  return (_obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
     context: IContext
   ) => {
     const obj =

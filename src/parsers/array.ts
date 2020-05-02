@@ -19,7 +19,10 @@ export class ArrayOperator {
 }
 
 export class Wrapped {
-  constructor(result, needle) {
+  result: any;
+  needle: number;
+
+  constructor(result: any, needle: number) {
     this.result = result;
     this.needle = needle;
   }
@@ -54,7 +57,7 @@ function regularItem(schema) {
     );
 }
 
-export default function (schema: Schema) {
+export default function (schema: ArraySchema) {
   return (obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
     context: IContext
   ) => {

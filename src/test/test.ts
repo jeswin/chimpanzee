@@ -1,12 +1,14 @@
 import "core-js";
+import "mocha";
+import "should";
 import { Match, Skip, Fault, Empty } from "../results";
 import { match } from "..";
 
 describe("chimpanzee", () => {
-  function run([description, dir, resultType]) {
+  function run([description, dir, resultType]: [string, string, string]) {
     it(`${description}`, () => {
       if (["match", "empty", "skip", "fault"].includes(resultType)) {
-        global.__chimpanzeeTestContext = [];
+        (global as any).__chimpanzeeTestContext = [];
         const fixture = require(`./fixtures/${dir}/fixture`);
         const actual = match(fixture.schema, fixture.input);
         const expected = require(`./fixtures/${dir}/expected`);
@@ -25,7 +27,9 @@ describe("chimpanzee", () => {
 
         if (expected.allResults) {
           for (const [actualIndex, expectedResult] of expected.allResults) {
-            const actualResult = (global as any).__chimpanzeeTestContext[actualIndex];
+            const actualResult = (global as any).__chimpanzeeTestContext[
+              actualIndex
+            ];
             if (expectedResult.message) {
               actualResult.message.should.equal(expectedResult.message);
             }
@@ -58,12 +62,12 @@ describe("chimpanzee", () => {
     [
       "array-injects-modifiers-with-capture",
       "array-injects-modifiers-with-capture",
-      "match"
+      "match",
     ],
     [
       "array-inside-object-injects-modifiers",
       "array-inside-object-injects-modifiers",
-      "match"
+      "match",
     ],
     ["array-mixed", "array-mixed", "match"],
     ["array-optional", "array-optional", "match"],
@@ -96,7 +100,7 @@ describe("chimpanzee", () => {
     [
       "context-reset-override-in-child-object",
       "context-reset-override-in-child-object",
-      "match"
+      "match",
     ],
     ["deep", "deep", "match"],
     ["deep-fault", "deep-fault", "fault"],
@@ -122,7 +126,7 @@ describe("chimpanzee", () => {
     [
       "nested-native-array-simple-capture",
       "nested-native-array-simple-capture",
-      "match"
+      "match",
     ],
     ["nested-capture", "nested-capture", "match"],
     ["nested-named-capture", "nested-named-capture", "match"],
@@ -133,7 +137,7 @@ describe("chimpanzee", () => {
     [
       "object-inside-array-injects-modifiers",
       "object-inside-array-injects-modifiers",
-      "match"
+      "match",
     ],
     ["object-modifier", "object-modifier", "match"],
     ["object-modifier-override", "object-modifier-override", "match"],
@@ -154,16 +158,10 @@ describe("chimpanzee", () => {
     ["then-negative", "then-negative", "skip"],
     ["then-fail-schema", "then-fail-schema", "skip"],
     ["value-modifier", "value-modifier", "match"],
-    ["wrap", "wrap", "match"]
+    ["wrap", "wrap", "match"],
   ];
 
-  // Use this when you want to disable other tests.
-  // while (tests.length) {
-  //   tests.pop();
-  // }
-  // tests.push();
-
   for (const test of tests) {
-    run(test);
+    run(test as [string, string, string]);
   }
 });

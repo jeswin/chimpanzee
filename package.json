@@ -11,6 +11,8 @@
     "lazily": "^1.0.0"
   },
   "devDependencies": {
+    "@types/mocha": "^7.0.2",
+    "@types/should": "^13.0.0",
     "mocha": "^7.1.2",
     "should": "^13.2.3"
   },

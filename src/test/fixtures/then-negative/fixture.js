@@ -10,5 +10,5 @@ export const schema = wrap({
   hello: capture("key"),
   does: "exist"
 }).then(result => ({
-  next: { inner: result.key, text: capture() }
+  next: { inner: result.value.key, text: capture() }
 }));

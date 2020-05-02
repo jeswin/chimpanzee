@@ -2,7 +2,7 @@ import Result from "./result";
 import { IEnv, IMeta } from "../types";
 
 export default class Empty extends Result {  
-  constructor(env: IEnv, meta: IMeta) {
+  constructor(env: IEnv, meta?: IMeta) {
     super(env, meta);
 
     //Unit test support

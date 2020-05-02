@@ -1,32 +1,51 @@
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema } from "../schemas";
+import { FunctionSchema, Schema } from "../schemas";
 import parse from "../parse";
 import { getParams } from "./utils";
+import { Primitive, Value, IParams, IContext } from "../types";
 
-export function capture(params) {
+export type Predicate = (value: Value) => boolean;
+
+export function capture(params: IParams) {
   return captureIf((obj) => typeof obj !== "undefined", params);
 }
 
-export function captureIf(predicate, params) {
+export function captureIf(predicate: Predicate, params?: IParams) {
   return take(predicate, undefined, params);
 }
 
-export function modify(predicate, modifier, params) {
+export function modify(
+  predicate: Predicate,
+  modifier: IModifier,
+  params: IParams
+) {
   return take(predicate, undefined, params, { modifier });
 }
 
-export function captureAndParse(schema, params) {
+export function captureAndParse(schema: Schema, params: IParams) {
   return take((obj) => typeof obj !== "undefined", schema, params);
 }
 
-export function literal(what, params) {
+export function literal(what: Value, params: IParams) {
   return take((x) => x === what, undefined, params, {
-    skipMessage: (x) =>
-      `Expected value to be ${what.toString()} but got ${x.toString()}.`,
+    skipMessage: (x: Value) =>
+      `Expected value to be ${(what as any).toString()} but got ${x.toString()}.`,
   });
 }
 
-export function take(predicate, schema, params = {}, options = {}) {
+export type IModifier = (value: Value) => Value;
+
+export type IOptions = {
+  modifier?: IModifier;
+  skipMessage?: (value: Value) => string;
+};
+
+export function take(
+  predicate: Predicate,
+  schema: Schema | undefined,
+  params: IParams = {},
+  options: IOptions = {}
+) {
   const meta = { type: "take", schema, params, predicate, options };
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {

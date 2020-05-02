@@ -24,10 +24,10 @@ export type IEnv = any;
 // }
 
 export type ParseFunc = (
-  schema: Schema
-) => (
-  _obj: Value,
+  obj: Value,
   key: string,
   parents: Value[],
   parentKeys: string[]
 ) => (context: IContext) => Result;
+
+export type SchemaParseFunc = (schema: Schema) => ParseFunc;

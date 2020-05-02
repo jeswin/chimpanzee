@@ -1,18 +1,19 @@
-function flatten(items) {
+function flatten(items: Array<any>) {
   return [].concat.apply([], items);
 }
 
-export function permute(items, max) {
-  function _do(items, omitted) {
+export function permute(items: Array<any>, max?: number) : Array<Array<any>> {
+  function _do(items: Array<any>, omitted: number) : Array<Array<any>> {
     return items.length > 1 && items.length > omitted
       ? flatten(
           items.map((item, i) =>
-            _do(items.slice(i + 1).concat(items.slice(0, i)), omitted).map(p =>
-              [items[i]].concat(p)
-            )
+            _do(
+              items.slice(i + 1).concat(items.slice(0, i)),
+              omitted
+            ).map((p) => [items[i]].concat(p))
           )
         )
-      : items.map(i => [i]);
+      : items.map((i) => [i]);
   }
 
   return _do(items, typeof max === "undefined" ? 0 : items.length - (max - 1));
@@ -22,35 +23,35 @@ function reduce(mods, obj) {
   const { getters, setters } = mods.reduce(
     (acc, [getter, setter]) => ({
       getters: [...acc.getters, getter],
-      setters: [...acc.setters, setter]
+      setters: [...acc.setters, setter],
     }),
     { getters: [], setters: [] }
   );
 
-  const vals = getters.map(g => g(obj));
+  const vals = getters.map((g) => g(obj));
   const permutations = permute(vals);
 
-  return permutations.map(permutation =>
+  return permutations.map((permutation) =>
     setters.reduce((acc, setter, i) => setter(acc, permutation[i]), obj)
   );
 }
 
 export function permuteObject(props, obj) {
   return reduce(
-    props.map(prop => [x => x[prop], (x, v) => ({ ...x, [prop]: v })]),
+    props.map((prop) => [(x) => x[prop], (x, v) => ({ ...x, [prop]: v })]),
     obj
   );
 }
 
-export function permuteArray(indexes, array) {
+export function permuteArray(indexes: number[], array: Array<any>) {
   return reduce(
-    indexes.map(i => [
-      x => x[i],
+    indexes.map((i) => [
+      (x) => x[i],
       (x, v) =>
         x
           .slice(0, i)
           .concat([v])
-          .concat(x.slice(i + 1))
+          .concat(x.slice(i + 1)),
     ]),
     array
   );

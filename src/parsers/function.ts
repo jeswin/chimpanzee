@@ -2,7 +2,7 @@ import { Result, Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema, Schema } from "../schemas";
 import { Value, IContext } from "../types";
 
-export default function (schema: Schema) {
+export default function (schema: FunctionSchema) {
   return (_obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
     context: IContext
   ) => {

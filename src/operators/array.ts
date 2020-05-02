@@ -14,7 +14,12 @@ import { Value, IObject, IContext, IParams } from "../types";
   returns [4, 4], with needle moved to 5.
 */
 
-export function repeating(_schema, opts = {}) {
+export type RepeatingOptions = {
+  min?: number;
+  max?: number;
+};
+
+export function repeating(_schema: Schema, opts: RepeatingOptions = {}) {
   const meta = { type: "repeating", schema: _schema };
 
   const min = opts.min || 0;
@@ -23,10 +28,12 @@ export function repeating(_schema, opts = {}) {
   const schema = toNeedledSchema(_schema);
 
   return new ArrayOperator(
-    (needle) =>
+    (needle: number) =>
       new FunctionSchema(
-        (obj, key, parents, parentKeys) => (context) => {
-          function completed(results, needle) {
+        (obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
+          context: IContext
+        ) => {
+          function completed(results: any[], needle: number) {
             return results.length >= min && (!max || results.length <= max)
               ? new Wrapped(
                   new Match(results, { obj, key, parents, parentKeys }, meta),
@@ -183,13 +190,15 @@ export function recursive(schema: Schema, params: IParams) {
   A Skip() is not issued when an item is not found.
   The needle is incremented by 1 if found, otherwise it remains the same.
 */
-export function optionalItem(_schema) {
+export function optionalItem(_schema: Schema) {
   const meta = { type: "optionalItem", schema: _schema };
   const schema = toNeedledSchema(_schema);
 
-  return new ArrayOperator((needle) => {
+  return new ArrayOperator((needle: number) => {
     return new FunctionSchema(
-      (obj, key, parents, parentKeys) => (context) => {
+      (obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
+        context: IContext
+      ) => {
         const { result } = parse(schema(needle))(obj, key, parents, parentKeys)(
           context
         );

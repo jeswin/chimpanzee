@@ -3,7 +3,7 @@ import { Match, Empty, Skip, Fault } from "../results";
 import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 import { getParams } from "./utils";
-import { IParams } from "../types";
+import { IParams, IContext, Value } from "../types";
 
 export function number(params: IParams) {
   return checkType("number", params);
@@ -25,12 +25,12 @@ export function func(params: IParams) {
   return checkType("function", params);
 }
 
-function checkType(type, params = {}) {
+function checkType(type: string, params: IParams) {
   const meta = { type, params };
 
-  function fn(obj, key, parents, parentKeys) {
-    return context => {
-      const result = parse(captureIf(obj => typeof obj === type))(
+  function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {
+    return (context: IContext) => {
+      const result = parse(captureIf((obj) => typeof obj === type))(
         obj,
         key,
         parents,

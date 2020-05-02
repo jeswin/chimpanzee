@@ -3,7 +3,7 @@ import PrimitiveSchema from "../schemas/primitive";
 import { Schema } from "../schemas";
 import { Value, IContext } from "../types";
 
-export default function (schema: Schema) {
+export default function (schema: PrimitiveSchema) {
   return (_obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
     context: IContext
   ) => {
@@ -15,7 +15,9 @@ export default function (schema: Schema) {
     return schema.value === obj
       ? new Empty({ obj, key, parents, parentKeys })
       : new Skip(
-          `Expected ${schema.value.toString()} but got ${
+          `Expected ${
+            schema.value !== undefined ? schema.value.toString() : "undefined"
+          } but got ${
             typeof obj !== "undefined" ? obj.toString() : "undefined"
           }.`,
           {

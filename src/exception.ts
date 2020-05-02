@@ -20,8 +20,8 @@ class ChimpanzeeError extends Error {
 
 export default function (
   message: string,
-  inner: Error | undefined,
-  props: { [key: string]: any } | undefined = undefined
+  inner?: Error | undefined,
+  props?: { [key: string]: any } | undefined
 ) : never {
   console.log("CHIMPANZEE_DEBUG:", message);
 

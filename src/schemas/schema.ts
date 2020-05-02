@@ -3,6 +3,9 @@
 */
 import { parse, Match, Empty } from "..";
 import { IParams, IMeta, Value, IContext } from "../types";
+import { Result } from "../results";
+
+export type FnGetSchemaFromResult = (result: Result) => Schema;
 
 export default class Schema {
   params: IParams;
@@ -13,7 +16,10 @@ export default class Schema {
     this.meta = meta;
   }
 
-  then(fnSuccessSchema: Schema, fnFailSchema: Schema) {
+  then(
+    fnSuccessSchema: FnGetSchemaFromResult,
+    fnFailSchema: FnGetSchemaFromResult
+  ) {
     return (
       obj: Value,
       key: string,
@@ -22,9 +28,7 @@ export default class Schema {
     ) => (context: IContext) => {
       const result = parse(this)(obj, key, parents, parentKeys)(context);
       return result instanceof Match || result instanceof Empty
-        ? parse(fnSuccessSchema(result.value))(obj, key, parents, parentKeys)(
-            context
-          )
+        ? parse(fnSuccessSchema(result))(obj, key, parents, parentKeys)(context)
         : fnFailSchema
         ? fnFailSchema(result)
         : result;
