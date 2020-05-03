@@ -1,9 +1,9 @@
 import { captureIf } from "./capture";
-import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema } from "../schemas/Schema";
+import { Skip } from "../results";
 import parse from "../parse";
 import { getParams } from "./utils";
 import { IParams, IContext, Value } from "../types";
+import { FunctionSchema } from "../schemas";
 
 export function number(params: IParams) {
   return checkType("number", params);

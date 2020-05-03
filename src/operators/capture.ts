@@ -3,6 +3,7 @@ import parse from "../parse";
 import { getParams } from "./utils";
 import { Primitive, Value, IParams, IContext } from "../types";
 import { Schema, FunctionSchema } from "../schemas";
+import { isObject } from "../utils/obj";
 
 export type Predicate = (value: Value) => boolean;
 
@@ -11,7 +12,7 @@ export function capture(params: IParams) {
 }
 
 export function captureIf(predicate: Predicate, params?: IParams) {
-  return take(predicate, undefined, params);
+  return take(predicate, params);
 }
 
 export function modify(
@@ -19,7 +20,7 @@ export function modify(
   modifier: IModifier,
   params: IParams
 ) {
-  return take(predicate, undefined, params, { modifier });
+  return take(predicate, params, { modifier });
 }
 
 export function captureAndParse(schema: Schema<any>, params: IParams) {
@@ -27,7 +28,7 @@ export function captureAndParse(schema: Schema<any>, params: IParams) {
 }
 
 export function literal(what: Value, params: IParams) {
-  return take((x) => x === what, undefined, params, {
+  return takeWithSchema((x) => x === what, undefined, params, {
     skipMessage: (x: Value) =>
       `Expected value to be ${(what as any).toString()} but got ${
         x !== undefined ? x.toString() : "undefined"
@@ -44,6 +45,33 @@ export type IOptions = {
 
 export function take(
   predicate: Predicate,
+  params: IParams = {},
+  options: IOptions = {}
+) {
+  const meta = { type: "take", undefined, params, predicate, options };
+
+  function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {
+    return (context: IContext) =>
+      predicate(obj)
+        ? new Match(
+            options.modifier ? options.modifier(obj) : obj,
+            { obj, key, parents, parentKeys },
+            meta
+          )
+        : new Skip(
+            options.skipMessage
+              ? options.skipMessage(obj)
+              : `Predicate returned false. Predicate was ${predicate.toString()}`,
+            { obj, key, parents, parentKeys },
+            meta
+          );
+  }
+
+  return new FunctionSchema(fn, getParams(params), meta);
+}
+
+export function takeWithSchema(
+  predicate: Predicate,
   schema: Schema<any> | undefined,
   params: IParams = {},
   options: IOptions = {}
@@ -54,36 +82,42 @@ export function take(
     return (context: IContext) =>
       predicate(obj)
         ? typeof schema !== "undefined"
-          ? (() => {
-              const result = parse(schema)(obj, key, parents, parentKeys)(
-                context
-              );
+          ? isObject(obj)
+            ? (() => {
+                const result = parse(schema)(obj, key, parents, parentKeys)(
+                  context
+                );
 
-              return result instanceof Match
-                ? new Match(
-                    {
-                      ...obj,
-                      ...result.value,
-                    },
-                    { obj, key, parents, parentKeys },
-                    meta
-                  )
-                : result instanceof Empty
-                ? new Match(
-                    {
-                      ...obj,
-                    },
-                    { obj, key, parents, parentKeys },
-                    meta
-                  )
-                : result instanceof Skip
-                ? new Skip(
-                    "Capture failed in inner schema.",
-                    { obj, key, parents, parentKeys },
-                    meta
-                  )
-                : result; //Fault
-            })()
+                return result instanceof Match
+                  ? new Match(
+                      {
+                        ...obj,
+                        ...result.value,
+                      },
+                      { obj, key, parents, parentKeys },
+                      meta
+                    )
+                  : result instanceof Empty
+                  ? new Match(
+                      {
+                        ...obj,
+                      },
+                      { obj, key, parents, parentKeys },
+                      meta
+                    )
+                  : result instanceof Skip
+                  ? new Skip(
+                      "Did not match inner schema.",
+                      { obj, key, parents, parentKeys },
+                      meta
+                    )
+                  : result; //Fault
+              })()
+            : new Skip(
+                "Not an object.",
+                { obj, key, parents, parentKeys },
+                meta
+              )
           : new Match(
               options.modifier ? options.modifier(obj) : obj,
               { obj, key, parents, parentKeys },

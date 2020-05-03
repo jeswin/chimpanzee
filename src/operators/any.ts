@@ -2,9 +2,9 @@ import { Match, Empty, Skip, Fault, Result } from "../results";
 import { FunctionSchema, Schema } from "../schemas";
 import parse from "../parse";
 import { getParams } from "./utils";
-import { Value, IContext, IParams } from "../types";
+import { Value, IContext, IParams, IObject } from "../types";
 
-export function any(schemas: Schema<any>[], params: IParams) {
+export function any(schemas: (Schema<any> | any)[], params?: IParams) {
   const meta = { type: "any", schemas, params };
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {

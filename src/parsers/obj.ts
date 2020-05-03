@@ -13,7 +13,7 @@ function sortFn(schema1: Schema<any>, schema2: Schema<any>) {
   return schema1Order - schema2Order;
 }
 
-export default function (schema: Schema<IObject>) {
+export default function (schema: Schema<any>) {
   return (_obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
     context: IContext
   ) => {

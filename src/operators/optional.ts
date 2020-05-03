@@ -1,10 +1,10 @@
-import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema, Schema } from "../schemas/Schema";
+import { Empty, Skip } from "../results";
 import parse from "../parse";
 import { getParams } from "./utils";
 import { Value, IContext, IParams } from "../types";
+import { FunctionSchema, Schema } from "../schemas";
 
-export function optional(schema: Schema, params: IParams = {}) {
+export function optional(schema: Schema<any>, params: IParams = {}) {
   const meta = { type: "optional", schema, params };
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {

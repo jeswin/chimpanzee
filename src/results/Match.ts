@@ -2,9 +2,9 @@ import Result from "./Result";
 import { Value, IEnv, IMeta } from "../types";
 
 export default class Match extends Result {
-  value: Value;
+  value: any;
 
-  constructor(value: Value, env?: IEnv, meta?: IMeta) {
+  constructor(value: any, env?: IEnv, meta?: IMeta) {
     super(env, meta);
     this.value = value;
 

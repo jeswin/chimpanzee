@@ -1,4 +1,4 @@
-import { capture, any } from "../../../";
+import { capture, any } from "../../..";
 
 export const input = {
   level1: {

@@ -1,25 +1,27 @@
-import { Match, Empty, Skip, Fault } from "../results";
+import { Match, Empty, Skip, Fault, Result } from "../results";
 import parse from "../parse";
 import { wrapSchemaIfLiteralChild } from "./literals";
 import exception from "../exception";
-import { Value, IContext } from "../types";
+import { Value, IContext, IParams } from "../types";
 import { FunctionSchema, Schema } from "../schemas";
 
-export function toNeedledSchema(schema) {
+// TODO - handle params
+export function toNeedledSchema(schema: Schema<any>) {
   return schema instanceof ArrayOperator ? schema.fn : regularItem(schema);
 }
 
 export class ArrayOperator {
-  constructor(fn) {
+  fn: (needle: number, params?: IParams) => FunctionSchema;
+  constructor(fn: (needle: number) => FunctionSchema) {
     this.fn = fn;
   }
 }
 
-export class Wrapped {
+export class ArrayResult {
   result: any;
   needle: number;
 
-  constructor(result: any, needle: number) {
+  constructor(result: Result, needle: number) {
     this.result = result;
     this.needle = needle;
   }
@@ -29,14 +31,17 @@ export class Wrapped {
   Not array types, viz optional, unordered or repeating.
   Not a sequence
 */
-function regularItem(schema) {
+function regularItem(schema: Schema<any>) {
   const meta = { type: "regularItem", schema };
 
-  return (needle: number) =>
+  return (needle: number, params?: IParams) =>
     new FunctionSchema(
-      (obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
-        context: IContext
-      ) => {
+      (
+        obj: Array<Value>,
+        key: string,
+        parents: Value[],
+        parentKeys: string[]
+      ) => (context: IContext) => {
         const item = obj[needle];
         const result = parse(schema)(
           item,
@@ -46,8 +51,8 @@ function regularItem(schema) {
         )(context);
 
         return result instanceof Match || result instanceof Empty
-          ? new Wrapped(result, needle + 1)
-          : new Wrapped(result, needle);
+          ? new ArrayResult(result, needle + 1)
+          : new ArrayResult(result, needle);
       },
       {},
       meta
@@ -68,7 +73,11 @@ export default function (schema: Schema<Array<any>>) {
             { obj, key, parents, parentKeys },
             meta
           )
-        : (function loop(schemas, results, needle) {
+        : (function loop(
+            schemas: Schema<any>[],
+            results: Result[],
+            needle: number
+          ): Result {
             const wrappedSchema = wrapSchemaIfLiteralChild(schema, schemas[0]);
             const needledSchema = toNeedledSchema(wrappedSchema);
             const { result, needle: updatedNeedle } = parse(

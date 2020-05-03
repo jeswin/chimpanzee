@@ -1,12 +1,17 @@
-import { Match, Empty, Skip, Fault } from "../results";
+import { Match, Empty, Skip, Fault, Result } from "../results";
 import { Seq } from "lazily";
 import parse from "../parse";
 import { getParams } from "./utils";
 import merge from "../utils/merge";
-import { IParams, Value, IContext } from "../types";
+import { IParams, Value, IContext, IObject } from "../types";
 import { ObjectSchema, Schema, FunctionSchema } from "../schemas";
+import { wrap } from "./wrap";
+import { isObject } from "../utils/obj";
 
-function getSchema(schema: Schema<any>, paramSelector: string) {
+function getSchema(
+  schema: Schema<any>,
+  paramSelector: string
+): Schema<any> | IObject | undefined {
   const schemaSelector =
     schema.params && schema.params.selector
       ? schema.params.selector
@@ -53,20 +58,20 @@ export function composite(
     ? _paramsList
     : [{ name: "default" }].concat(_paramsList);
 
-  const schemas = paramsList.map(
-    (params) =>
-      new ObjectSchema(
-        getSchema(schema, (params && params.name) || "default") || {},
-        params
-      )
-  );
+  const schemas = paramsList.map((params) => {
+    const schemaForParam =
+      (getSchema(schema, (params && params.name) || "default") || {}, params);
+    return isObject(schemaForParam)
+      ? new ObjectSchema(schemaForParam, params)
+      : wrap(schemaForParam, params);
+  });
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {
     return (context: IContext) => {
       const env = { obj, key, parents, parentKeys };
 
       return schemas.length
-        ? (function loop([schema, ...rest], state) {
+        ? (function loop([schema, ...rest], state): Result {
             const result = parse(schema)(obj, key, parents, parentKeys)(
               context
             );

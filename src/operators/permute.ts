@@ -1,58 +1,76 @@
-function flatten(items: Array<any>) {
-  return [].concat.apply([], items);
+import { IObject } from "../types";
+
+// Boris Yuzhakov's one liner.
+export function permute<T>(a: Array<T>): Array<Array<T>> {
+  return a.length
+    ? a.reduce(
+        (r, v, i) => [
+          ...r,
+          ...permute([...a.slice(0, i), ...a.slice(i + 1)]).map((x) => [v, ...x]),
+        ],
+        [] as Array<Array<T>>
+      )
+    : [[]];
 }
 
-export function permute(items: Array<any>, max?: number) : Array<Array<any>> {
-  function _do(items: Array<any>, omitted: number) : Array<Array<any>> {
-    return items.length > 1 && items.length > omitted
-      ? flatten(
-          items.map((item, i) =>
-            _do(
-              items.slice(i + 1).concat(items.slice(0, i)),
-              omitted
-            ).map((p) => [items[i]].concat(p))
-          )
-        )
-      : items.map((i) => [i]);
-  }
+/*
+  permuteObject(props, input);
 
-  return _do(items, typeof max === "undefined" ? 0 : items.length - (max - 1));
+  permuteObject(["left", "right"], {
+    x: 1,
+    left: "a",
+    right: "b"
+  })
+    returns:
+      [
+        { x: 1, left: "a", right: "b" },
+        { x: 1, left: "b", right: "a" }
+      ]
+*/
+
+export function permuteObject(indexes: string[], obj: IObject): Array<IObject> {
+  const permutedIndexesList = permute(indexes);
+
+  return permutedIndexesList.map((permutedIndexes) => {
+    return indexes.reduce(
+      (acc: IObject, index: string, i: number) => {
+        const swappedIndex = permutedIndexes[i];
+        acc[index] = obj[swappedIndex];
+        return acc;
+      },
+      { ...obj }
+    );
+  });
 }
 
-function reduce(mods, obj) {
-  const { getters, setters } = mods.reduce(
-    (acc, [getter, setter]) => ({
-      getters: [...acc.getters, getter],
-      setters: [...acc.setters, setter],
-    }),
-    { getters: [], setters: [] }
-  );
+/*
+  permuteArray(indexes, input);
 
-  const vals = getters.map((g) => g(obj));
-  const permutations = permute(vals);
+  permuteArray([0, 1, 2], [1, 2, 3])
+    returns:
+      [
+        [1, 2, 3],
+        [1, 3, 2],
+        [2, 3, 1],
+        [2, 1, 3],
+        [3, 1, 2],
+        [3, 2, 1]
+      ]
+*/
+export function permuteArray(
+  indexes: number[],
+  array: Array<any>
+): Array<Array<any>> {
+  const permutedIndexesList = permute(indexes);
 
-  return permutations.map((permutation) =>
-    setters.reduce((acc, setter, i) => setter(acc, permutation[i]), obj)
-  );
-}
-
-export function permuteObject(props, obj) {
-  return reduce(
-    props.map((prop) => [(x) => x[prop], (x, v) => ({ ...x, [prop]: v })]),
-    obj
-  );
-}
-
-export function permuteArray(indexes: number[], array: Array<any>) {
-  return reduce(
-    indexes.map((i) => [
-      (x) => x[i],
-      (x, v) =>
-        x
-          .slice(0, i)
-          .concat([v])
-          .concat(x.slice(i + 1)),
-    ]),
-    array
+  return permutedIndexesList.map((permutedIndexes) =>
+    indexes.reduce(
+      (acc: Array<any>, index: number, i: number) => {
+        const swappedIndex = permutedIndexes[i];
+        acc[index] = array[swappedIndex];
+        return acc;
+      },
+      [...array]
+    )
   );
 }

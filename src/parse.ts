@@ -7,7 +7,7 @@ import { toSchema } from "./schemas";
   EntryEvalFunction vs EvalFunction:
     EntryEvalFunction allows key, parents, parentKeys to be empty.
 */
-export default function (source: any): ParseFunc {
+export default function (source: any): ParseFunc<any> {
   const schema = toSchema(source);
   const parse = schema.getParseFunc();
 

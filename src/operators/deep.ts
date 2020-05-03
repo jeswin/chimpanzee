@@ -1,36 +1,49 @@
 import { Seq } from "lazily";
-import { Match, Empty, Skip, Fault } from "../results";
+import { Match, Empty, Skip, Fault, Result } from "../results";
 import parse from "../parse";
 import { getParams } from "./utils";
-import { Value, IContext } from "../types";
+import { Value, IContext, IObject, IMeta, IParams } from "../types";
 import { Schema, FunctionSchema } from "../schemas";
+import { isObject } from "../utils/obj";
 
-export function deep(schema: Schema<any>, params = {}) {
-  const meta = { type: "deep", schema, params };
-
-  function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {
-    return (context: IContext) => {
-      function traverseObject(keys: string[]) {
+function traverseObject(schema: Schema<any>, params: IParams, meta: IMeta) {
+  return function (
+    obj: IObject,
+    key: string,
+    parents: Value[],
+    parentKeys: string[]
+  ) {
+    return function (context: IContext) {
+      return function loop(keys: string[]): Result {
         return keys.length
           ? (() => {
-              const result = parse(deep(schema))(
+              const result = parse(deep(schema, params))(
                 obj[keys[0]],
                 key,
                 parents.concat(obj),
                 parentKeys.concat(keys[0])
               )(context);
-              return !(result instanceof Skip)
-                ? result
-                : traverseObject(keys.slice(1));
+              return !(result instanceof Skip) ? result : loop(keys.slice(1));
             })()
           : new Skip(
               "Not found in deep.",
               { obj, key, parents, parentKeys },
               meta
             );
-      }
+      };
+    };
+  };
+}
 
-      function traverseArray(items: Array<Value>) {
+function traverseArray(schema: Schema<any>, params: IParams, meta: IMeta) {
+  return function (
+    obj: Array<Value>,
+    key: string,
+    parents: Value[],
+    parentKeys: string[]
+  ) {
+    return function (context: IContext) {
+      (function loop(items: Array<Value>): Result {
         return items.length
           ? (() => {
               const result = parse(deep(schema, params))(
@@ -39,25 +52,35 @@ export function deep(schema: Schema<any>, params = {}) {
                 parents,
                 parentKeys
               )(context);
-              return !(result instanceof Skip)
-                ? result
-                : traverseArray(items.slice(1));
+              return !(result instanceof Skip) ? result : loop(items.slice(1));
             })()
           : new Skip(
               "Not found in deep.",
               { obj, key, parents, parentKeys },
               meta
             );
-      }
+      })(obj);
+    };
+  };
+}
 
+export function deep(schema: Schema<any>, params = {}) {
+  const meta = { type: "deep", schema, params };
+
+  function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {
+    return (context: IContext) => {
       const result = parse(schema)(obj, key, parents, parentKeys)(context);
 
       return !(result instanceof Skip)
         ? result
-        : typeof obj === "object"
-        ? traverseObject(Object.keys(obj))
+        : isObject(obj)
+        ? traverseObject(schema, params, meta)(obj, key, parents, parentKeys)(
+            context
+          )
         : Array.isArray(obj)
-        ? traverseArray(obj)
+        ? traverseArray(schema, params, meta)(obj, key, parents, parentKeys)(
+            context
+          )
         : new Skip(
             "Not found in deep.",
             { obj, key, parents, parentKeys },
