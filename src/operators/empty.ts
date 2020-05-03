@@ -1,7 +1,7 @@
-import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema } from "../schemas/Schema";
+import {  Empty, Skip } from "../results";
 import { getParams } from "./utils";
 import { Value, IContext } from "../types";
+import { FunctionSchema } from "../schemas";
 
 export function empty() {
   const meta = { type: "empty" };

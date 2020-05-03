@@ -5,7 +5,7 @@ import { Schema } from "../schemas";
 import { wrapSchemaIfLiteralChild } from "./literals";
 import { Value, IContext, IObject } from "../types";
 
-function sortFn(schema1: Schema, schema2: Schema) {
+function sortFn(schema1: Schema<any>, schema2: Schema<any>) {
   const schema1Order =
     schema1.params && schema1.params.order ? schema1.params.order : 0;
   const schema2Order =

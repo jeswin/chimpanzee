@@ -1,12 +1,12 @@
 import { Match, Empty, Skip, Fault } from "../results";
 import { Seq } from "lazily";
-import { Schema, ObjectSchema, FunctionSchema } from "../schemas/Schema";
 import parse from "../parse";
 import { getParams } from "./utils";
 import merge from "../utils/merge";
 import { IParams, Value, IContext } from "../types";
+import { ObjectSchema, Schema, FunctionSchema } from "../schemas";
 
-function getSchema(schema: Schema, paramSelector: string) {
+function getSchema(schema: Schema<any>, paramSelector: string) {
   const schemaSelector =
     schema.params && schema.params.selector
       ? schema.params.selector
@@ -36,7 +36,7 @@ function getSchema(schema: Schema, paramSelector: string) {
 }
 
 export function composite(
-  schema: Schema,
+  schema: Schema<any>,
   _paramsList: IParams[],
   ownParams = {}
 ) {

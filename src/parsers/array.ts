@@ -1,12 +1,9 @@
-import { Seq } from "lazily";
-import { Result, Match, Empty, Skip, Fault } from "../results";
-import Schema, { Schema, FunctionSchema } from "../schemas/Schema";
+import { Match, Empty, Skip, Fault } from "../results";
 import parse from "../parse";
-import { ArraySchema } from "../schemas/Schema";
 import { wrapSchemaIfLiteralChild } from "./literals";
 import exception from "../exception";
-import { number } from "../operators/types";
 import { Value, IContext } from "../types";
+import { FunctionSchema, Schema } from "../schemas";
 
 export function toNeedledSchema(schema) {
   return schema instanceof ArrayOperator ? schema.fn : regularItem(schema);

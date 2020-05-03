@@ -1,9 +1,9 @@
 import { captureIf } from "./capture";
-import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema } from "../schemas/Schema";
+import { Skip } from "../results";
 import parse from "../parse";
 import { getParams } from "./utils";
 import { Value, IContext, IParams } from "../types";
+import { FunctionSchema } from "../schemas";
 
 export function regex(regex: RegExp | string, params: IParams) {
   const meta = { type: "regex", regex, params };

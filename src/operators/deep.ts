@@ -1,11 +1,11 @@
 import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema, Schema } from "../schemas/Schema";
 import parse from "../parse";
 import { getParams } from "./utils";
 import { Value, IContext } from "../types";
+import { Schema, FunctionSchema } from "../schemas";
 
-export function deep(schema: Schema, params = {}) {
+export function deep(schema: Schema<any>, params = {}) {
   const meta = { type: "deep", schema, params };
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {

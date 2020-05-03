@@ -1,8 +1,8 @@
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema, Schema } from "../schemas/Schema";
 import parse from "../parse";
 import { getParams } from "./utils";
 import { Primitive, Value, IParams, IContext } from "../types";
+import { Schema, FunctionSchema } from "../schemas";
 
 export type Predicate = (value: Value) => boolean;
 
@@ -22,7 +22,7 @@ export function modify(
   return take(predicate, undefined, params, { modifier });
 }
 
-export function captureAndParse(schema: Schema, params: IParams) {
+export function captureAndParse(schema: Schema<any>, params: IParams) {
   return take((obj) => typeof obj !== "undefined", schema, params);
 }
 
@@ -44,7 +44,7 @@ export type IOptions = {
 
 export function take(
   predicate: Predicate,
-  schema: Schema | undefined,
+  schema: Schema<any> | undefined,
   params: IParams = {},
   options: IOptions = {}
 ) {

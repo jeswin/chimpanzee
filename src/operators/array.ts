@@ -1,10 +1,8 @@
-import { Result, Match, Empty, Skip, Fault } from "../results";
-import { Schema, FunctionSchema } from "../schemas/Schema";
+import { Match, Empty, Skip, Fault } from "../results";
+import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";
-import exception from "../exception";
-import { getParams } from "./utils";
 import { toNeedledSchema, ArrayOperator, Wrapped } from "../parsers/array";
-import { Value, IObject, IContext, IParams } from "../types";
+import { Value, IContext, IParams } from "../types";
 
 /*
   Unordered does not change the needle.
@@ -19,7 +17,7 @@ export type RepeatingOptions = {
   max?: number;
 };
 
-export function repeating(_schema: Schema, opts: RepeatingOptions = {}) {
+export function repeating(_schema: Schema<any>, opts: RepeatingOptions = {}) {
   const meta = { type: "repeating", schema: _schema };
 
   const min = opts.min || 0;

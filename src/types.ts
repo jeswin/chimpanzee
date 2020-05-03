@@ -1,5 +1,5 @@
 import { string } from "./operators/types";
-import Schema, { Schema } from "./schemas/Schema";
+import { Schema } from "./schemas";
 import { Result } from "./results";
 
 export type IMeta = any;
