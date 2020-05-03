@@ -1,6 +1,6 @@
 import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema, Schema } from "../schemas";
+import { FunctionSchema, Schema } from "../schemas/Schema";
 import parse from "../parse";
 import { getParams } from "./utils";
 import { Value, IContext } from "../types";

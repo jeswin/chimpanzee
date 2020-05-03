@@ -14,15 +14,15 @@ describe("chimpanzee", () => {
         const expected = require(`./fixtures/${dir}/expected`);
         if (resultType === "match") {
           actual.should.be.an.instanceOf(Match);
-          actual.value.should.deepEqual(expected.result);
+          ((actual as Match).value as any).should.deepEqual(expected.result);
         } else if (resultType === "empty") {
           actual.should.be.an.instanceOf(Empty);
         } else if (resultType === "skip") {
           actual.should.be.an.instanceOf(Skip);
-          actual.message.should.equal(expected.result);
+          (actual as Skip).message.should.equal(expected.result);
         } else if (resultType === "fault") {
           actual.should.be.an.instanceOf(Fault);
-          actual.message.should.equal(expected.result);
+          (actual as Fault).message.should.equal(expected.result);
         }
 
         if (expected.allResults) {

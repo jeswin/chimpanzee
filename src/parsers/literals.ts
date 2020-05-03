@@ -1,4 +1,4 @@
-import { ObjectSchema, ArraySchema, PrimitiveSchema, Schema } from "../schemas";
+import { ObjectSchema, ArraySchema, PrimitiveSchema, Schema } from "../schemas/Schema";
 
 export function wrapSchemaIfLiteralChild(schema: Schema, childSchema: Schema) {
   // Value and property modifiers pass through literal containers ({} and []).
@@ -23,6 +23,8 @@ export function wrapSchemaIfLiteralChild(schema: Schema, childSchema: Schema) {
     : typeof childSchema === "string" ||
       typeof childSchema === "number" ||
       typeof childSchema === "boolean" ||
+      typeof childSchema === "bigint" ||
+      typeof childSchema === "undefined" ||
       typeof childSchema === "symbol"
     ? new PrimitiveSchema(childSchema, modifiersForLiteralChildren)
     : childSchema;

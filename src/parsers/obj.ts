@@ -1,9 +1,9 @@
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
 import parse from "../parse";
-import { ObjectSchema, Schema } from "../schemas";
+import { Schema } from "../schemas";
 import { wrapSchemaIfLiteralChild } from "./literals";
-import { Value, IContext } from "../types";
+import { Value, IContext, IObject } from "../types";
 
 function sortFn(schema1: Schema, schema2: Schema) {
   const schema1Order =
@@ -13,7 +13,7 @@ function sortFn(schema1: Schema, schema2: Schema) {
   return schema1Order - schema2Order;
 }
 
-export default function (schema: ObjectSchema) {
+export default function (schema: Schema<IObject>) {
   return (_obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
     context: IContext
   ) => {

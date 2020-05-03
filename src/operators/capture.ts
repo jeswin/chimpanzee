@@ -1,5 +1,5 @@
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema, Schema } from "../schemas";
+import { FunctionSchema, Schema } from "../schemas/Schema";
 import parse from "../parse";
 import { getParams } from "./utils";
 import { Primitive, Value, IParams, IContext } from "../types";
@@ -29,7 +29,9 @@ export function captureAndParse(schema: Schema, params: IParams) {
 export function literal(what: Value, params: IParams) {
   return take((x) => x === what, undefined, params, {
     skipMessage: (x: Value) =>
-      `Expected value to be ${(what as any).toString()} but got ${x.toString()}.`,
+      `Expected value to be ${(what as any).toString()} but got ${
+        x !== undefined ? x.toString() : "undefined"
+      }.`,
   });
 }
 

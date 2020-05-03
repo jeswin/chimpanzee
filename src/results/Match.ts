@@ -1,10 +1,10 @@
-import Result from "./result";
+import Result from "./Result";
 import { Value, IEnv, IMeta } from "../types";
 
 export default class Match extends Result {
   value: Value;
 
-  constructor(value: Value, env: IEnv, meta: IMeta | undefined = undefined) {
+  constructor(value: Value, env?: IEnv, meta?: IMeta) {
     super(env, meta);
     this.value = value;
 

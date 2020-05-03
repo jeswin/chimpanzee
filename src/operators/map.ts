@@ -1,9 +1,10 @@
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema } from "../schemas";
+import { FunctionSchema, Schema } from "../schemas/Schema";
 import parse from "../parse";
 import { getParams } from "./utils";
+import { Value, IContext, IParams } from "../types";
 
-export function map(schema, mapper, params) {
+export function map(schema: Schema, mapper: (x: any) => any, params: IParams) {
   const meta = { type: "map", schema, mapper, params };
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {

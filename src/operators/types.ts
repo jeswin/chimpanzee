@@ -1,6 +1,6 @@
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema } from "../schemas";
+import { FunctionSchema } from "../schemas/Schema";
 import parse from "../parse";
 import { getParams } from "./utils";
 import { IParams, IContext, Value } from "../types";

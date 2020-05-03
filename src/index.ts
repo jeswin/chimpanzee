@@ -9,7 +9,7 @@ export {
   captureAndParse,
   literal,
   modify,
-  take
+  take,
 } from "./operators/capture";
 export { composite } from "./operators/composite";
 export { deep } from "./operators/deep";
@@ -23,8 +23,7 @@ export {
   optionalItem,
   recursive,
   repeating,
-  slice,
-  unordered
+  unordered,
 } from "./operators/array";
 export { wrap } from "./operators/wrap";
 export { permute, permuteArray, permuteObject } from "./operators/permute";
@@ -35,6 +34,6 @@ import * as builtins from "./operators/builtins";
 import { Schema } from "./schemas";
 export { builtins };
 
-export function match(schema: Schema, input: any) {
-  return parse(schema)(input, "__INIT__")();
+export function match(schema: Schema<any>, input: any) {
+  return parse(schema)(input, "__INIT__", [], [])({});
 }

@@ -1,8 +1,7 @@
-import { Result, Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema, Schema } from "../schemas";
+import { Schema } from "../schemas";
 import { Value, IContext } from "../types";
 
-export default function (schema: FunctionSchema) {
+export default function (schema: Schema<Function>) {
   return (_obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
     context: IContext
   ) => {
@@ -10,6 +9,6 @@ export default function (schema: FunctionSchema) {
       schema.params && schema.params.modifiers && schema.params.modifiers.object
         ? schema.params.modifiers.object(_obj)
         : _obj;
-    return schema.fn(obj, key, parents, parentKeys)(context);
+    return schema.value(obj, key, parents, parentKeys)(context);
   };
 }

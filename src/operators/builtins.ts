@@ -1,6 +1,6 @@
 import ArraySchema from "../schemas/array";
 
-import { FunctionSchema, Schema } from "../schemas";
+import { FunctionSchema, Schema } from "../schemas/Schema";
 
 import PrimitiveSchema from "../schemas/primitive";
 

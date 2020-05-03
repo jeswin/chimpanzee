@@ -1,9 +1,12 @@
-import Result from "./result";
+import Result from "./Result";
 import { IEnv, IMeta } from "../types";
 
-export default class Empty extends Result {  
-  constructor(env: IEnv, meta?: IMeta) {
+export default class Skip extends Result {
+  message: string;
+
+  constructor(message: string, env?: IEnv, meta?: IMeta) {
     super(env, meta);
+    this.message = message;
 
     //Unit test support
     if ((global as any).__chimpanzeeTestContext) {
@@ -12,7 +15,8 @@ export default class Empty extends Result {
   }
 
   updateEnv(args: IEnv) {
-    return new Empty(
+    return new Skip(
+      this.message,
       typeof this.env !== "undefined" ? { ...this.env, ...args } : args,
       this.meta
     );

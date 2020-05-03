@@ -1,10 +1,11 @@
 import { captureIf } from "./capture";
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema } from "../schemas";
+import { FunctionSchema } from "../schemas/Schema";
 import parse from "../parse";
 import { getParams } from "./utils";
+import { Value, IContext, IParams } from "../types";
 
-export function regex(regex, params) {
+export function regex(regex: RegExp | string, params: IParams) {
   const meta = { type: "regex", regex, params };
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {

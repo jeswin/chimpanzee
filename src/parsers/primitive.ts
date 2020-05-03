@@ -1,9 +1,8 @@
-import { Result, Match, Empty, Skip, Fault } from "../results";
-import PrimitiveSchema from "../schemas/primitive";
+import { Empty, Skip } from "../results";
 import { Schema } from "../schemas";
-import { Value, IContext } from "../types";
+import { Value, IContext, Primitive } from "../types";
 
-export default function (schema: PrimitiveSchema) {
+export default function (schema: Schema<Primitive>) {
   return (_obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
     context: IContext
   ) => {

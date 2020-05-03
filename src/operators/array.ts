@@ -1,5 +1,5 @@
 import { Result, Match, Empty, Skip, Fault } from "../results";
-import { Schema, FunctionSchema } from "../schemas";
+import { Schema, FunctionSchema } from "../schemas/Schema";
 import parse from "../parse";
 import exception from "../exception";
 import { getParams } from "./utils";
@@ -156,7 +156,7 @@ export function recursive(schema: Schema, params: IParams) {
                   ? loop(items.slice(result.env.needle), results)
                   : result
                 : new Fault(
-                    `The child expression in recursive() needs to be an array.`
+                    `The child expression in recursive() needs to be an array.`,
                   );
             })()
           : results.length

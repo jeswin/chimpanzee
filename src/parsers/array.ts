@@ -1,8 +1,8 @@
 import { Seq } from "lazily";
 import { Result, Match, Empty, Skip, Fault } from "../results";
-import { Schema, FunctionSchema } from "../schemas";
+import Schema, { Schema, FunctionSchema } from "../schemas/Schema";
 import parse from "../parse";
-import { ArraySchema } from "../schemas";
+import { ArraySchema } from "../schemas/Schema";
 import { wrapSchemaIfLiteralChild } from "./literals";
 import exception from "../exception";
 import { number } from "../operators/types";
@@ -57,7 +57,7 @@ function regularItem(schema) {
     );
 }
 
-export default function (schema: ArraySchema) {
+export default function (schema: Schema<Array<any>>) {
   return (obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
     context: IContext
   ) => {

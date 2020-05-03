@@ -1,10 +1,14 @@
-import Result from "./result";
+const IS_DEBUG =
+  process.env.CHIMPANZEE_DEBUG === "true" ||
+  process.env.CHIMPANZEE_DEBUG === "1";
+
+import Result from "./Result";
 import { IEnv, IMeta } from "../types";
 
-export default class Skip extends Result {
+export default class Fault extends Result {
   message: string;
 
-  constructor(message: string, env: IEnv, meta?: IMeta) {
+  constructor(message: string, env?: IEnv, meta?: IMeta) {
     super(env, meta);
     this.message = message;
 
@@ -12,10 +16,14 @@ export default class Skip extends Result {
     if ((global as any).__chimpanzeeTestContext) {
       (global as any).__chimpanzeeTestContext.push(this);
     }
+
+    if (IS_DEBUG) {
+      console.log(new Error().stack);
+    }
   }
 
   updateEnv(args: IEnv) {
-    return new Skip(
+    return new Fault(
       this.message,
       typeof this.env !== "undefined" ? { ...this.env, ...args } : args,
       this.meta

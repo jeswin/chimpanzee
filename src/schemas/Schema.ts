@@ -1,20 +1,24 @@
 /*
   This is the base class for all schemas.
 */
-import { parse, Match, Empty } from "..";
-import { IParams, IMeta, Value, IContext } from "../types";
-import { Result } from "../results";
+import { IParams, IMeta, Value, IContext, SchemaParser } from "../types";
+import parse from "../parse";
+import { Match, Empty, Result } from "../results";
 
-export type FnGetSchemaFromResult = (result: Result) => Schema;
+export type FnGetSchemaFromResult = (result: Result) => Schema<any>;
 
-export default class Schema {
-  params: IParams;
-  meta: IMeta;
+export default abstract class Schema<T> {
+  value: T;
+  params: IParams | undefined;
+  meta: IMeta | undefined;
 
-  constructor(params: IParams, meta: IMeta) {
+  constructor(value: T, params?: IParams, meta?: IMeta) {
+    this.value = value;
     this.params = params;
     this.meta = meta;
   }
+
+  abstract getParseFunc(): SchemaParser<T>;
 
   then(
     fnSuccessSchema: FnGetSchemaFromResult,

@@ -1,5 +1,5 @@
-export { default as Result } from "./result";
-export { default as Match } from "./match";
-export { default as Empty } from "./empty";
-export { default as Fault } from "./fault";
-export { default as Skip } from "./skip";
+export { default as Result } from "./Result";
+export { default as Match } from "./Match";
+export { default as Empty } from "./Empty";
+export { default as Fault } from "./Fault";
+export { default as Skip } from "./Skip";

@@ -1,5 +1,5 @@
 import { Match, Empty, Skip, Fault } from "../results";
-import { FunctionSchema } from "../schemas";
+import { FunctionSchema } from "../schemas/Schema";
 import { getParams } from "./utils";
 import { Value, IContext } from "../types";
 

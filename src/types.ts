@@ -1,5 +1,5 @@
 import { string } from "./operators/types";
-import { Schema } from "./schemas";
+import Schema, { Schema } from "./schemas/Schema";
 import { Result } from "./results";
 
 export type IMeta = any;
@@ -15,14 +15,6 @@ export type IContext = any;
 
 export type IEnv = any;
 
-// export interface IMeta {
-
-// }
-
-// export interface IParams {
-
-// }
-
 export type ParseFunc = (
   obj: Value,
   key: string,
@@ -30,4 +22,4 @@ export type ParseFunc = (
   parentKeys: string[]
 ) => (context: IContext) => Result;
 
-export type SchemaParseFunc = (schema: Schema) => ParseFunc;
+export type SchemaParser<T> = (schema: Schema<T>) => ParseFunc;
