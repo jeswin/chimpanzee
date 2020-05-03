@@ -13,7 +13,7 @@ export function any(schemas: Schema<any>[], params: IParams) {
         schemas: Schema<any>[],
         skippedSchemas: Schema<any>[],
         skippedResults: Result[]
-      ) {
+      ): Result {
         const result = parse(schemas[0])(obj, key, parents, parentKeys)(
           context
         );
