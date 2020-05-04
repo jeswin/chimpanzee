@@ -2,11 +2,11 @@ import { Seq } from "lazily";
 import { Match, Empty, Skip, Fault, Result } from "../results";
 import parse from "../parse";
 import { getParams } from "./utils";
-import { Value, IContext, IObject, IMeta, IParams } from "../types";
+import { Value, IContext, IObject, IMeta, IParams, LiteralSchema, AnySchema } from "../types";
 import { Schema, FunctionSchema } from "../schemas";
 import { isObject } from "../utils/obj";
 
-function traverseObject(schema: Schema<any>, params: IParams, meta: IMeta) {
+function traverseObject(schema: AnySchema, params: IParams, meta: IMeta) {
   return function (
     obj: IObject,
     key: string,
@@ -35,7 +35,7 @@ function traverseObject(schema: Schema<any>, params: IParams, meta: IMeta) {
   };
 }
 
-function traverseArray(schema: Schema<any>, params: IParams, meta: IMeta) {
+function traverseArray(schema: AnySchema, params: IParams, meta: IMeta) {
   return function (
     obj: Array<Value>,
     key: string,
@@ -64,7 +64,7 @@ function traverseArray(schema: Schema<any>, params: IParams, meta: IMeta) {
   };
 }
 
-export function deep(schema: Schema<any>, params = {}) {
+export function deep(schema: AnySchema, params = {}) {
   const meta = { type: "deep", schema, params };
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {

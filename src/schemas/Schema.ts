@@ -1,11 +1,11 @@
 /*
   This is the base class for all schemas.
 */
-import { IParams, IMeta, Value, IContext, SchemaParser } from "../types";
+import { IParams, IMeta, Value, IContext, SchemaParser, LiteralSchema, AnySchema } from "../types";
 import parse from "../parse";
 import { Match, Empty, Result } from "../results";
 
-export type FnGetSchemaFromResult = (result: Result) => Schema<any>;
+export type FnGetSchemaForResult = (result: Result) => AnySchema;
 
 export default abstract class Schema<T> {
   value: T;
@@ -21,8 +21,8 @@ export default abstract class Schema<T> {
   abstract getParseFunc(): SchemaParser<T>;
 
   then(
-    fnSuccessSchema: FnGetSchemaFromResult,
-    fnFailSchema: FnGetSchemaFromResult
+    fnSuccessSchema: FnGetSchemaForResult,
+    fnFailSchema: FnGetSchemaForResult
   ) {
     return (
       obj: Value,

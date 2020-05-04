@@ -45,6 +45,25 @@ export type Value = Primitive | IObject | Function | Array<Value>;
 export type IContext = any;
 
 /*
+  Literal schemas are written like a regular value.
+*/
+export type LiteralObjectSchema = {
+  [key: string]: LiteralSchema | Schema<any>;
+};
+
+export type LiteralArraySchema = Array<LiteralSchema | Schema<any>>;
+
+export type LiteralSchema =
+  | Primitive
+  | LiteralObjectSchema
+  | LiteralArraySchema;
+
+/*
+  Literal and Nominal Schemas
+*/
+export type AnySchema = Schema<any> | LiteralSchema;
+
+/*
   A function derived from a schema that can parse an input.
 */
 export type ParseFunc<TResult> = (

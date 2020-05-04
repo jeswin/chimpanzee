@@ -5,27 +5,27 @@ import { getParams } from "./utils";
 import { IParams, IContext, Value } from "../types";
 import { FunctionSchema } from "../schemas";
 
-export function number(params: IParams) {
+export function number(params?: IParams) {
   return checkType("number", params);
 }
 
-export function bool(params: IParams) {
+export function bool(params?: IParams) {
   return checkType("boolean", params);
 }
 
-export function string(params: IParams) {
+export function string(params?: IParams) {
   return checkType("string", params);
 }
 
-export function object(params: IParams) {
+export function object(params?: IParams) {
   return checkType("object", params);
 }
 
-export function func(params: IParams) {
+export function func(params?: IParams) {
   return checkType("function", params);
 }
 
-function checkType(type: string, params: IParams) {
+function checkType(type: string, params?: IParams) {
   const meta = { type, params };
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {

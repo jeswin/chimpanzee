@@ -1,6 +1,6 @@
 import { Schema, ObjectSchema, ArraySchema, PrimitiveSchema } from "../schemas";
 
-export function wrapSchemaIfLiteralChild(schema: Schema<any>, childSchema: any) {
+export function wrapSchemaIfLiteralChild(schema: any, childSchema: any) {
   // Value and property modifiers pass through literal containers ({} and []).
   const modifiersForLiteralChildren =
     schema.params && schema.params.modifiers

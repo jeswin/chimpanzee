@@ -32,8 +32,9 @@ export { Empty, Fault, Match, Skip } from "./results";
 
 import * as builtins from "./operators/builtins";
 import { Schema } from "./schemas";
+import { LiteralSchema, AnySchema } from "./types";
 export { builtins };
 
-export function match(schema: Schema<any>, input: any) {
+export function match(schema: AnySchema, input: any) {
   return parse(schema)(input, "__INIT__", [], [])({});
 }

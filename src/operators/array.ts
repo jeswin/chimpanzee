@@ -2,7 +2,7 @@ import { Match, Empty, Skip, Fault, Result } from "../results";
 import { Schema, FunctionSchema } from "../schemas";
 import parse from "../parse";
 import { toNeedledSchema, ArrayOperator, ArrayResult } from "../parsers/array";
-import { Value, IContext, IParams } from "../types";
+import { Value, IContext, IParams, LiteralSchema, AnySchema } from "../types";
 
 /*
   Unordered does not change the needle.
@@ -17,7 +17,7 @@ export type RepeatingOptions = {
   max?: number;
 };
 
-export function repeating(schema: Schema<any>, opts: RepeatingOptions = {}) {
+export function repeating(schema: AnySchema, opts: RepeatingOptions = {}) {
   const meta = { type: "repeating", schema: schema };
 
   const min = opts.min || 0;
@@ -100,7 +100,7 @@ export type UnorderedOptions = {
   searchPrevious?: boolean;
 };
 
-export function unordered(schema: Schema<any>, opts: UnorderedOptions = {}) {
+export function unordered(schema: AnySchema, opts: UnorderedOptions = {}) {
   const useNeedle = opts.searchPrevious === false ? true : false;
 
   const meta = { type: "unordered", schema: schema };
@@ -147,7 +147,7 @@ export function unordered(schema: Schema<any>, opts: UnorderedOptions = {}) {
   
   If a child schema invocation consumes multiple items, the next iteration will have as many items less.
 */
-export function recursive(schema: Schema<any>, params: IParams) {
+export function recursive(schema: AnySchema, params: IParams) {
   const meta = { type: "recursive", schema, params };
 
   return new FunctionSchema(
@@ -207,7 +207,7 @@ export function recursive(schema: Schema<any>, params: IParams) {
   A Skip() is not issued when an item is not found.
   The needle is incremented by 1 if found, otherwise it remains the same.
 */
-export function optionalItem(schema: Schema<any>) {
+export function optionalItem(schema: AnySchema) {
   const meta = { type: "optionalItem", schema: schema };
   const needledSchema = toNeedledSchema(schema);
 

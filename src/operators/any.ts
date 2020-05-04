@@ -2,16 +2,16 @@ import { Match, Empty, Skip, Fault, Result } from "../results";
 import { FunctionSchema, Schema } from "../schemas";
 import parse from "../parse";
 import { getParams } from "./utils";
-import { Value, IContext, IParams, IObject } from "../types";
+import { Value, IContext, IParams, IObject, LiteralSchema, AnySchema } from "../types";
 
-export function any(schemas: (Schema<any> | any)[], params?: IParams) {
+export function any(schemas: AnySchema[], params?: IParams) {
   const meta = { type: "any", schemas, params };
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {
     return (context: IContext) =>
       (function loop(
-        schemas: Schema<any>[],
-        skippedSchemas: Schema<any>[],
+        schemas: AnySchema[],
+        skippedSchemas: AnySchema[],
         skippedResults: Result[]
       ): Result {
         const result = parse(schemas[0])(obj, key, parents, parentKeys)(

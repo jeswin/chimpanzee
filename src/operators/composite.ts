@@ -3,28 +3,25 @@ import { Seq } from "lazily";
 import parse from "../parse";
 import { getParams } from "./utils";
 import merge from "../utils/merge";
-import { IParams, Value, IContext, IObject } from "../types";
-import { ObjectSchema, Schema, FunctionSchema } from "../schemas";
+import { IParams, Value, IContext, AnySchema } from "../types";
+import { ObjectSchema, Schema, FunctionSchema, isLiteralObjectSchema } from "../schemas";
 import { wrap } from "./wrap";
 import { isObject } from "../utils/obj";
 
-function getSchema(
-  schema: Schema<any>,
-  paramSelector: string
-): Schema<any> | IObject | undefined {
-  const schemaSelector =
-    schema.params && schema.params.selector
-      ? schema.params.selector
-      : "default";
-
+function getSchema(schema: AnySchema, paramSelector: string): AnySchema {
   return Array.isArray(schema)
     ? schema
         .map((item) => getSchema(item, paramSelector))
         .filter((x) => x !== undefined)
     : schema instanceof Schema
-    ? schemaSelector === paramSelector
-      ? schema
-      : undefined
+    ? (() => {
+        const schemaSelector =
+          schema.params && schema.params.selector
+            ? schema.params.selector
+            : "default";
+
+        return schemaSelector === paramSelector ? schema : undefined;
+      })()
     : typeof schema === "object"
     ? (() => {
         const innerSchema = Seq.of(Object.keys(schema)).reduce((acc, key) => {
@@ -41,7 +38,7 @@ function getSchema(
 }
 
 export function composite(
-  schema: Schema<any>,
+  schema: AnySchema,
   _paramsList: IParams[],
   ownParams = {}
 ) {
@@ -61,7 +58,7 @@ export function composite(
   const schemas = paramsList.map((params) => {
     const schemaForParam =
       (getSchema(schema, (params && params.name) || "default") || {}, params);
-    return isObject(schemaForParam)
+    return isLiteralObjectSchema(schemaForParam)
       ? new ObjectSchema(schemaForParam, params)
       : wrap(schemaForParam, params);
   });

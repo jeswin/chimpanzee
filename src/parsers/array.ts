@@ -2,11 +2,11 @@ import { Match, Empty, Skip, Fault, Result } from "../results";
 import parse from "../parse";
 import { wrapSchemaIfLiteralChild } from "./literals";
 import exception from "../exception";
-import { Value, IContext, IParams } from "../types";
+import { Value, IContext, IParams, LiteralSchema, AnySchema } from "../types";
 import { FunctionSchema, Schema } from "../schemas";
 
 // TODO - handle params
-export function toNeedledSchema(schema: Schema<any>) {
+export function toNeedledSchema(schema: AnySchema) {
   return schema instanceof ArrayOperator ? schema.fn : regularItem(schema);
 }
 
@@ -31,7 +31,7 @@ export class ArrayResult {
   Not array types, viz optional, unordered or repeating.
   Not a sequence
 */
-function regularItem(schema: Schema<any>) {
+function regularItem(schema: AnySchema) {
   const meta = { type: "regularItem", schema };
 
   return (needle: number, params?: IParams) =>
@@ -74,7 +74,7 @@ export default function (schema: Schema<Array<any>>) {
             meta
           )
         : (function loop(
-            schemas: Schema<any>[],
+            schemas: AnySchema[],
             results: Result[],
             needle: number
           ): Result {

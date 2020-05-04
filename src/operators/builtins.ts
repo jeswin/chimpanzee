@@ -1,5 +1,5 @@
 import { getParams } from "./utils";
-import { IParams, Primitive, IObject } from "../types";
+import { IParams, Primitive, IObject, LiteralArraySchema, LiteralObjectSchema } from "../types";
 import {
   ArraySchema,
   FunctionSchema,
@@ -7,7 +7,7 @@ import {
   ObjectSchema,
 } from "../schemas";
 
-export function arr(schema: Array<any>, params: IParams) {
+export function arr(schema: LiteralArraySchema, params: IParams) {
   const meta = { type: "builtins.arr", schema, params };
   return new ArraySchema(schema, getParams(params), meta);
 }
@@ -17,7 +17,7 @@ export function func(schema: Function, params: IParams) {
   return new FunctionSchema(schema, getParams(params), meta);
 }
 
-export function obj(schema: IObject, params: IParams) {
+export function obj(schema: LiteralObjectSchema, params: IParams) {
   const meta = { type: "builtins.obj", schema, params };
   return new ObjectSchema(schema, getParams(params), meta);
 }

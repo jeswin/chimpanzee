@@ -10,5 +10,5 @@ export const schema = $.obj(
     hello: "world!!!",
     something: capture()
   },
-  { modifiers: { value: x => `${x}!!!` } }
+  { modifiers: { value: (x: string) => `${x}!!!` } }
 );

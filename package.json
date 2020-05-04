@@ -3,7 +3,7 @@
   "version": "0.0.71",
   "author": "Jeswin Kumar<jeswinpk@agilehead.com>",
   "scripts": {
-    "test": "mocha dist/test/test.js",
+    "test": "./build.sh && mocha dist/test/test.js",
     "debug": "mocha --debug-brk dist/test/test.js"
   },
   "main": "dist/index.js",

@@ -1,14 +1,14 @@
 import {  Empty, Skip } from "../results";
 import parse from "../parse";
 import { getParams } from "./utils";
-import { Value, IContext } from "../types";
+import { Value, IContext, LiteralSchema, AnySchema } from "../types";
 import { FunctionSchema, Schema } from "../schemas";
 
 /*
   Parse with schema if the predicate returns true.
 */
 // TODO Rename this...
-export function exists(predicate: (x: Value) => boolean, schema: Schema<any>) {
+export function exists(predicate: (x: Value) => boolean, schema: AnySchema) {
   const meta = { type: "exists", schema, predicate };
 
   predicate = predicate || ((x) => typeof x !== "undefined");
