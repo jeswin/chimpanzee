@@ -7,6 +7,6 @@ export const input = {
 
 export const schema = wrap({
   hello: capture("key"),
-}).then((result) => ({
+}).then((result: any) => ({
   next: { inner: result.value.key, text: capture() },
 }));

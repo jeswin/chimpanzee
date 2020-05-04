@@ -5,20 +5,20 @@ export const input = {
     prop1: "hello",
     level2: {
       level3: {
-        prop2: "something"
-      }
+        prop2: "something",
+      },
     },
     level2a: {
       level3a: {
         level4a: {
           level5a: {
-            prop3: "world"
-          }
+            prop3: "world",
+          },
         },
-        level4b: "yoyo"
-      }
-    }
-  }
+        level4b: "yoyo",
+      },
+    },
+  },
 };
 
 export const schema = {
@@ -26,10 +26,11 @@ export const schema = {
     level2a: deep(
       {
         level5a: {
-          prop3: obj => context => new Fault("SCHEMA has a fault.")
-        }
+          prop3: (obj: any) => (context: any) =>
+            new Fault("SCHEMA has a fault."),
+        },
       },
       "prop1"
-    )
-  }
+    ),
+  },
 };

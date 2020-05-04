@@ -1,17 +1,20 @@
-import {  Empty, Skip } from "../results";
+import { Empty, Skip } from "../results";
 import parse from "../parse";
 import { getParams } from "./utils";
-import { Value, IContext, LiteralSchema, AnySchema } from "../types";
-import { FunctionSchema, Schema } from "../schemas";
+import { Value, IContext, AnySchema } from "../types";
+import { FunctionSchema } from "../schemas";
 
 /*
   Parse with schema if the predicate returns true.
 */
 // TODO Rename this...
-export function exists(predicate: (x: Value) => boolean, schema: AnySchema) {
-  const meta = { type: "exists", schema, predicate };
+export function exists(
+  maybePredicate?: (x: Value) => boolean,
+  schema?: AnySchema
+) {
+  const meta = { type: "exists", schema, predicate: maybePredicate };
 
-  predicate = predicate || ((x) => typeof x !== "undefined");
+  const predicate = maybePredicate || ((x) => typeof x !== "undefined");
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {
     return (context: IContext) =>

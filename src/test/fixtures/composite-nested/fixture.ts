@@ -6,12 +6,12 @@ export const input = {
       something: "else",
       node: {
         level2: {
-          node: { hello: "world" }
-        }
-      }
-    }
+          node: { hello: "world" },
+        },
+      },
+    },
   },
-  prop: "something"
+  prop: "something",
 };
 
 export const schema = composite(
@@ -19,15 +19,15 @@ export const schema = composite(
     level1: {
       something: capture(),
       level2: {
-        hello: capture({ selector: "alt" })
-      }
-    }
+        hello: capture({ selector: "alt" }),
+      },
+    },
   },
   [
-    { name: "default", modifiers: { object: obj => obj.node } },
+    { name: "default", modifiers: { object: (obj: any) => obj.node } },
     {
       name: "alt",
-      modifiers: { property: (obj, key) => obj.node[key] }
-    }
+      modifiers: { property: (obj: any, key: string) => obj.node[key] },
+    },
   ]
 );

@@ -1,8 +1,8 @@
 import { Empty, Skip } from "../results";
 import parse from "../parse";
 import { getParams } from "./utils";
-import { Value, IContext, IParams, LiteralSchema, AnySchema } from "../types";
-import { FunctionSchema, Schema } from "../schemas";
+import { Value, IContext, IParams, AnySchema } from "../types";
+import { FunctionSchema } from "../schemas";
 
 export function optional(schema: AnySchema, params: IParams = {}) {
   const meta = { type: "optional", schema, params };

@@ -10,8 +10,9 @@ export const schema = wrap({
   hello: capture("key"),
   does: "exist",
 }).then(
-  (result) => ({
+  (result: any) => ({
     next: { inner: result.value.key, text: capture() },
   }),
-  (result) => (result instanceof Skip ? new Skip("That is an error.") : result)
+  (result: any) =>
+    result instanceof Skip ? new Skip("That is an error.") : result
 );

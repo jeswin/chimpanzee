@@ -1,8 +1,8 @@
-import { Match, Empty, Skip, Fault } from "../results";
+import { Match, Empty, Skip } from "../results";
 import parse from "../parse";
 import { getParams } from "./utils";
-import { Primitive, Value, IParams, IContext, LiteralSchema, AnySchema } from "../types";
-import { Schema, FunctionSchema } from "../schemas";
+import { Value, IParams, IContext, AnySchema } from "../types";
+import { FunctionSchema } from "../schemas";
 import { isObject } from "../utils/obj";
 
 export type Predicate = (value: Value) => boolean;
@@ -18,17 +18,17 @@ export function captureIf(predicate: Predicate, params?: IParams) {
 export function modify(
   predicate: Predicate,
   modifier: IModifier,
-  params: IParams
+  params?: IParams
 ) {
   return take(predicate, params, { modifier });
 }
 
-export function captureAndParse(schema: AnySchema, params: IParams) {
-  return take((obj) => typeof obj !== "undefined", schema, params);
+export function captureAndParse(schema: AnySchema, params?: IParams) {
+  return takeWithSchema((obj) => typeof obj !== "undefined", schema, params);
 }
 
-export function literal(what: Value, params: IParams) {
-  return takeWithSchema((x) => x === what, undefined, params, {
+export function literal(what: Value, params?: IParams) {
+  return take((x) => x === what, params, {
     skipMessage: (x: Value) =>
       `Expected value to be ${(what as any).toString()} but got ${
         x !== undefined ? x.toString() : "undefined"

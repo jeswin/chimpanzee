@@ -1,7 +1,9 @@
 import { IObject } from "../types";
 
 function isObject(item: any): item is IObject {
-  return item && typeof item === "object" && !Array.isArray(item);
+  // TODO remove
+  // return item && typeof item === "object" && !Array.isArray(item);
+  return typeof item === "object" && item.constructor === Object;
 }
 
 export default function merge(

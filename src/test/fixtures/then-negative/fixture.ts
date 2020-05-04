@@ -1,4 +1,5 @@
 import { wrap, object, capture } from "../../../";
+import { any } from "../../../operators/any";
 
 export const input = {
   hello: "world",
@@ -9,6 +10,6 @@ export const input = {
 export const schema = wrap({
   hello: capture("key"),
   does: "exist"
-}).then(result => ({
+}).then((result:any) => ({
   next: { inner: result.value.key, text: capture() }
 }));

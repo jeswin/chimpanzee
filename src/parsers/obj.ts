@@ -1,9 +1,9 @@
 import { Seq } from "lazily";
-import { Result, Match, Empty, Skip, Fault } from "../results";
+import { Match, Empty, Skip, Fault } from "../results";
 import parse from "../parse";
-import { Schema } from "../schemas";
+import { Schema, isLiteralObjectSchema } from "../schemas";
 import { wrapSchemaIfLiteralChild } from "./literals";
-import { Value, IContext, IObject } from "../types";
+import { Value, IContext } from "../types";
 
 function sortFn(schema1: Schema<any>, schema2: Schema<any>) {
   const schema1Order =
@@ -39,6 +39,7 @@ export default function (schema: Schema<any>) {
                 const effectiveContainerObj = childUnmodified.object
                   ? _obj
                   : obj;
+
                 const propModifier =
                   schema.params &&
                   schema.params.modifiers &&
@@ -50,10 +51,6 @@ export default function (schema: Schema<any>) {
                     : effectiveContainerObj[childKey];
 
                 // child is { ... }
-                const isChildLiteralObject =
-                  typeof childSource === "object" &&
-                  childSource.constructor === Object;
-
                 const childSchema = wrapSchemaIfLiteralChild(
                   schema,
                   childSource
@@ -68,7 +65,7 @@ export default function (schema: Schema<any>) {
 
                 return result instanceof Match
                   ? (childSchema.params && childSchema.params.replace) ||
-                    isChildLiteralObject
+                    isLiteralObjectSchema(childSource)
                     ? {
                         ...context,
                         ...result.value,

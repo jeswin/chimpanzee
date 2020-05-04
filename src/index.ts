@@ -28,7 +28,7 @@ export {
 export { wrap } from "./operators/wrap";
 export { permute, permuteArray, permuteObject } from "./operators/permute";
 
-export { Empty, Fault, Match, Skip } from "./results";
+export { Empty, Fault, Match, Skip, Result } from "./results";
 
 import * as builtins from "./operators/builtins";
 import { Schema } from "./schemas";

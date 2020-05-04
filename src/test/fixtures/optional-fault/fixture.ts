@@ -5,14 +5,16 @@ export const input = {
     prop1: "hello",
     other1: "something1",
     level2: {
-      prop2: "world"
-    }
-  }
+      prop2: "world",
+    },
+  },
 };
 
 export const schema = {
   level1: {
     prop1: capture(),
-    prop2: optional(obj => context => new Fault("SCHEMA has a fault."))
-  }
+    prop2: optional((obj: any) => (context: any) =>
+      new Fault("SCHEMA has a fault.")
+    ),
+  },
 };

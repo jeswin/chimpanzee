@@ -8,16 +8,16 @@ export const input = {
     list: [
       {
         inner: 1,
-        otherInner: { node: 2 }
-      }
+        otherInner: { node: 2 },
+      },
     ],
     heal: {
       node: {
-        what: "the world"
-      }
-    }
+        what: "the world",
+      },
+    },
   },
-  prop: "something"
+  prop: "something",
 };
 
 export const schema = composite(
@@ -28,14 +28,18 @@ export const schema = composite(
     prop: capture({ key: "second", selector: "alt" }),
     heal: $.obj(
       {
-        what: capture()
+        what: capture(),
       },
-      { selector: "heal", replace: true, modifiers: { object: x => x.node } }
-    )
+      {
+        selector: "heal",
+        replace: true,
+        modifiers: { object: (x: any) => x.node },
+      }
+    ),
   },
   [
-    { name: "default", modifiers: { object: x => x.node } },
+    { name: "default", modifiers: { object: (x: any) => x.node } },
     { name: "alt" },
-    { name: "heal", modifiers: { object: x => x.node } }
+    { name: "heal", modifiers: { object: (x: any) => x.node } },
   ]
 );

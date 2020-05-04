@@ -1,7 +1,14 @@
 /*
   This is the base class for all schemas.
 */
-import { IParams, IMeta, Value, IContext, SchemaParser, LiteralSchema, AnySchema } from "../types";
+import {
+  IParams,
+  IMeta,
+  Value,
+  IContext,
+  SchemaParser,
+  AnySchema,
+} from "../types";
 import parse from "../parse";
 import { Match, Empty, Result } from "../results";
 
@@ -22,7 +29,7 @@ export default abstract class Schema<T> {
 
   then(
     fnSuccessSchema: FnGetSchemaForResult,
-    fnFailSchema: FnGetSchemaForResult
+    fnFailSchema?: FnGetSchemaForResult
   ) {
     return (
       obj: Value,

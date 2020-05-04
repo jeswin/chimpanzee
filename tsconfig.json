@@ -12,6 +12,5 @@
     "strict": true,
     "types": ["node"]
   },
-  "include": ["./src/**/*"],
-  "exclude": ["src/test/fixtures"]
+  "include": ["./src/**/*"]
 }

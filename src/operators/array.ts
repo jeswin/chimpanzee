@@ -1,8 +1,8 @@
 import { Match, Empty, Skip, Fault, Result } from "../results";
-import { Schema, FunctionSchema } from "../schemas";
+import { FunctionSchema } from "../schemas";
 import parse from "../parse";
 import { toNeedledSchema, ArrayOperator, ArrayResult } from "../parsers/array";
-import { Value, IContext, IParams, LiteralSchema, AnySchema } from "../types";
+import { Value, IContext, IParams, AnySchema } from "../types";
 
 /*
   Unordered does not change the needle.
@@ -110,9 +110,12 @@ export function unordered(schema: AnySchema, opts: UnorderedOptions = {}) {
   return new ArrayOperator(
     (needle: number) =>
       new FunctionSchema(
-        (obj: Array<Value>, key: string, parents: Value[], parentKeys: string[]) => (
-          context: IContext
-        ) =>
+        (
+          obj: Array<Value>,
+          key: string,
+          parents: Value[],
+          parentKeys: string[]
+        ) => (context: IContext) =>
           (function loop(i: number): ArrayResult {
             const { result } = parse(needledSchema(i))(
               obj,
@@ -147,7 +150,7 @@ export function unordered(schema: AnySchema, opts: UnorderedOptions = {}) {
   
   If a child schema invocation consumes multiple items, the next iteration will have as many items less.
 */
-export function recursive(schema: AnySchema, params: IParams) {
+export function recursive(schema: AnySchema, params?: IParams) {
   const meta = { type: "recursive", schema, params };
 
   return new FunctionSchema(
@@ -216,9 +219,12 @@ export function optionalItem(schema: AnySchema) {
       (obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
         context: IContext
       ) => {
-        const { result } = parse(needledSchema(needle))(obj, key, parents, parentKeys)(
-          context
-        );
+        const { result } = parse(needledSchema(needle))(
+          obj,
+          key,
+          parents,
+          parentKeys
+        )(context);
 
         return result instanceof Match || result instanceof Empty
           ? new ArrayResult(result, needle + 1)

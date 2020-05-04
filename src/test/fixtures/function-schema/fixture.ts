@@ -1,9 +1,9 @@
 import { Match } from "../../../";
 
 export const input = {
-  hello: "world"
+  hello: "world",
 };
 
 export const schema = {
-  hello: obj => context => new Match(`${obj}!!!`)
+  hello: (obj: any) => (context: any) => new Match(`${obj}!!!`),
 };

@@ -26,7 +26,7 @@ export const input = {
 
 const titleSchema = "title";
 const commentsSchema = [literal("comments"), any([literal("off"), literal("on")])];
-const urlSchema = [literal("url"), captureIf(x => x.startsWith("https:"))];
+const urlSchema = [literal("url"), captureIf(x => typeof x === "string" &&  x.startsWith("https:"))];
 
 export const schema = {
   level1: recursive(

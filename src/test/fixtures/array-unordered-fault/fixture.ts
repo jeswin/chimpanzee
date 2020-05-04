@@ -15,8 +15,8 @@ export const input = {
 export const schema = {
   level1: [
     unordered(string()),
-    unordered((obj, key, parents, parentKeys) => context =>
-      obj !== "two" ? new Skip() : new Fault("TWO can't happen.")
+    unordered((obj: any, key: string, parents: any[], parentKeys: string[]) => (context: any) =>
+      obj !== "two" ? new Skip("Skipping") : new Fault("TWO can't happen.")
     )
   ]
 };

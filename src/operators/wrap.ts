@@ -1,9 +1,9 @@
 import parse from "../parse";
 import { getParams } from "./utils";
-import { Value, IContext, IParams, LiteralSchema, AnySchema } from "../types";
-import { FunctionSchema, Schema } from "../schemas";
+import { Value, IContext, IParams, AnySchema } from "../types";
+import { FunctionSchema } from "../schemas";
 
-export function wrap(schema: AnySchema, params: IParams) {
+export function wrap(schema: AnySchema, params?: IParams) {
   const meta = { schema, params };
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {

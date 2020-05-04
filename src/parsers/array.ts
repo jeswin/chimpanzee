@@ -2,7 +2,7 @@ import { Match, Empty, Skip, Fault, Result } from "../results";
 import parse from "../parse";
 import { wrapSchemaIfLiteralChild } from "./literals";
 import exception from "../exception";
-import { Value, IContext, IParams, LiteralSchema, AnySchema } from "../types";
+import { Value, IContext, IParams, AnySchema } from "../types";
 import { FunctionSchema, Schema } from "../schemas";
 
 // TODO - handle params

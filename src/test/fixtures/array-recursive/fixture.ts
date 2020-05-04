@@ -5,7 +5,6 @@ import {
   literal,
   repeating,
   recursive,
-  string
 } from "../../../";
 
 export const input = {
@@ -19,18 +18,24 @@ export const input = {
     "Hello",
     "world",
     ".",
-    "promote"
+    "promote",
   ],
-  hello: "world"
+  hello: "world",
 };
 
-const titleSchema = [literal("title"), repeating(captureIf(x => x !== "."))];
-const commentsSchema = [literal("comments"), any([literal("off"), literal("on")])];
-const urlSchema = [literal("url"), captureIf(x => x.startsWith("https:"))];
+const titleSchema = [literal("title"), repeating(captureIf((x) => x !== "."))];
+const commentsSchema = [
+  literal("comments"),
+  any([literal("off"), literal("on")]),
+];
+const urlSchema = [
+  literal("url"),
+  captureIf((x) => typeof x === "string" && x.startsWith("https:")),
+];
 
 export const schema = {
   level1: recursive(
     any([commentsSchema, urlSchema, titleSchema, ["."], ["promote"]])
   ),
-  hello: capture()
+  hello: capture(),
 };

@@ -2,9 +2,9 @@ import { builtins as $, wrap, composite, capture } from "../../../";
 
 export const input = {
   node: {
-    list: [{ inner: 1 }]
+    list: [{ inner: 1 }],
   },
-  list: [{ altInner: 2 }]
+  list: [{ altInner: 2 }],
 };
 
 export const schema = composite(
@@ -12,12 +12,12 @@ export const schema = composite(
     list: [
       {
         inner: capture(),
-        altInner: wrap(capture(), { selector: "alt" })
-      }
-    ]
+        altInner: wrap(capture(), { selector: "alt" }),
+      },
+    ],
   },
   [
-    { name: "default", modifiers: { object: x => x.node } },
-    { name: "alt", mergeArray: true }
+    { name: "default", modifiers: { object: (x: any) => x.node } },
+    { name: "alt", mergeArray: true },
   ]
 );

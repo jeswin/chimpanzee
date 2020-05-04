@@ -1,9 +1,8 @@
-import { Seq } from "lazily";
-import { Match, Empty, Skip, Fault, Result } from "../results";
+import { Skip, Result } from "../results";
 import parse from "../parse";
 import { getParams } from "./utils";
-import { Value, IContext, IObject, IMeta, IParams, LiteralSchema, AnySchema } from "../types";
-import { Schema, FunctionSchema } from "../schemas";
+import { Value, IContext, IObject, IMeta, IParams, AnySchema } from "../types";
+import { FunctionSchema } from "../schemas";
 import { isObject } from "../utils/obj";
 
 function traverseObject(schema: AnySchema, params: IParams, meta: IMeta) {
@@ -13,8 +12,8 @@ function traverseObject(schema: AnySchema, params: IParams, meta: IMeta) {
     parents: Value[],
     parentKeys: string[]
   ) {
-    return function (context: IContext) {
-      return function loop(keys: string[]): Result {
+    return function (context: IContext): Result {
+      return (function loop(keys: string[]): Result {
         return keys.length
           ? (() => {
               const result = parse(deep(schema, params))(
@@ -30,7 +29,7 @@ function traverseObject(schema: AnySchema, params: IParams, meta: IMeta) {
               { obj, key, parents, parentKeys },
               meta
             );
-      };
+      })(Object.keys(obj));
     };
   };
 }
@@ -42,8 +41,8 @@ function traverseArray(schema: AnySchema, params: IParams, meta: IMeta) {
     parents: Value[],
     parentKeys: string[]
   ) {
-    return function (context: IContext) {
-      (function loop(items: Array<Value>): Result {
+    return function (context: IContext): Result {
+      return (function loop(items: Array<Value>): Result {
         return items.length
           ? (() => {
               const result = parse(deep(schema, params))(

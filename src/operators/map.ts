@@ -1,10 +1,14 @@
 import { Match } from "../results";
 import parse from "../parse";
 import { getParams } from "./utils";
-import { Value, IContext, IParams, LiteralSchema, AnySchema } from "../types";
-import { FunctionSchema, Schema } from "../schemas";
+import { Value, IContext, IParams, AnySchema } from "../types";
+import { FunctionSchema } from "../schemas";
 
-export function map(schema: AnySchema, mapper: (x: any) => any, params: IParams) {
+export function map(
+  schema: AnySchema,
+  mapper: (x: any) => any,
+  params?: IParams
+) {
   const meta = { type: "map", schema, mapper, params };
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {

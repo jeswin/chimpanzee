@@ -10,5 +10,5 @@ export const schema = map(
     prop1: capture(),
     prop2: capture()
   },
-  s => ({ prop3: `${s.prop1} ${s.prop2}` })
+  (s: any) => ({ prop3: `${s.prop1} ${s.prop2}` })
 );

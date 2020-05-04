@@ -1,4 +1,4 @@
-import { Schema, ObjectSchema, ArraySchema, PrimitiveSchema } from "../schemas";
+import { ObjectSchema, ArraySchema, PrimitiveSchema } from "../schemas";
 
 export function wrapSchemaIfLiteralChild(schema: any, childSchema: any) {
   // Value and property modifiers pass through literal containers ({} and []).

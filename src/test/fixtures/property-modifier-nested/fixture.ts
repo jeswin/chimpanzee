@@ -1,30 +1,30 @@
 import { builtins as $, capture } from "../../../";
 
 export const input = {
-  getItem(item) {
+  getItem(item: any) {
     return item === "level1"
       ? {
-          getItem(item) {
+          getItem(item: any) {
             return item === "level2"
               ? {
-                  getItem(item) {
+                  getItem(item: any) {
                     return item === "level3" ? "hello" : "nothing";
-                  }
+                  },
                 }
               : "nothing";
-          }
+          },
         }
       : "nothing";
-  }
+  },
 };
 
 export const schema = $.obj(
   {
     level1: {
       level2: {
-        level3: capture()
-      }
-    }
+        level3: capture(),
+      },
+    },
   },
-  { modifiers: { property: (obj, key) => obj.getItem(key) } }
+  { modifiers: { property: (obj: any, key: string) => obj.getItem(key) } }
 );

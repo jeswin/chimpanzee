@@ -50,7 +50,7 @@ describe("chimpanzee", () => {
   }
 
   const tests = [
-    ["any", "any", "match"],
+    // ["any", "any", "match"],
     // ["any-fault", "any-fault", "fault"],
     // ["any-native-types", "any-native-types", "empty"],
     // ["any-negative", "any-negative", "skip"],
@@ -88,7 +88,7 @@ describe("chimpanzee", () => {
     // ["capture-simple", "capture-simple", "match"],
     // ["child-task-order", "child-task-order", "match"],
     // ["child-task-order-missing", "child-task-order-missing", "match"],
-    // ["composite", "composite", "match"],
+    ["composite", "composite", "match"],
     // ["composite-arrays", "composite-arrays", "match"],
     // ["composite-arrays-merge", "composite-arrays-merge", "match"],
     // ["composite-complex", "composite-complex", "match"],

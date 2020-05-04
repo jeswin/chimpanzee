@@ -5,7 +5,7 @@ import { getParams } from "./utils";
 import { Value, IContext, IParams } from "../types";
 import { FunctionSchema } from "../schemas";
 
-export function regex(regex: RegExp | string, params: IParams) {
+export function regex(regex: RegExp | string, params?: IParams) {
   const meta = { type: "regex", regex, params };
 
   function fn(obj: Value, key: string, parents: Value[], parentKeys: string[]) {

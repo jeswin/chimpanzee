@@ -1,6 +1,6 @@
-import { string } from "./operators/types";
 import { Schema } from "./schemas";
 import { Result } from "./results";
+import { ArrayOperator } from "./parsers/array";
 
 /*
   Params represent the params passed to a schema.
@@ -51,12 +51,15 @@ export type LiteralObjectSchema = {
   [key: string]: LiteralSchema | Schema<any>;
 };
 
-export type LiteralArraySchema = Array<LiteralSchema | Schema<any>>;
+export type LiteralArraySchema = Array<
+  LiteralSchema | Schema<any> | ArrayOperator
+>;
 
 export type LiteralSchema =
   | Primitive
   | LiteralObjectSchema
-  | LiteralArraySchema;
+  | LiteralArraySchema
+  | Function;
 
 /*
   Literal and Nominal Schemas

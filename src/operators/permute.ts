@@ -6,7 +6,10 @@ export function permute<T>(a: Array<T>): Array<Array<T>> {
     ? a.reduce(
         (r, v, i) => [
           ...r,
-          ...permute([...a.slice(0, i), ...a.slice(i + 1)]).map((x) => [v, ...x]),
+          ...permute([...a.slice(0, i), ...a.slice(i + 1)]).map((x) => [
+            v,
+            ...x,
+          ]),
         ],
         [] as Array<Array<T>>
       )

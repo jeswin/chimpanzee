@@ -1,19 +1,25 @@
-import { Match, Empty, Skip, Fault, Result } from "../results";
-import { Seq } from "lazily";
+import { Match, Empty, Result } from "../results";
 import parse from "../parse";
 import { getParams } from "./utils";
 import merge from "../utils/merge";
 import { IParams, Value, IContext, AnySchema } from "../types";
-import { ObjectSchema, Schema, FunctionSchema, isLiteralObjectSchema } from "../schemas";
+import {
+  ObjectSchema,
+  Schema,
+  FunctionSchema,
+  isLiteralObjectSchema,
+  isLiteralArraySchema,
+} from "../schemas";
 import { wrap } from "./wrap";
-import { isObject } from "../utils/obj";
+import { ArrayOperator } from "../parsers/array";
 
-function getSchema(schema: AnySchema, paramSelector: string): AnySchema {
-  return Array.isArray(schema)
-    ? schema
-        .map((item) => getSchema(item, paramSelector))
-        .filter((x) => x !== undefined)
-    : schema instanceof Schema
+function getSchema(
+  schema: AnySchema | ArrayOperator,
+  paramSelector: string
+): AnySchema {
+  // If the schema is a Schema instance
+  //  pickup the selector from its props.
+  return schema instanceof Schema
     ? (() => {
         const schemaSelector =
           schema.params && schema.params.selector
@@ -22,9 +28,10 @@ function getSchema(schema: AnySchema, paramSelector: string): AnySchema {
 
         return schemaSelector === paramSelector ? schema : undefined;
       })()
-    : typeof schema === "object"
+    : // if literal object, pick props with matching selector
+    isLiteralObjectSchema(schema)
     ? (() => {
-        const innerSchema = Seq.of(Object.keys(schema)).reduce((acc, key) => {
+        const innerSchema = Object.keys(schema).reduce((acc, key) => {
           const result = getSchema(schema[key], paramSelector);
           return result !== undefined && Object.keys(result).length > 0
             ? { ...acc, [key]: result }
@@ -32,6 +39,11 @@ function getSchema(schema: AnySchema, paramSelector: string): AnySchema {
         }, {});
         return Object.keys(innerSchema).length > 0 ? innerSchema : undefined;
       })()
+    : // if literal array, then loop and get the matching ones
+    isLiteralArraySchema(schema)
+    ? schema
+        .map((item) => getSchema(item, paramSelector))
+        .filter((x) => x !== undefined)
     : paramSelector === "default"
     ? schema
     : undefined;
@@ -39,25 +51,27 @@ function getSchema(schema: AnySchema, paramSelector: string): AnySchema {
 
 export function composite(
   schema: AnySchema,
-  _paramsList: IParams[],
+  paramsList: IParams[],
   ownParams = {}
 ) {
   const meta = {
     type: "composite",
     schema,
-    paramsList: _paramsList,
+    paramsList: paramsList,
     ownParams,
   };
 
-  const paramsList = _paramsList.some(
+  const normalizedParamsList = paramsList.some(
     (params) => !params.name || params.name === "default"
   )
-    ? _paramsList
-    : [{ name: "default" }].concat(_paramsList);
+    ? paramsList
+    : [{ name: "default" }].concat(paramsList);
 
-  const schemas = paramsList.map((params) => {
+  const schemas = normalizedParamsList.map((params) => {
     const schemaForParam =
       (getSchema(schema, (params && params.name) || "default") || {}, params);
+
+    console.log("schemaForParam", schemaForParam);
     return isLiteralObjectSchema(schemaForParam)
       ? new ObjectSchema(schemaForParam, params)
       : wrap(schemaForParam, params);

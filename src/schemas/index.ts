@@ -5,10 +5,10 @@ import PrimitiveSchema from "./PrimitiveSchema";
 import FunctionSchema from "./FunctionSchema";
 import exception from "../exception";
 import {
-  LiteralSchema,
   AnySchema,
   Primitive,
   LiteralObjectSchema,
+  LiteralArraySchema,
 } from "../types";
 
 export { default as Schema } from "./Schema";
@@ -34,6 +34,12 @@ export function isLiteralObjectSchema(
   return typeof schema === "object" && schema.constructor === Object;
 }
 
+export function isLiteralArraySchema(
+  schema: any
+): schema is LiteralArraySchema {
+  return Array.isArray(schema);
+}
+
 export function toSchema(source: AnySchema): Schema<any> {
   return source instanceof Schema
     ? source
@@ -41,7 +47,7 @@ export function toSchema(source: AnySchema): Schema<any> {
     ? new PrimitiveSchema(source)
     : source instanceof Function
     ? new FunctionSchema(source)
-    : source instanceof Array
+    : isLiteralArraySchema(source)
     ? new ArraySchema(source)
     : source.constructor === Object
     ? new ObjectSchema(source)

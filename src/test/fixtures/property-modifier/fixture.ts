@@ -1,14 +1,14 @@
 import { builtins as $, capture } from "../../../";
 
 export const input = {
-  getItem(item) {
+  getItem(item: any) {
     return item === "hello" ? "world" : "nothing";
-  }
+  },
 };
 
 export const schema = $.obj(
   {
-    hello: capture()
+    hello: capture(),
   },
-  { modifiers: { property: (obj, key) => obj.getItem(key) } }
+  { modifiers: { property: (obj: any, key: string) => obj.getItem(key) } }
 );

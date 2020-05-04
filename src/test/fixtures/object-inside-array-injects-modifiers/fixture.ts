@@ -3,16 +3,16 @@ import { builtins as $, capture } from "../../../";
 export const input = [
   {
     hello: "world",
-    something: "else"
-  }
+    something: "else",
+  },
 ];
 
 export const schema = $.arr(
   [
     {
       hello: "world!!!",
-      something: capture()
-    }
+      something: capture(),
+    },
   ],
-  { modifiers: { value: x => `${x}!!!` } }
+  { modifiers: { value: (x: any) => `${x}!!!` } }
 );
