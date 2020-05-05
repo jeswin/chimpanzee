@@ -14,5 +14,5 @@ export const schema = wrap({
     next: { inner: result.value.key, text: capture() },
   }),
   (result: any) =>
-    result instanceof Skip ? new Skip("That is an error.") : result
+    result instanceof Skip ? new Skip("That is an error.", {} as any) : result
 );

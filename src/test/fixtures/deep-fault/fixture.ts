@@ -27,7 +27,7 @@ export const schema = {
       {
         level5a: {
           prop3: (obj: any) => (context: any) =>
-            new Fault("SCHEMA has a fault."),
+            new Fault("SCHEMA has a fault.", {} as any),
         },
       },
       "prop1"

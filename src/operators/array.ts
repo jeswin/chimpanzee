@@ -163,7 +163,7 @@ export function unordered(schema: AnySchema, opts: UnorderedOptions = {}) {
               const result = parse(schema)(items, key, parents, parentKeys)(
                 context
               );
-              return result.env && typeof result.env.needle !== "undefined"
+              return result.env && result.env.needle !== undefined
                 ? result instanceof Match
                   ? loop(
                       items.slice(result.env.needle),
@@ -173,7 +173,8 @@ export function unordered(schema: AnySchema, opts: UnorderedOptions = {}) {
                   ? loop(items.slice(result.env.needle), results)
                   : result
                 : new Fault(
-                    `The child expression in recursive() needs to be an array.`
+                    `The child expression in recursive() needs to be an array.`,
+                    env
                   );
             })()
           : results.length

@@ -1,8 +1,8 @@
 import Result from "./Result";
-import { IEnv, IMeta } from "../types";
+import { Env, IMeta } from "../types";
 
-export default class Empty extends Result {  
-  constructor(env?: IEnv, meta?: IMeta) {
+export default class Empty extends Result {
+  constructor(env: Env, meta?: IMeta) {
     super(env, meta);
 
     //Unit test support
@@ -11,10 +11,7 @@ export default class Empty extends Result {
     }
   }
 
-  updateEnv(args: IEnv) {
-    return new Empty(
-      typeof this.env !== "undefined" ? { ...this.env, ...args } : args,
-      this.meta
-    );
+  updateEnv(args: Env) {
+    return new Empty({ ...this.env, ...args }, this.meta);
   }
 }

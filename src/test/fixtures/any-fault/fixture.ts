@@ -7,7 +7,8 @@ export const input = {
 };
 
 const schema1 = {
-  level4: (obj: any) => (context: any) => new Fault("SCHEMA1 has a Fault."),
+  level4: (obj: any) => (context: any) =>
+    new Fault("SCHEMA1 has a Fault.", {} as any),
 };
 
 const schema2 = {

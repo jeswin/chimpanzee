@@ -14,7 +14,7 @@ export const schema = {
   level1: {
     prop1: capture(),
     prop2: optional((obj: any) => (context: any) =>
-      new Fault("SCHEMA has a fault.")
+      new Fault("SCHEMA has a fault.", {} as any)
     ),
   },
 };

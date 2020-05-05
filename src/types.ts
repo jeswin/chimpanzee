@@ -13,7 +13,17 @@ Namely { obj, key, parent, parentKeys }
 
 It may optionally contain others details which were parsed from the env.
 */
-export type IEnv = any;
+export type EnvProps = {
+  obj: any;
+  key: string;
+  parents: any[];
+  parentKeys: string[];
+  skippedSchemas?: AnySchema[];
+  skippedResults?: any[];
+  needle?: number;
+};
+
+export type Env = EnvProps & { [key: string]: any };
 
 /*
   Meta contains information about the currently parsed schema and its parameters.
@@ -50,9 +60,7 @@ export type LiteralObjectSchema = {
   [key: string]: LiteralSchema | Schema<any>;
 };
 
-export type LiteralArraySchema = Array<
-  LiteralSchema | Schema<any> 
->;
+export type LiteralArraySchema = Array<LiteralSchema | Schema<any>>;
 
 export type LiteralSchema =
   | Primitive

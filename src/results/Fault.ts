@@ -3,12 +3,12 @@ const IS_DEBUG =
   process.env.CHIMPANZEE_DEBUG === "1";
 
 import Result from "./Result";
-import { IEnv, IMeta } from "../types";
+import { Env, IMeta } from "../types";
 
 export default class Fault extends Result {
   message: string;
 
-  constructor(message: string, env?: IEnv, meta?: IMeta) {
+  constructor(message: string, env: Env, meta?: IMeta) {
     super(env, meta);
     this.message = message;
 
@@ -22,11 +22,7 @@ export default class Fault extends Result {
     }
   }
 
-  updateEnv(args: IEnv) {
-    return new Fault(
-      this.message,
-      typeof this.env !== "undefined" ? { ...this.env, ...args } : args,
-      this.meta
-    );
+  updateEnv(args: { [key: string]: any }) {
+    return new Fault(this.message, { ...this.env, ...args }, this.meta);
   }
 }

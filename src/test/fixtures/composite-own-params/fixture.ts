@@ -22,7 +22,7 @@ export const schema = composite(
   {
     build: (obj: any) => (context: any) => (result: any) =>
       result instanceof Match
-        ? new Match({ third: "yaaay", ...result.value })
+        ? new Match({ third: "yaaay", ...result.value }, {} as any)
         : result,
   }
 );
