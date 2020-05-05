@@ -1,7 +1,8 @@
 import { Schema } from "../schemas";
-import { Value, IContext } from "../types";
+import { Value, IContext, ParseFunc } from "../types";
+import { Result } from "../results";
 
-export default function (schema: Schema<Function>) {
+export default function (schema: Schema<ParseFunc<any, any>>) {
   return (_obj: Value, key: string, parents: Value[], parentKeys: string[]) => (
     context: IContext
   ) => {

@@ -9,6 +9,8 @@ import {
   Primitive,
   LiteralObjectSchema,
   LiteralArraySchema,
+  ParseFunc,
+  Value,
 } from "../types";
 
 export { default as Schema } from "./Schema";
@@ -46,7 +48,7 @@ export function toSchema(source: AnySchema): Schema<any> {
     : isPrimitiveSchema(source)
     ? new PrimitiveSchema(source)
     : source instanceof Function
-    ? new FunctionSchema(source)
+    ? new FunctionSchema(source as ParseFunc<Value, any>)
     : isLiteralArraySchema(source)
     ? new ArraySchema(source)
     : source.constructor === Object

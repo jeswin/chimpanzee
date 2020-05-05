@@ -4,6 +4,7 @@ import {
   Primitive,
   LiteralArraySchema,
   LiteralObjectSchema,
+  ParseFunc,
 } from "../types";
 import {
   ArraySchema,
@@ -17,7 +18,7 @@ export function arr(schema: LiteralArraySchema, params?: IParams) {
   return new ArraySchema(schema, getParams(params), meta);
 }
 
-export function func(schema: Function, params?: IParams) {
+export function func(schema: ParseFunc<any, any>, params?: IParams) {
   const meta = { type: "builtins.func", schema, params };
   return new FunctionSchema(schema, getParams(params), meta);
 }

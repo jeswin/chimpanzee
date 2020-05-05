@@ -35,7 +35,7 @@ const urlSchema = [
 
 export const schema = {
   level1: recursive(
-    any([commentsSchema, urlSchema, titleSchema, ["."], ["promote"]])
+    any([commentsSchema, urlSchema, titleSchema as any, ["."], ["promote"]])
   ),
   hello: capture(),
 };

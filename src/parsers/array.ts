@@ -2,18 +2,38 @@ import { Match, Empty, Skip, Fault, Result } from "../results";
 import parse from "../parse";
 import { wrapSchemaIfLiteralChild } from "./literals";
 import exception from "../exception";
-import { Value, IContext, IParams, AnySchema } from "../types";
-import { FunctionSchema, Schema } from "../schemas";
+import {
+  Value,
+  IContext,
+  IParams,
+  AnySchema,
+  ParseFunc,
+  IMeta,
+} from "../types";
+import { Schema } from "../schemas";
 
-// TODO - handle params
-export function toNeedledSchema(schema: AnySchema) {
-  return schema instanceof ArrayOperator ? schema.fn : regularItem(schema);
+export function toNeedledSchema(
+  schema: AnySchema | ArrayItemSchema,
+  params?: IParams
+) {
+  return schema instanceof ArrayItemSchema
+    ? schema
+    : convertToNeedledSchema(schema, params);
 }
 
-export class ArrayOperator {
-  fn: (needle: number, params?: IParams) => FunctionSchema;
-  constructor(fn: (needle: number) => FunctionSchema) {
+export type NeedledParseFunc = (
+  needle: number
+) => ParseFunc<Array<Value>, ArrayResult>;
+
+export class ArrayItemSchema {
+  fn: NeedledParseFunc;
+  params?: IParams;
+  meta?: IMeta;
+
+  constructor(fn: NeedledParseFunc, params?: IParams, meta?: IMeta) {
     this.fn = fn;
+    this.params = params;
+    this.meta = meta;
   }
 }
 
@@ -31,32 +51,30 @@ export class ArrayResult {
   Not array types, viz optional, unordered or repeating.
   Not a sequence
 */
-function regularItem(schema: AnySchema) {
+function convertToNeedledSchema(schema: AnySchema, params?: IParams) {
   const meta = { type: "regularItem", schema };
 
-  return (needle: number, params?: IParams) =>
-    new FunctionSchema(
-      (
-        obj: Array<Value>,
-        key: string,
-        parents: Value[],
-        parentKeys: string[]
-      ) => (context: IContext) => {
-        const item = obj[needle];
-        const result = parse(schema)(
-          item,
-          `${key}.${needle}`,
-          parents.concat(obj),
-          parentKeys.concat(key)
-        )(context);
+  return new ArrayItemSchema(
+    (needle: number) => (
+      obj: Value[],
+      key: string,
+      parents: Value[],
+      parentKeys: string[]
+    ) => (context: IContext) => {
+      const item = obj[needle];
+      const result = parse(schema)(
+        item,
+        `${key}.${needle}`,
+        parents.concat(obj),
+        parentKeys.concat(key)
+      )(context);
 
-        return result instanceof Match || result instanceof Empty
-          ? new ArrayResult(result, needle + 1)
-          : new ArrayResult(result, needle);
-      },
-      {},
-      meta
-    );
+      return result instanceof Match || result instanceof Empty
+        ? new ArrayResult(result, needle + 1)
+        : new ArrayResult(result, needle);
+    },
+    params
+  );
 }
 
 export default function (schema: Schema<Array<any>>) {
@@ -79,14 +97,14 @@ export default function (schema: Schema<Array<any>>) {
             needle: number
           ): Result {
             const wrappedSchema = wrapSchemaIfLiteralChild(schema, schemas[0]);
-            const needledSchema = toNeedledSchema(wrappedSchema);
+            const needledSchema = toNeedledSchema(
+              wrappedSchema,
+              schema.params && schema.params.modifiers
+                ? schema.params.modifiers
+                : {}
+            );
             const { result, needle: updatedNeedle } = parse(
-              needledSchema(
-                needle,
-                schema.params && schema.params.modifiers
-                  ? schema.params.modifiers
-                  : {}
-              )
+              needledSchema.fn(needle)
             )(
               obj,
               key,

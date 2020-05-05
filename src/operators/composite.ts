@@ -11,10 +11,9 @@ import {
   isLiteralArraySchema,
 } from "../schemas";
 import { wrap } from "./wrap";
-import { ArrayOperator } from "../parsers/array";
 
 function getSchema(
-  schema: AnySchema | ArrayOperator,
+  schema: AnySchema,
   paramSelector: string
 ): AnySchema {
   // If the schema is a Schema instance

@@ -1,6 +1,5 @@
 import { Schema } from "./schemas";
-import { Result } from "./results";
-import { ArrayOperator } from "./parsers/array";
+import { ArrayItemSchema } from "./parsers/array";
 
 /*
   Params represent the params passed to a schema.
@@ -52,7 +51,7 @@ export type LiteralObjectSchema = {
 };
 
 export type LiteralArraySchema = Array<
-  LiteralSchema | Schema<any> | ArrayOperator
+  LiteralSchema | Schema<any> 
 >;
 
 export type LiteralSchema =
@@ -69,8 +68,8 @@ export type AnySchema = Schema<any> | LiteralSchema;
 /*
   A function derived from a schema that can parse an input.
 */
-export type ParseFunc<TResult> = (
-  obj: Value,
+export type ParseFunc<TValue, TResult> = (
+  obj: TValue,
   key: string,
   parents: Value[],
   parentKeys: string[]
@@ -79,4 +78,6 @@ export type ParseFunc<TResult> = (
 /*
   A function which takes a Schema and returns a callable ParseFunc.  
 */
-export type SchemaParser<T> = (schema: Schema<T>) => ParseFunc<Result>;
+export type SchemaParser<TSchema, TValue, TResult> = (
+  schema: Schema<TSchema>
+) => ParseFunc<TValue, TResult>;

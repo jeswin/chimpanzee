@@ -25,7 +25,7 @@ export default abstract class Schema<T> {
     this.meta = meta;
   }
 
-  abstract getParseFunc(): SchemaParser<T>;
+  abstract getParseFunc(): SchemaParser<T, any, any>;
 
   then(
     fnSuccessSchema: FnGetSchemaForResult,
