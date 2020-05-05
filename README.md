@@ -1,9 +1,7 @@
 # chimpanzee
 
-Chimpanzee is a library with which you can write a "Schema" for traversing trees structures and capturing values of certain nodes.
+Chimpanzee is a library written in TypeScript with which you can write a "Schema" for traversing trees structures and capturing values of certain nodes.
 This is especially useful for analyzing ASTs, which can be fairly large and complex. Schemas can be composed, allowing common structures to be abstracted out.
-
-This project is being maintained at gitlab.com/looptype. Everything else is just a mirror.
 
 ## Installation
 

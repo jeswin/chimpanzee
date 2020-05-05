@@ -1,6 +1,6 @@
 {
   "name": "chimpanzee",
-  "version": "0.0.71",
+  "version": "1.0.0",
   "author": "Jeswin Kumar<jeswinpk@agilehead.com>",
   "scripts": {
     "build": "./build.sh",
