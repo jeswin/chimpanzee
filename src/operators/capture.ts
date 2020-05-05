@@ -7,12 +7,12 @@ import { isObject } from "../utils/obj";
 
 export type Predicate = (value: Value) => boolean;
 
-export function capture(params?: IParams) {
+export function capture(params?: string | IParams) {
   return captureIf((obj) => typeof obj !== "undefined", params);
 }
 
-export function captureIf(predicate: Predicate, params?: IParams) {
-  return take(predicate, params);
+export function captureIf(predicate: Predicate, params?: string | IParams) {
+  return take(predicate, {}, params);
 }
 
 export function modify(
@@ -20,20 +20,29 @@ export function modify(
   modifier: IModifier,
   params?: IParams
 ) {
-  return take(predicate, params, { modifier });
+  return take(predicate, { modifier }, params);
 }
 
-export function captureAndParse(schema: AnySchema, params?: IParams) {
-  return takeWithSchema((obj) => typeof obj !== "undefined", schema, params);
+export function captureAndParse(schema: AnySchema, params?: string | IParams) {
+  return takeWithSchema(
+    (obj) => typeof obj !== "undefined",
+    schema,
+    {},
+    params
+  );
 }
 
 export function literal(what: Value, params?: IParams) {
-  return take((x) => x === what, params, {
-    skipMessage: (x: Value) =>
-      `Expected value to be ${(what as any).toString()} but got ${
-        x !== undefined ? x.toString() : "undefined"
-      }.`,
-  });
+  return take(
+    (x) => x === what,
+    {
+      skipMessage: (x: Value) =>
+        `Expected value to be ${(what as any).toString()} but got ${
+          x !== undefined ? x.toString() : "undefined"
+        }.`,
+    },
+    params
+  );
 }
 
 export type IModifier = (value: Value) => Value;
@@ -45,8 +54,8 @@ export type IOptions = {
 
 export function take(
   predicate: Predicate,
-  params: IParams = {},
-  options: IOptions = {}
+  options: IOptions,
+  params?: string | IParams
 ) {
   const meta = { type: "take", undefined, params, predicate, options };
 
@@ -73,8 +82,8 @@ export function take(
 export function takeWithSchema(
   predicate: Predicate,
   schema: AnySchema,
-  params: IParams = {},
-  options: IOptions = {}
+  options: IOptions = {},
+  params?: string | IParams
 ) {
   const meta = { type: "take", schema, params, predicate, options };
 

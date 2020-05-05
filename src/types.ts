@@ -5,7 +5,26 @@ import { ArrayItemSchema } from "./parsers/array";
   Params represent the params passed to a schema.
   Some params are schema specific, while many are applicable to all.
 */
-export type IParams = any;
+export type IParams = {
+  key?: string;
+  name?: string;
+  selector?: string;
+  mergeArray?: boolean;
+  reuseContext?: boolean;
+  build?: ParseFunc<any, any>;
+  exact?: boolean;
+  modifiers?: {
+    object?: (obj: any) => any;
+    property?: (obj: any, key: string) => any;
+    value?: (val: any) => any;
+  };
+  order?: number;
+  replace?: boolean;
+  unmodified?: {
+    property?: boolean;
+    object?: boolean;
+  };
+};
 
 /*
 Env represents the env in which the parsing happened.

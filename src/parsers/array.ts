@@ -100,7 +100,7 @@ export default function (schema: Schema<Array<any>>) {
             const needledSchema = toNeedledSchema(
               wrappedSchema,
               schema.params && schema.params.modifiers
-                ? schema.params.modifiers
+                ? { modifiers: schema.params.modifiers }
                 : {}
             );
             const { result, needle: updatedNeedle } = parse(

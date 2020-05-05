@@ -64,7 +64,7 @@ export function composite(
     (params) => !params.name || params.name === "default"
   )
     ? paramsList
-    : [{ name: "default" }].concat(paramsList);
+    : [{ name: "default" } as IParams].concat(paramsList);
 
   const schemas = normalizedParamsList.map((params) => {
     const schemaForParam =
