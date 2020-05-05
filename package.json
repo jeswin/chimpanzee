@@ -3,8 +3,9 @@
   "version": "0.0.71",
   "author": "Jeswin Kumar<jeswinpk@agilehead.com>",
   "scripts": {
+    "build": "./build.sh",
     "test": "./build.sh && mocha dist/test/test.js",
-    "debug": "mocha --debug-brk dist/test/test.js"
+    "debug": "./build.sh && mocha --inspect-brk dist/test/test.js"
   },
   "main": "dist/index.js",
   "dependencies": {

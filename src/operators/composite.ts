@@ -69,9 +69,8 @@ export function composite(
 
   const schemas = normalizedParamsList.map((params) => {
     const schemaForParam =
-      (getSchema(schema, (params && params.name) || "default") || {}, params);
+      getSchema(schema, (params && params.name) || "default") || {};
 
-    console.log("schemaForParam", schemaForParam);
     return isLiteralObjectSchema(schemaForParam)
       ? new ObjectSchema(schemaForParam, params)
       : wrap(schemaForParam, params);
