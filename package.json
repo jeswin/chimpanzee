@@ -1,6 +1,6 @@
 {
   "name": "chimpanzee",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Jeswin Kumar<jeswinpk@agilehead.com>",
   "scripts": {
     "build": "./build.sh",
@@ -9,7 +9,7 @@
   },
   "main": "dist/index.js",
   "dependencies": {
-    "lazily": "^1.0.0"
+    "lazily": "^1.0.1"
   },
   "devDependencies": {
     "@types/mocha": "^8.0.2",
