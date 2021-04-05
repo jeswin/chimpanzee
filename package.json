@@ -1,6 +1,6 @@
 {
   "name": "chimpanzee",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "author": "Jeswin Kumar<jeswinpk@agilehead.com>",
   "repository": {
     "type": "git",
@@ -13,13 +13,13 @@
   },
   "main": "dist/index.js",
   "dependencies": {
-    "lazily": "1.0.1"
+    "lazily": "^1.0.3"
   },
   "devDependencies": {
-    "@types/mocha": "8.0.2",
-    "@types/should": "13.0.0",
-    "mocha": "8.1.1",
-    "should": "13.2.3"
+    "@types/mocha": "^8.2.2",
+    "@types/should": "^13.0.0",
+    "mocha": "^8.3.2",
+    "should": "^13.2.3"
   },
   "license": "MIT"
 }
