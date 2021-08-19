@@ -1,4 +1,4 @@
-import { optional, capture } from "../../../";
+import { optional, capture } from "../../../index.js";
 
 export const input = {
   level1: {

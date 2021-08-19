@@ -1,4 +1,4 @@
-import { any, captureIf } from "../../../";
+import { any, captureIf } from "../../../index.js";
 
 export const input = {
   prop1: { prop2: "hello" }

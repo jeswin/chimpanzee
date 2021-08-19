@@ -1,4 +1,4 @@
-import { exists, capture } from "../../../";
+import { exists, capture } from "../../../index.js";
 
 export const input = {
   prop1: "val1"

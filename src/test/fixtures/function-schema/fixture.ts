@@ -1,4 +1,4 @@
-import { Match } from "../../../";
+import { Match } from "../../../index.js";
 
 export const input = {
   hello: "world",

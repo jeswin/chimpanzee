@@ -1,4 +1,4 @@
-import { composite, capture } from "../../../";
+import { composite, capture } from "../../../index.js";
 
 export const input = {
   node: {

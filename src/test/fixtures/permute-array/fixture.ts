@@ -1,4 +1,4 @@
-import { permuteArray } from "../../../";
+import { permuteArray } from "../../../index.js";
 
 export function fn() {
   const result = permuteArray([1, 2], [10, 20, 30]);

@@ -1,4 +1,4 @@
-import { number, Match } from "../../../";
+import { number, Match } from "../../../index.js";
 
 export const input = {
   level1: {

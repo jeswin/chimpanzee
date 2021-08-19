@@ -1,4 +1,4 @@
-import { deep, Fault } from "../../../";
+import { deep, Fault } from "../../../index.js";
 
 export const input = {
   level1: {

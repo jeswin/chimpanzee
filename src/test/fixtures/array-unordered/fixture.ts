@@ -1,4 +1,4 @@
-import { capture, unordered, bool, string } from "../../../";
+import { capture, unordered, bool, string } from "../../../index.js";
 
 export const input = {
   level1: ["one", "two", true]

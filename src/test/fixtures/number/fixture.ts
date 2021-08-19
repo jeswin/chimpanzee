@@ -1,4 +1,4 @@
-import { number } from "../../../";
+import { number } from "../../../index.js";
 
 export const input = {
   hello: 9

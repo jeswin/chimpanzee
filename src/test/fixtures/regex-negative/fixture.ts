@@ -1,4 +1,4 @@
-import { regex } from "../../../";
+import { regex } from "../../../index.js";
 
 export const input = {
   hello: "planet"

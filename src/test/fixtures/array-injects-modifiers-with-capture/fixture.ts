@@ -1,4 +1,4 @@
-import { builtins as $, literal, capture } from "../../../";
+import { builtins as $, literal, capture } from "../../../index.js";
 
 export const input = ["world"];
 

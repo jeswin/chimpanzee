@@ -1,4 +1,4 @@
-import { permuteObject } from "../../../";
+import { permuteObject } from "../../../index.js";
 
 export function fn() {
   const result = permuteObject(["left", "right"], {

@@ -1,4 +1,4 @@
-import { literal } from "../../../";
+import { literal } from "../../../index.js";
 
 export const input = {
   hello: "world"

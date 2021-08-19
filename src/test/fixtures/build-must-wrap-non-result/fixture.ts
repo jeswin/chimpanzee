@@ -1,4 +1,4 @@
-import { builtins as $, capture, Match } from "../../../";
+import { builtins as $, capture, Match } from "../../../index.js";
 
 export const input = {
   hello: "world",

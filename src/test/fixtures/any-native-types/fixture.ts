@@ -1,4 +1,4 @@
-import { any } from "../../../";
+import { any } from "../../../index.js";
 
 export const input = {
   operator: "<"

@@ -1,4 +1,4 @@
-import { parse, capture, Match } from "../../../";
+import { parse, capture, Match } from "../../../index.js";
 
 export const input = {
   level1: {

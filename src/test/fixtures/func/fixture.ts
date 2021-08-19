@@ -1,4 +1,4 @@
-import { func } from "../../../";
+import { func } from "../../../index.js";
 
 export function testFunc() {}
 

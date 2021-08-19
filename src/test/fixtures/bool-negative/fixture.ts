@@ -1,4 +1,4 @@
-import { bool } from "../../../";
+import { bool } from "../../../index.js";
 
 export const input = {
   hello: "world"

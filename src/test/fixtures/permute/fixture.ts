@@ -1,4 +1,4 @@
-import { permute } from "../../../";
+import { permute } from "../../../index.js";
 
 export function fn() {
   const result = permute([1, 2, 3]);

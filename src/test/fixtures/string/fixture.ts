@@ -1,4 +1,4 @@
-import { string } from "../../../";
+import { string } from "../../../index.js";
 
 export const input = {
   hello: "world"

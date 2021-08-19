@@ -1,4 +1,4 @@
-import { map, capture } from "../../../";
+import { map, capture } from "../../../index.js";
 
 export const input = {
   prop1: "hello",

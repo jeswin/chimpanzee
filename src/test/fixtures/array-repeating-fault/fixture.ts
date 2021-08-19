@@ -1,4 +1,4 @@
-import { repeating, Match, Fault } from "../../../";
+import { repeating, Match, Fault } from "../../../index.js";
 
 export const input = {
   level1: ["one", "two", "three"],

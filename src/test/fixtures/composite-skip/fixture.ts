@@ -1,4 +1,4 @@
-import { composite, capture, literal } from "../../../";
+import { composite, capture, literal } from "../../../index.js";
 import { any } from "../../../operators/any";
 
 export const input = {

@@ -5,7 +5,7 @@ import {
   literal,
   repeating,
   recursive,
-} from "../../../";
+} from "../../../index.js";
 
 export const input = {
   level1: [

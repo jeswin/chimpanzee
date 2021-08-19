@@ -1,4 +1,4 @@
-import { wrap, object, capture } from "../../../";
+import { wrap, object, capture } from "../../../index.js";
 import { any } from "../../../operators/any";
 
 export const input = {

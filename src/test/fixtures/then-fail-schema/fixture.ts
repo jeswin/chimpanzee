@@ -1,4 +1,4 @@
-import { wrap, object, capture, Skip } from "../../../";
+import { wrap, object, capture, Skip } from "../../../index.js";
 
 export const input = {
   hello: "world",

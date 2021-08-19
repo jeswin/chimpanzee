@@ -6,7 +6,7 @@ import {
   Match,
   Skip,
   Fault,
-} from "../../../";
+} from "../../../index.js";
 
 export const input = {
   level1: ["one", true, "two"],

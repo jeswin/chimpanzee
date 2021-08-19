@@ -1,4 +1,4 @@
-import { capture, empty } from "../../../";
+import { capture, empty } from "../../../index.js";
 
 export const input = {
   prop1: "hello",

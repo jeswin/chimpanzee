@@ -1,4 +1,4 @@
-import { captureIf } from "../../../";
+import { captureIf } from "../../../index.js";
 
 export const input = {
   hello: "world"

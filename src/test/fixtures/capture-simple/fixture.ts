@@ -1,4 +1,4 @@
-import { capture } from "../../../";
+import { capture } from "../../../index.js";
 
 export const input = {
   hello: "world"

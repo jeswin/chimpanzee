@@ -1,4 +1,4 @@
-import { builtins as $, wrap, composite, capture } from "../../../";
+import { builtins as $, wrap, composite, capture } from "../../../index.js";
 
 export const input = {
   node: {

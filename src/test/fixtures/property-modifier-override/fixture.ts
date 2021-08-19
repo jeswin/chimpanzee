@@ -1,4 +1,4 @@
-import { builtins as $, captureIf } from "../../../";
+import { builtins as $, captureIf } from "../../../index.js";
 
 export const input = {
   hello: "world",

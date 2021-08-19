@@ -1,4 +1,4 @@
-import { builtins as $, capture } from "../../../";
+import { builtins as $, capture } from "../../../index.js";
 
 export const input = {
   level1: [

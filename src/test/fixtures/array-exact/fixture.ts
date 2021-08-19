@@ -1,4 +1,4 @@
-import { bool, builtins as $, string, number } from "../../../";
+import { bool, builtins as $, string, number } from "../../../index.js";
 
 export const input = {
   level1: [true, "two", 3, 4]

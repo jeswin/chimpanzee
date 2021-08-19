@@ -2,7 +2,7 @@ import {
   bool,
   string,
   number
-} from "../../../";
+} from "../../../index.js";
 
 export const input = {
   level1: [true, "two", 3, 4]

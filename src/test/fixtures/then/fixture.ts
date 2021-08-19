@@ -1,4 +1,4 @@
-import { wrap, object, capture } from "../../../";
+import { wrap, object, capture } from "../../../index.js";
 
 export const input = {
   hello: "world",

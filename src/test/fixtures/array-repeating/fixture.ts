@@ -1,4 +1,4 @@
-import { capture, repeating, string } from "../../../";
+import { capture, repeating, string } from "../../../index.js";
 
 export const input = {
   level1: ["one", "two", "three"]

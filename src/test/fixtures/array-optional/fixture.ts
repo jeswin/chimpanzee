@@ -4,7 +4,7 @@ import {
   bool,
   number,
   string
-} from "../../../";
+} from "../../../index.js";
 
 export const input = {
   level1: [20, "HELLO", true, 100]
