@@ -1,6 +1,6 @@
 {
   "name": "chimpanzee",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "main": "dist/index.js",
   "type": "module",
   "types": "src/index.ts",
@@ -12,10 +12,10 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "build": "npm run clean && mkdir -p dist && npx tsc",
-    "test": "node --experimental-specifier-resolution=node node_modules/mocha/lib/cli/cli.js dist/test/test.js"
+    "test": "mocha dist/test/test.js"
   },
   "dependencies": {
-    "lazily": "^2.0.0"
+    "lazily": "^2.0.1"
   },
   "devDependencies": {
     "@types/mocha": "^9.0.0",

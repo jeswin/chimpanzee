@@ -1,6 +1,6 @@
-import { Empty, Skip } from "../results";
-import { Schema } from "../schemas";
-import { Value, IContext, Primitive } from "../types";
+import { Empty, Skip } from "../results/index.js";
+import { Schema } from "../schemas/index.js";
+import { Value, IContext, Primitive } from "../types.js";
 
 export default function (schema: Schema<Primitive>) {
   return (_obj: Value, key: string, parents: Value[], parentKeys: string[]) => (

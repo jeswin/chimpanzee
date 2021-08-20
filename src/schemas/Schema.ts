@@ -8,9 +8,9 @@ import {
   IContext,
   SchemaParser,
   AnySchema,
-} from "../types";
-import parse from "../parse";
-import { Match, Empty, Result } from "../results";
+} from "../types.js";
+import parse from "../parse.js";
+import { Match, Empty, Result } from "../results/index.js";
 
 export type FnGetSchemaForResult = (result: Result) => AnySchema;
 

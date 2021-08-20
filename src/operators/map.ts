@@ -1,8 +1,8 @@
-import { Match } from "../results";
-import parse from "../parse";
-import { getParams } from "./utils";
-import { Value, IContext, IParams, AnySchema } from "../types";
-import { FunctionSchema } from "../schemas";
+import { Match } from "../results/index.js";
+import parse from "../parse.js";
+import { getParams } from "./utils.js";
+import { Value, IContext, IParams, AnySchema } from "../types.js";
+import { FunctionSchema } from "../schemas/index.js";
 
 export function map(
   schema: AnySchema,

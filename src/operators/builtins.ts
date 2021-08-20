@@ -1,17 +1,17 @@
-import { getParams } from "./utils";
+import { getParams } from "./utils.js";
 import {
   IParams,
   Primitive,
   LiteralArraySchema,
   LiteralObjectSchema,
   ParseFunc,
-} from "../types";
+} from "../types.js";
 import {
   ArraySchema,
   FunctionSchema,
   PrimitiveSchema,
   ObjectSchema,
-} from "../schemas";
+} from "../schemas/index.js";
 
 export function arr(schema: LiteralArraySchema, params?: IParams) {
   const meta = { type: "builtins.arr", schema, params };

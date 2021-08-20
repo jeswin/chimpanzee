@@ -1,6 +1,6 @@
-import Schema from "./Schema";
-import array from "../parsers/array";
-import { LiteralArraySchema } from "../types";
+import Schema from "./Schema.js";
+import array from "../parsers/array.js";
+import { LiteralArraySchema } from "../types.js";
 
 export default class ArraySchema extends Schema<LiteralArraySchema> {
   getParseFunc() {

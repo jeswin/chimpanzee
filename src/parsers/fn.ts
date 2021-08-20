@@ -1,6 +1,5 @@
-import { Schema } from "../schemas";
-import { Value, IContext, ParseFunc } from "../types";
-import { Result } from "../results";
+import { Schema } from "../schemas/index.js";
+import { Value, IContext, ParseFunc } from "../types.js";
 
 export default function (schema: Schema<ParseFunc<any, any>>) {
   return (_obj: Value, key: string, parents: Value[], parentKeys: string[]) => (

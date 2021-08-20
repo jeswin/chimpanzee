@@ -1,9 +1,9 @@
-import { Match, Empty, Skip } from "../results";
-import parse from "../parse";
-import { getParams } from "./utils";
-import { Value, IParams, IContext, AnySchema } from "../types";
-import { FunctionSchema } from "../schemas";
-import { isObject } from "../utils/obj";
+import { Match, Empty, Skip } from "../results/index.js";
+import parse from "../parse.js";
+import { getParams } from "./utils.js";
+import { Value, IParams, IContext, AnySchema } from "../types.js";
+import { FunctionSchema } from "../schemas/index.js";
+import { isObject } from "../utils/obj.js";
 
 export type Predicate = (value: Value) => boolean;
 

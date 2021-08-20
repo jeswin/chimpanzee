@@ -1,16 +1,16 @@
-import { Match, Empty, Result } from "../results";
-import parse from "../parse";
-import { getParams } from "./utils";
-import merge from "../utils/merge";
-import { IParams, Value, IContext, AnySchema } from "../types";
+import { Match, Empty, Result } from "../results/index.js";
+import parse from "../parse.js";
+import { getParams } from "./utils.js";
+import merge from "../utils/merge.js";
+import { IParams, Value, IContext, AnySchema } from "../types.js";
 import {
   ObjectSchema,
   Schema,
   FunctionSchema,
   isLiteralObjectSchema,
   isLiteralArraySchema,
-} from "../schemas";
-import { wrap } from "./wrap";
+} from "../schemas/index.js";
+import { wrap } from "./wrap.js";
 
 function getSchema(
   schema: AnySchema,

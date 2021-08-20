@@ -1,5 +1,5 @@
-import Result from "./Result";
-import { Env, IMeta } from "../types";
+import Result from "./Result.js";
+import { Env, IMeta } from "../types.js";
 
 export default class Empty extends Result {
   constructor(env: Env, meta?: IMeta) {

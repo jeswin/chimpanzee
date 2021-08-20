@@ -1,7 +1,6 @@
-import Schema from "./Schema";
-import fn from "../parsers/fn";
-import { Result } from "../results";
-import { ParseFunc } from "../types";
+import Schema from "./Schema.js";
+import fn from "../parsers/fn.js";
+import { ParseFunc } from "../types.js";
 
 export default class FunctionSchema extends Schema<ParseFunc<any, any>> {
   getParseFunc() {

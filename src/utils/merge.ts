@@ -1,4 +1,4 @@
-import { IObject } from "../types";
+import { IObject } from "../types.js";
 
 function isObject(item: any): item is IObject {
   // TODO remove

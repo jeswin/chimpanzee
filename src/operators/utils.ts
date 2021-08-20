@@ -1,4 +1,4 @@
-import { IParams } from "../types";
+import { IParams } from "../types.js";
 
 export function getParams(params?: string | IParams): IParams {
   return typeof params === "string"

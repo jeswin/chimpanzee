@@ -1,16 +1,16 @@
 import "mocha";
 import "should";
-import { Match, Skip, Fault, Empty } from "../results";
-import { match } from "..";
+import { Match, Skip, Fault, Empty } from "../results/index.js";
+import { match } from "../index.js";
 
 describe("chimpanzee", () => {
   function run([description, dir, resultType]: [string, string, string]) {
     it(`${description}`, async () => {
       if (["match", "empty", "skip", "fault"].includes(resultType)) {
         (global as any).__chimpanzeeTestContext = [];
-        const fixture = await import(`./fixtures/${dir}/fixture`);
+        const fixture = await import(`./fixtures/${dir}/fixture.js`);
         const actual = match(fixture.schema, fixture.input);
-        const expected = await import(`./fixtures/${dir}/expected`);
+        const expected = await import(`./fixtures/${dir}/expected.js`);
         if (resultType === "match") {
           actual.should.be.an.instanceOf(Match);
           ((actual as Match).value as any).should.deepEqual(expected.result);
@@ -43,7 +43,7 @@ describe("chimpanzee", () => {
           }
         }
       } else {
-        const fixture = await import(`./fixtures/${dir}/fixture`);
+        const fixture = await import(`./fixtures/${dir}/fixture.js`);
         fixture.fn();
       }
     });

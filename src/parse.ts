@@ -1,7 +1,7 @@
-import { Result, Match } from "./results";
+import { Result, Match } from "./results/index.js";
 
-import { Value, IContext, ParseFunc } from "./types";
-import { toSchema } from "./schemas";
+import { Value, IContext, ParseFunc } from "./types.js";
+import { toSchema } from "./schemas/index.js";
 
 /*
   EntryEvalFunction vs EvalFunction:

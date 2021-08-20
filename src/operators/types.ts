@@ -1,9 +1,9 @@
-import { captureIf } from "./capture";
-import { Skip } from "../results";
-import parse from "../parse";
-import { getParams } from "./utils";
-import { IParams, IContext, Value } from "../types";
-import { FunctionSchema } from "../schemas";
+import { captureIf } from "./capture.js";
+import { Skip } from "../results/index.js";
+import parse from "../parse.js";
+import { getParams } from "./utils.js";
+import { IParams, IContext, Value } from "../types.js";
+import { FunctionSchema } from "../schemas/index.js";
 
 export function number(params?: IParams) {
   return checkType("number", params);

@@ -1,4 +1,4 @@
-import { IObject } from "../types";
+import { IObject } from "../types.js";
 
 // Boris Yuzhakov's one liner.
 export function permute<T>(a: Array<T>): Array<Array<T>> {

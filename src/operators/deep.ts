@@ -1,9 +1,9 @@
-import { Skip, Result } from "../results";
-import parse from "../parse";
-import { getParams } from "./utils";
-import { Value, IContext, IObject, IMeta, IParams, AnySchema } from "../types";
-import { FunctionSchema } from "../schemas";
-import { isObject } from "../utils/obj";
+import { Skip, Result } from "../results/index.js";
+import parse from "../parse.js";
+import { getParams } from "./utils.js";
+import { Value, IContext, IObject, IMeta, IParams, AnySchema } from "../types.js";
+import { FunctionSchema } from "../schemas/index.js";
+import { isObject } from "../utils/obj.js";
 
 function traverseObject(schema: AnySchema, params: IParams, meta: IMeta) {
   return function (

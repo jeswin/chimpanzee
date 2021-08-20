@@ -1,8 +1,8 @@
-import { Match, Empty, Skip, Fault, Result } from "../results";
-import { FunctionSchema } from "../schemas";
-import parse from "../parse";
-import { getParams } from "./utils";
-import { Value, IContext, IParams, AnySchema } from "../types";
+import { Match, Empty, Skip, Fault, Result } from "../results/index.js";
+import { FunctionSchema } from "../schemas/index.js";
+import parse from "../parse.js";
+import { getParams } from "./utils.js";
+import { Value, IContext, IParams, AnySchema } from "../types.js";
 
 export function any(schemas: AnySchema[], params?: IParams) {
   const meta = { type: "any", schemas, params };

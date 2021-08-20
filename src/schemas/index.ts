@@ -1,9 +1,9 @@
-import Schema from "./Schema";
-import ArraySchema from "./ArraySchema";
-import ObjectSchema from "./ObjectSchema";
-import PrimitiveSchema from "./PrimitiveSchema";
-import FunctionSchema from "./FunctionSchema";
-import exception from "../exception";
+import Schema from "./Schema.js";
+import ArraySchema from "./ArraySchema.js";
+import ObjectSchema from "./ObjectSchema.js";
+import PrimitiveSchema from "./PrimitiveSchema.js";
+import FunctionSchema from "./FunctionSchema.js";
+import exception from "../exception.js";
 import {
   AnySchema,
   Primitive,
@@ -11,13 +11,13 @@ import {
   LiteralArraySchema,
   ParseFunc,
   Value,
-} from "../types";
+} from "../types.js";
 
-export { default as Schema } from "./Schema";
-export { default as ArraySchema } from "./ArraySchema";
-export { default as ObjectSchema } from "./ObjectSchema";
-export { default as PrimitiveSchema } from "./PrimitiveSchema";
-export { default as FunctionSchema } from "./FunctionSchema";
+export { default as Schema } from "./Schema.js";
+export { default as ArraySchema } from "./ArraySchema.js";
+export { default as ObjectSchema } from "./ObjectSchema.js";
+export { default as PrimitiveSchema } from "./PrimitiveSchema.js";
+export { default as FunctionSchema } from "./FunctionSchema.js";
 
 export function isPrimitiveSchema(x: any): x is Primitive {
   return [

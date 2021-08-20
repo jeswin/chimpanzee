@@ -1,5 +1,5 @@
-import Result from "./Result";
-import { Env, IMeta } from "../types";
+import Result from "./Result.js";
+import { Env, IMeta } from "../types.js";
 
 export default class Skip extends Result {
   message: string;

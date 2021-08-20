@@ -1,7 +1,7 @@
-import { Match, Empty, Skip, Fault, Result } from "../results";
-import parse from "../parse";
-import { wrapSchemaIfLiteralChild } from "./literals";
-import exception from "../exception";
+import { Match, Empty, Skip, Fault, Result } from "../results/index.js";
+import parse from "../parse.js";
+import { wrapSchemaIfLiteralChild } from "./literals.js";
+import exception from "../exception.js";
 import {
   Value,
   IContext,
@@ -9,8 +9,8 @@ import {
   AnySchema,
   ParseFunc,
   IMeta,
-} from "../types";
-import { Schema } from "../schemas";
+} from "../types.js";
+import { Schema } from "../schemas/index.js";
 
 export function toNeedledSchema(
   schema: AnySchema | ArrayItemSchema,

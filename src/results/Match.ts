@@ -1,5 +1,5 @@
-import Result from "./Result";
-import { Value, Env, IMeta } from "../types";
+import Result from "./Result.js";
+import { Value, Env, IMeta } from "../types.js";
 
 export default class Match extends Result {
   value: any;

@@ -1,12 +1,12 @@
-import { Match, Empty, Skip, Fault, Result } from "../results";
-import { FunctionSchema } from "../schemas";
-import parse from "../parse";
+import { Match, Empty, Skip, Fault, Result } from "../results/index.js";
+import { FunctionSchema } from "../schemas/index.js";
+import parse from "../parse.js";
 import {
   ArrayResult,
   ArrayItemSchema,
   toNeedledSchema,
-} from "../parsers/array";
-import { Value, IContext, IParams, AnySchema } from "../types";
+} from "../parsers/array.js";
+import { Value, IContext, IParams, AnySchema } from "../types.js";
 
 /*
   Unordered does not change the needle.

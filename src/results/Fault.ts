@@ -2,8 +2,8 @@ const IS_DEBUG =
   process.env.CHIMPANZEE_DEBUG === "true" ||
   process.env.CHIMPANZEE_DEBUG === "1";
 
-import Result from "./Result";
-import { Env, IMeta } from "../types";
+import Result from "./Result.js";
+import { Env, IMeta } from "../types.js";
 
 export default class Fault extends Result {
   message: string;

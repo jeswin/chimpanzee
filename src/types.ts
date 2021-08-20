@@ -1,5 +1,5 @@
-import { Schema } from "./schemas";
-import { ArrayItemSchema } from "./parsers/array";
+import { Schema } from "./schemas/index.js";
+import { ArrayItemSchema } from "./parsers/array.js";
 
 /*
   Params represent the params passed to a schema.

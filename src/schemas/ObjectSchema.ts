@@ -1,6 +1,6 @@
-import Schema from "./Schema";
-import { LiteralObjectSchema } from "../types";
-import obj from "../parsers/obj";
+import Schema from "./Schema.js";
+import { LiteralObjectSchema } from "../types.js";
+import obj from "../parsers/obj.js";
 
 export default class ObjectSchema extends Schema<LiteralObjectSchema> {
   getParseFunc() {

@@ -1,8 +1,8 @@
-import { Empty, Skip } from "../results";
-import parse from "../parse";
-import { getParams } from "./utils";
-import { Value, IContext, AnySchema } from "../types";
-import { FunctionSchema } from "../schemas";
+import { Empty, Skip } from "../results/index.js";
+import parse from "../parse.js";
+import { getParams } from "./utils.js";
+import { Value, IContext, AnySchema } from "../types.js";
+import { FunctionSchema } from "../schemas/index.js";
 
 /*
   Parse with schema if the predicate returns true.

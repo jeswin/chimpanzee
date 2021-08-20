@@ -1,9 +1,9 @@
 import { Seq } from "lazily";
-import { Match, Empty, Skip, Fault } from "../results";
-import parse from "../parse";
-import { Schema, isLiteralObjectSchema } from "../schemas";
-import { wrapSchemaIfLiteralChild } from "./literals";
-import { Value, IContext } from "../types";
+import { Match, Empty, Skip, Fault } from "../results/index.js";
+import parse from "../parse.js";
+import { Schema, isLiteralObjectSchema } from "../schemas/index.js";
+import { wrapSchemaIfLiteralChild } from "./literals.js";
+import { Value, IContext } from "../types.js";
 
 function sortFn(schema1: Schema<any>, schema2: Schema<any>) {
   const schema1Order =

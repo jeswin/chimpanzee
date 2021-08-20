@@ -1,4 +1,4 @@
-import { Env, IMeta } from "../types";
+import { Env, IMeta } from "../types.js";
 
 export default class Result {
   //TODO: env need not be optional
