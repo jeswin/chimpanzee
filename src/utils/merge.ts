@@ -35,7 +35,7 @@ export default function merge(
                   ? isObject(item) && isObject(shorter[i])
                     ? [merge(item, shorter[i])]
                     : [item, shorter[i]]
-                  : [i]
+                  : [item]
               ),
             []
           );
