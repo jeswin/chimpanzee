@@ -4,16 +4,16 @@ import parse from "../parse.js";
 import {
   ArrayResult,
   ArrayItemSchema,
-  toNeedledSchema,
+  toIndexedSchema as toIndexedSchema,
 } from "../parsers/array.js";
 import { Value, IContext, IParams, AnySchema } from "../types.js";
 
 /*
-  Unordered does not change the needle.
+  Unordered does not change the index.
   Searching for "1" in
   [1, 4, 4, 4, 4, 5, 6, 67]
-            ^needle
-  returns [4, 4], with needle moved to 5.
+            ^index
+  returns [4, 4], with index moved to 5.
 */
 
 export type RepeatingOptions = {
@@ -27,28 +27,28 @@ export function repeating(schema: AnySchema, opts: RepeatingOptions = {}) {
   const min = opts.min || 0;
   const max = opts.max;
 
-  const needledSchema = toNeedledSchema(schema);
+  const indexedSchema = toIndexedSchema(schema);
 
   return new ArrayItemSchema(
-    (needle: number) => (
+    (index: number) => (
       obj: Array<Value>,
       key: string,
       parents: Value[],
       parentKeys: string[]
     ) => (context: IContext) => {
-      function completed(results: Result[], needle: number) {
+      function completed(results: Result[], index: number) {
         const env = { obj, key, parents, parentKeys };
         return results.length >= min && (!max || results.length <= max)
-          ? new ArrayResult(new Match(results, env, meta), needle)
+          ? new ArrayResult(new Match(results, env, meta), index)
           : new ArrayResult(
               new Skip("Incorrect number of matches.", env, meta),
-              needle
+              index
             );
       }
 
-      return (function loop(results: Result[], needle: number): ArrayResult {
-        const { result, needle: updatedNeedle } = parse(
-          needledSchema.fn(needle)
+      return (function loop(results: Result[], index: number): ArrayResult {
+        const { result, index: updatedIndex } = parse(
+          indexedSchema.fn(index)
         )(
           obj,
           key,
@@ -57,55 +57,55 @@ export function repeating(schema: AnySchema, opts: RepeatingOptions = {}) {
         )(context);
 
         return result instanceof Match || result instanceof Empty
-          ? obj.length > needle
+          ? obj.length > index
             ? loop(
                 result instanceof Match
                   ? results.concat([result.value])
                   : results,
-                updatedNeedle
+                updatedIndex
               )
             : completed(
                 result instanceof Match
                   ? results.concat([result.value])
                   : results,
-                needle
+                index
               )
           : result instanceof Skip
-          ? completed(results, needle)
-          : new ArrayResult(result, needle); // Skip or Fault
-      })([], needle);
+          ? completed(results, index)
+          : new ArrayResult(result, index); // Skip or Fault
+      })([], index);
     }
   );
 }
 
 /*
-  Unordered does not change the needle.
+  Unordered does not change the index.
   Searching for "1" in
   [1, 2, 4, 5, 6, 67]
-         ^needle
-  returns 1, with needle still pointing at 4.
-  We don't care about the needle.
+         ^index
+  returns 1, with index still pointing at 4.
+  We don't care about the index.
 */
 export type UnorderedOptions = {
   searchPrevious?: boolean;
 };
 
 export function unordered(schema: AnySchema, opts: UnorderedOptions = {}) {
-  const useNeedle = opts.searchPrevious === false ? true : false;
+  const useIndex = opts.searchPrevious === false ? true : false;
 
   const meta = { type: "unordered", schema: schema };
 
-  const needledSchema = toNeedledSchema(schema);
+  const indexedSchema = toIndexedSchema(schema);
 
   return new ArrayItemSchema(
-    (needle: number) => (
+    (index: number) => (
       obj: Array<Value>,
       key: string,
       parents: Value[],
       parentKeys: string[]
     ) => (context: IContext) =>
       (function loop(i: number): ArrayResult {
-        const { result } = parse(needledSchema.fn(i))(
+        const { result } = parse(indexedSchema.fn(i))(
           obj,
           key,
           parents,
@@ -115,7 +115,7 @@ export function unordered(schema: AnySchema, opts: UnorderedOptions = {}) {
         return result instanceof Match ||
           result instanceof Empty ||
           result instanceof Fault
-          ? new ArrayResult(result, needle)
+          ? new ArrayResult(result, index)
           : obj.length > i
           ? loop(i + 1)
           : new ArrayResult(
@@ -124,9 +124,9 @@ export function unordered(schema: AnySchema, opts: UnorderedOptions = {}) {
                 { obj, key, parents, parentKeys },
                 meta
               ),
-              needle
+              index
             );
-      })(useNeedle ? needle : 0),
+      })(useIndex ? index : 0),
     {},
     meta
   );
@@ -163,14 +163,14 @@ export function unordered(schema: AnySchema, opts: UnorderedOptions = {}) {
               const result = parse(schema)(items, key, parents, parentKeys)(
                 context
               );
-              return result.env && result.env.needle !== undefined
+              return result.env && result.env.index !== undefined
                 ? result instanceof Match
                   ? loop(
-                      items.slice(result.env.needle),
+                      items.slice(result.env.index),
                       results.concat([result.value])
                     )
                   : result instanceof Empty
-                  ? loop(items.slice(result.env.needle), results)
+                  ? loop(items.slice(result.env.index), results)
                   : result
                 : new Fault(
                     `The child expression in recursive() needs to be an array.`,
@@ -190,21 +190,21 @@ export function unordered(schema: AnySchema, opts: UnorderedOptions = {}) {
 /*
   Optional items may or may not exist.
   A Skip() is not issued when an item is not found.
-  The needle is incremented by 1 if found, otherwise it remains the same.
+  The index is incremented by 1 if found, otherwise it remains the same.
 */
 export function optionalItem(schema: AnySchema) {
   const meta = { type: "optionalItem", schema: schema };
-  const needledSchema = toNeedledSchema(schema);
+  const indexedSchema = toIndexedSchema(schema);
 
   return new ArrayItemSchema(
-    (needle: number) => (
+    (index: number) => (
       obj: Value,
       key: string,
       parents: Value[],
       parentKeys: string[]
     ) => (context: IContext) => {
       const env = { obj, key, parents, parentKeys };
-      const { result } = parse(needledSchema.fn(needle))(
+      const { result } = parse(indexedSchema.fn(index))(
         obj,
         key,
         parents,
@@ -212,10 +212,10 @@ export function optionalItem(schema: AnySchema) {
       )(context);
 
       return result instanceof Match || result instanceof Empty
-        ? new ArrayResult(result, needle + 1)
+        ? new ArrayResult(result, index + 1)
         : result instanceof Skip
-        ? new ArrayResult(new Empty(env, meta), needle)
-        : new ArrayResult(result, needle);
+        ? new ArrayResult(new Empty(env, meta), index)
+        : new ArrayResult(result, index);
     },
     {},
     meta

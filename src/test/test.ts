@@ -77,7 +77,7 @@ describe("chimpanzee", () => {
     ["array-repeating-fault", "array-repeating-fault", "fault"],
     ["array-unordered", "array-unordered", "match"],
     ["array-unordered-fault", "array-unordered-fault", "fault"],
-    ["array-unordered-with-needle", "array-unordered-with-needle", "match"],
+    ["array-unordered-with-index", "array-unordered-with-index", "match"],
     ["bool", "bool", "match"],
     ["bool-negative", "bool-negative", "skip"],
     ["build", "build", "match"],
